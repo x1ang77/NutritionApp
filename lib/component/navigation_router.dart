@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../ui/home.dart';
 import '../ui/login.dart';
+import '../ui/register.dart';
 
 class NavigationRouter extends StatelessWidget {
   NavigationRouter({Key? key, required this.initialRoute}) : super(key: key);
@@ -12,6 +13,7 @@ class NavigationRouter extends StatelessWidget {
 
   final _routes = [
     GoRoute(path: "/login", builder: (context, state) => const Login()),
+    GoRoute(path: "/register", builder: (context,state) => const Register()),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
   ];
 
