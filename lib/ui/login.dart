@@ -17,6 +17,7 @@ class _LoginState extends State<Login> {
   var _passwordError = "";
   var _name = "";
   var _nameError = "";
+  var showPass = true;
 
   _onNameChanged(value) {
     setState(() {
@@ -75,14 +76,22 @@ class _LoginState extends State<Login> {
     //     });
   }
 
+  _navigateToRegister(){
+    context.push("/register");
+  }
+
+  _showPass(bool visibility){
+    setState(() {
+      showPass = !visibility;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Image.asset(
-          //   "assets/images/loginTop.png",
-          // ),
+
           CustomPaint(
             painter: CurvePainter(),
             child: Container(),
@@ -90,11 +99,6 @@ class _LoginState extends State<Login> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Icon(
-              //   Icons.person,
-              //   size: 200,
-              //   color: Colors.grey.shade500,
-              // ),
               const Text(
                 "Welcome",
                 textDirection: TextDirection.ltr,
@@ -130,12 +134,12 @@ class _LoginState extends State<Login> {
                       elevation: 10,
                       borderRadius: BorderRadius.circular(10),
                       child: TextField(
-                        obscureText: true,
+                        obscureText: showPass,
                         onChanged: (value) => {_onPasswordChanged(value)},
                         decoration: InputDecoration(
                           hintText: "Password",
                           suffixIcon: IconButton(
-                            onPressed: () {},
+                            onPressed: () => _showPass(showPass),
                             icon: const Icon(Icons.remove_red_eye),
                           ),
                           errorText:
@@ -176,7 +180,7 @@ class _LoginState extends State<Login> {
                       height: 20,
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () => _navigateToRegister(),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
