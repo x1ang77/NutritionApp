@@ -75,14 +75,17 @@ class _LoginState extends State<Login> {
     //     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          Image.asset(
-            "assets/images/loginTop.png",
+          // Image.asset(
+          //   "assets/images/loginTop.png",
+          // ),
+          CustomPaint(
+            painter: CurvePainter(),
+            child: Container(),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -120,8 +123,9 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Material(
                       elevation: 10,
                       borderRadius: BorderRadius.circular(10),
@@ -132,43 +136,55 @@ class _LoginState extends State<Login> {
                           hintText: "Password",
                           suffixIcon: IconButton(
                             onPressed: () {},
-                            icon:const Icon(Icons.remove_red_eye),
+                            icon: const Icon(Icons.remove_red_eye),
                           ),
-                          errorText: _passwordError.isEmpty ? null : _passwordError,
+                          errorText:
+                              _passwordError.isEmpty ? null : _passwordError,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     GestureDetector(
                       onTap: () {},
                       child: const Text("Forgot your password"),
                     ),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Container(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () => _onClickTest(),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)
-                                ),
-                            padding: const EdgeInsets.symmetric(vertical: 16)
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            padding: const EdgeInsets.symmetric(vertical: 16)),
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        child: const Text("Login",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                       ),
                     ),
-                    const SizedBox(height: 20,),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     GestureDetector(
                       onTap: () {},
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text("Don't have an account? "),
-                          Text("Sign up",style: TextStyle(fontWeight: FontWeight.bold),)
+                          Text(
+                            "Sign up",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          )
                         ],
                       ),
                     ),
@@ -177,19 +193,17 @@ class _LoginState extends State<Login> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-
-                ],
+                children: [],
               ),
             ],
           ),
           Positioned(
-            bottom: 0,
+            top: 0,
             left: 0,
             right: 0,
-            child: Image.asset(
-              "assets/images/loginBottom.png",
-              fit: BoxFit.cover,
+            child: CustomPaint(
+              painter: CurvePainter(),
+              child: Container(),
             ),
           ),
         ],
@@ -199,5 +213,73 @@ class _LoginState extends State<Login> {
       //   child: const Icon(Icons.add),
       // ),
     );
+  }
+}
+
+class CurvePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint1 = Paint()
+      ..color = Color(0xFF6AC57E) // Color for the first curve
+      ..style = PaintingStyle.fill;
+
+    final paint2 = Paint()
+      ..color = Color(0xFF6AC57E) // Color for the first curve
+      ..style = PaintingStyle.fill;
+
+    // First Curve
+    final path1 = Path();
+
+    final startPoint1 = Offset(0, 120);
+    final endPoint1 = Offset(size.width, 20);
+
+    final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
+    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.15);
+
+    path1.moveTo(startPoint1.dx, startPoint1.dy);
+    path1.cubicTo(
+      controlPoint1_1.dx,
+      controlPoint1_1.dy,
+      controlPoint1_2.dx,
+      controlPoint1_2.dy,
+      endPoint1.dx,
+      endPoint1.dy,
+    );
+    path1.lineTo(size.width, 0);
+    path1.lineTo(0, 0);
+    path1.close();
+
+    canvas.drawPath(path1, paint1);
+
+
+    // Second Curve
+    final path2 = Path();
+
+    final startPoint2 = Offset(0, size.height * 0.88);
+    final endPoint2 = Offset(size.width, size.height - 20);
+
+    final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.95);
+    final controlPoint2_2 = Offset(size.width * 0.65, size.height * 0.88);
+
+    path2.moveTo(startPoint2.dx, startPoint2.dy);
+    path2.cubicTo(
+      controlPoint2_1.dx,
+      controlPoint2_1.dy,
+      controlPoint2_2.dx,
+      controlPoint2_2.dy,
+      endPoint2.dx,
+      endPoint2.dy,
+    );
+    path2.lineTo(size.width, size.height);
+    path2.lineTo(0, size.height);
+    path2.close();
+
+    canvas.drawPath(path2, paint2);
+
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }
