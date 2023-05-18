@@ -79,72 +79,118 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
-        // centerTitle: false,
-        // backgroundColor: Colors.teal,
-        actions: [
-          IconButton(
-              onPressed: () => debugPrint("Hello scaffold"),
-              icon: Icon(Icons.mail)),
-          IconButton(
-              onPressed: () => debugPrint("Hello scaffold sms"),
-              icon: Icon(Icons.sms)),
-        ],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          // Icon(
-          //   Icons.person,
-          //   size: 200,
-          //   color: Colors.grey.shade500,
-          // ),
-          Text(
-            "Login",
-            textDirection: TextDirection.ltr,
-            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 20.0),
+          Image.asset(
+            "assets/images/loginTop.png",
           ),
-          Text(
-            "You entered $_email",
-            textDirection: TextDirection.ltr,
-            style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 20.0),
-          ),
-
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            child: TextField(
-              onChanged: (value) => {_onEmailChanged(value)},
-              decoration: InputDecoration(
-                  hintText: "Email",
-                  errorText: _emailError.isEmpty ? null : _emailError,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-            child: TextField(
-              obscureText: true,
-              onChanged: (value) => {_onPasswordChanged(value)},
-              decoration: InputDecoration(
-                  hintText: "Password",
-                  errorText: _passwordError.isEmpty ? null : _passwordError,
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10))),
-            ),
-          ),
-          Row(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: () => _onClickTest(),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(20.0, 20.0),
+              // Icon(
+              //   Icons.person,
+              //   size: 200,
+              //   color: Colors.grey.shade500,
+              // ),
+              const Text(
+                "Welcome",
+                textDirection: TextDirection.ltr,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+              ),
+              Container(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  children: [
+                    Material(
+                      elevation: 10,
+                      borderRadius: BorderRadius.circular(10),
+                      child: TextField(
+                        onChanged: (value) => {_onEmailChanged(value)},
+                        decoration: InputDecoration(
+                          hintText: "Email",
+                          errorText: _emailError.isEmpty ? null : _emailError,
+                          suffixIcon: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.verified),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(width: 5.0),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20,),
+                    Material(
+                      elevation: 10,
+                      borderRadius: BorderRadius.circular(10),
+                      child: TextField(
+                        obscureText: true,
+                        onChanged: (value) => {_onPasswordChanged(value)},
+                        decoration: InputDecoration(
+                          hintText: "Password",
+                          suffixIcon: IconButton(
+                            onPressed: () {},
+                            icon:const Icon(Icons.remove_red_eye),
+                          ),
+                          errorText: _passwordError.isEmpty ? null : _passwordError,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20,),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Text("Forgot your password"),
+                    ),
+                    const SizedBox(height: 20,),
+                    Container(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => _onClickTest(),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20)
+                                ),
+                            padding: const EdgeInsets.symmetric(vertical: 16)
+                        ),
+                        child: const Text("Login",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    const SizedBox(height: 20,),
+                    GestureDetector(
+                      onTap: () {},
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Don't have an account? "),
+                          Text("Sign up",style: TextStyle(fontWeight: FontWeight.bold),)
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Text("Login"),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                ],
               ),
             ],
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Image.asset(
+              "assets/images/loginBottom.png",
+              fit: BoxFit.cover,
+            ),
           ),
         ],
       ),
