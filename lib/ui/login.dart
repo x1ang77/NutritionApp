@@ -80,6 +80,10 @@ class _LoginState extends State<Login> {
     context.push("/register");
   }
 
+  _navigateToDetails(){
+    context.push("/details");
+  }
+
   _showPass(bool visibility){
     setState(() {
       showPass = !visibility;
@@ -160,7 +164,7 @@ class _LoginState extends State<Login> {
                       Container(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () => _onClickTest(),
+                          onPressed: () => _navigateToDetails(),
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
