@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/ui/details.dart';
 
 import '../ui/home.dart';
 import '../ui/login.dart';
@@ -15,6 +16,7 @@ class NavigationRouter extends StatelessWidget {
     GoRoute(path: "/login", builder: (context, state) => const Login()),
     GoRoute(path: "/register", builder: (context,state) => const Register()),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
+    GoRoute(path: "/details", builder:(context, state) => const Details()),
   ];
 
   @override
