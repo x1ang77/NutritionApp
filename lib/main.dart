@@ -24,4 +24,5 @@ class MyApp extends StatelessWidget {
   // testing merging commits
   // testing merging commits again
   // testing merging commits once more
+  // testing merging commits once more again
 }
