@@ -80,9 +80,9 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Hello Flutter"),
-        centerTitle: false,
-        backgroundColor: Colors.teal,
+        title: const Text("Login"),
+        // centerTitle: false,
+        // backgroundColor: Colors.teal,
         actions: [
           IconButton(
               onPressed: () => debugPrint("Hello scaffold"),
