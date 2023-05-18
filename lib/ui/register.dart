@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,43 +43,33 @@ class _RegisterState extends State<Register> {
     });
   }
 
-  _onClickTest() {
-    setState(() {
-      if (_email.isEmpty) {
-        _emailError = "Can't be empty";
-        return;
-      } else {
-        _emailError = "";
-      }
-      if (_password.isEmpty) {
-        _passwordError = "Can't be empty";
-        return;
-      } else {
-        _passwordError = "";
-      }
+  _onClickTest() async {
+    try {
+      final UserCredential userCredential =
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
 
-      // if (_name.isEmpty) {
-      //   _nameError = "Can't be empty";
-      //   return;
-      // } else {
-      //   _nameError = "";
-      // }
+      final user = userCredential.user;
+      debugPrint("Registration Successful: ${user?.uid}");
 
-      debugPrint("$_email $_password");
-    });
+      // Hash the password
+      final hashedPassword = md5.convert(utf8.encode(_password)).toString();
 
-    debugPrint("$_email $_password");
+      // Save user data to Firestore
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'name': _name,
+        'email': _email,
+        'password': hashedPassword,
+        // Add other user data fields as needed
+      });
 
-    // AuthService.authenticate(
-    //     _email,
-    //     _password,
-    //         (status) =>
-    //     {
-    //       if (status)
-    //         {context.go("/home")}
-    //       else
-    //         {debugPrint("Wrong Credentials")}
-    //     });
+      // Navigate to the next screen or perform any other actions
+
+    } catch (e) {
+      debugPrint("Registration Failed: $e");
+    }
   }
 
   _navigateToLogin(){
@@ -96,6 +91,7 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
           children: [
             Image.asset(
