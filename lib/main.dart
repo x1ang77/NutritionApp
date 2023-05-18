@@ -21,5 +21,5 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  // testing merging commits
+  // forcing merge
 }
