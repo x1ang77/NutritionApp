@@ -20,6 +20,4 @@ class MyApp extends StatelessWidget {
       home: NavigationRouter(initialRoute: '/login',),
     );
   }
-
-  // forcing merge
 }
