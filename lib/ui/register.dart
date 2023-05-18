@@ -73,7 +73,7 @@ class _RegisterState extends State<Register> {
   }
 
   _navigateToLogin(){
-    context.pop();
+    context.go("/login");
   }
 
   _showPass(bool visibility){
