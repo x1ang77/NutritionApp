@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,43 +38,22 @@ class _LoginState extends State<Login> {
     });
   }
 
-  _onClickTest() {
-    setState(() {
-      if (_email.isEmpty) {
-        _emailError = "Can't be empty";
-        return;
-      } else {
-        _emailError = "";
-      }
-      if (_password.isEmpty) {
-        _passwordError = "Can't be empty";
-        return;
-      } else {
-        _passwordError = "";
-      }
+  _onClickTest() async {
+    try {
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      );
 
-      // if (_name.isEmpty) {
-      //   _nameError = "Can't be empty";
-      //   return;
-      // } else {
-      //   _nameError = "";
-      // }
+      final user = userCredential.user;
+      debugPrint("Login Successful: ${user?.uid}");
 
-      debugPrint("$_email $_password");
-    });
+      // Navigate to the home screen
+      Navigator.pushReplacementNamed(context, '/home');
 
-    debugPrint("$_email $_password");
-
-    // AuthService.authenticate(
-    //     _email,
-    //     _password,
-    //         (status) =>
-    //     {
-    //       if (status)
-    //         {context.go("/home")}
-    //       else
-    //         {debugPrint("Wrong Credentials")}
-    //     });
+    } catch (e) {
+      debugPrint("Login Failed: $e");
+    }
   }
 
   _navigateToRegister(){
@@ -89,6 +69,7 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
 
