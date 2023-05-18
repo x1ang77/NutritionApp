@@ -20,4 +20,6 @@ class MyApp extends StatelessWidget {
       home: NavigationRouter(initialRoute: '/login',),
     );
   }
+
+  // testing merging commits
 }
