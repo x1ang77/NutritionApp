@@ -7,28 +7,27 @@ import '../ui/home.dart';
 import '../ui/login.dart';
 import '../ui/register.dart';
 
-class NavigationRouter extends StatelessWidget {
-  NavigationRouter({Key? key, required this.initialRoute}) : super(key: key);
+class MyApp extends StatelessWidget {
+  MyApp({Key? key, required this.initialRoute}) : super(key: key);
 
   final String initialRoute;
 
   final _routes = [
-    GoRoute(path: "/login", builder: (context, state) => const Login()),
     GoRoute(path: "/register", builder: (context,state) => const Register()),
+    GoRoute(path: "/login", builder: (context, state) => const Login()),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
-    GoRoute(path: "/details", builder:(context, state) => const Details()),
+    // GoRoute(path: "/details", builder:(context, state) => const Details()),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return MaterialApp(
       title: "FoodSense",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.red),
-      routerConfig: GoRouter(
-        initialLocation: initialRoute,
-        routes: _routes
-      ),
+      home: MaterialApp.router(
+          routerConfig:
+          GoRouter(initialLocation: initialRoute, routes: _routes)),
     );
   }
 }

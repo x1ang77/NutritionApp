@@ -49,15 +49,15 @@ class _LoginState extends State<Login> {
       debugPrint("Login Successful: ${user?.uid}");
 
       // Navigate to the home screen
-      Navigator.pushReplacementNamed(context, '/home');
+      context.push('/home');
 
     } catch (e) {
       debugPrint("Login Failed: $e");
     }
   }
 
-  _navigateToRegister(){
-    context.push("/register");
+  _navigateToRegister() {
+    context.go("/register");
   }
 
   _showPass(bool visibility){
@@ -72,7 +72,6 @@ class _LoginState extends State<Login> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-
           CustomPaint(
             painter: CurvePainter(),
             child: Container(),
