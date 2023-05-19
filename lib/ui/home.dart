@@ -10,32 +10,34 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  _signOut() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      // Navigate to login screen or any other screen
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/login',
-            (route) => false,
-      );
-    } catch (e) {
-      // Handle logout error
-      print('Logout Error: $e');
-    }
-  }
+  // _signOut() async {
+  //   try {
+  //     await FirebaseAuth.instance.signOut();
+  //     // Navigate to login screen or any other screen
+  //     Navigator.pushNamedAndRemoveUntil(
+  //       context,
+  //       '/login',
+  //           (route) => false,
+  //     );
+  //   } catch (e) {
+  //     // Handle logout error
+  //     print('Logout Error: $e');
+  //   }
+  // }
 
   void _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
-      setState(() {
-        context.go("/login");
-      });
+      _navigateToLogin();
     } catch (e) {
       // An error occurred while signing out
       print('Error signing out: $e');
       // Show an error message or handle the error accordingly
     }
+  }
+
+  _navigateToLogin() {
+    context.go("/login");
   }
 
   @override
