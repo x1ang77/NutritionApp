@@ -28,7 +28,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "FoodSense",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.green),
+      theme: ThemeData(
+          primaryColor: Colors.green,
+      ),
       home: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login")
     );
   }

@@ -14,24 +14,18 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
   GlobalKey<ScaffoldMessengerState>();
+
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool isLoading = false;
 
   var _email = "";
   var _emailError = "";
   var _password = "";
   var _passwordError = "";
-  var _name = "";
-  var _nameError = "";
   var showPass = true;
 
-  // _onNameChanged(value) {
-  //   setState(() {
-  //     _name = value.toString();
-  //   });
-  // }
-  //
   // _onEmailChanged(value) {
   //   setState(() {
   //     _email = value.toString();
@@ -53,26 +47,25 @@ class _LoginState extends State<Login> {
     );
   }
 
-  _onClickTest() async {
+  Future login() async {
     try {
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
+      isLoading = true;
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
-
-      final user = userCredential.user;
-      debugPrint("Login Successful: ${user?.uid}");
-
-      // Navigate to the home screen
-      // context.push('/home');
-      setState(() {
-        context.go("/home");
-        _showSnackbar('Login successful', Colors.green);
-      });
+      isLoading = false;
+      _navigateToHome();
+      _showSnackbar('Login successful', Colors.green);
     } catch (e) {
-      debugPrint("Login Failed: $e");
+      isLoading = false;
+      debugPrint('Email or Password Incorrect');
       _showSnackbar('Login failed', Colors.red);
     }
+  }
+
+  _navigateToHome() {
+    context.go("/home");
   }
 
   _navigateToRegister() {
@@ -91,7 +84,6 @@ class _LoginState extends State<Login> {
       key: _scaffoldKey,
       child: SafeArea(
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
           body: Stack(
             children: [
               CustomPaint(
@@ -125,7 +117,7 @@ class _LoginState extends State<Login> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(width: 5.0),
+                                borderSide: const BorderSide(width: 5.0),
                               ),
                             ),
                           ),
@@ -164,16 +156,23 @@ class _LoginState extends State<Login> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Container(
+                        SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () => _onClickTest(),
+                            onPressed: () => login(),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10)),
                                 padding: const EdgeInsets.symmetric(vertical: 16)),
-                            child: const Text(
+                            child: isLoading
+                            ? const SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 3, color: Colors.white),
+                            )
+                            : const Text(
                               "Login",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.bold),
@@ -222,17 +221,17 @@ class CurvePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint1 = Paint()
-      ..color = Color(0xFF6AC57E) // Color for the first curve
+      ..color = const Color(0xFF6AC57E) // Color for the first curve
       ..style = PaintingStyle.fill;
 
     final paint2 = Paint()
-      ..color = Color(0xFF6AC57E) // Color for the first curve
+      ..color = const Color(0xFF6AC57E) // Color for the first curve
       ..style = PaintingStyle.fill;
 
     // First Curve
     final path1 = Path();
 
-    final startPoint1 = Offset(0, 120);
+    const startPoint1 = Offset(0, 120);
     final endPoint1 = Offset(size.width, 20);
 
     final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
