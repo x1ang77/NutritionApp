@@ -7,8 +7,8 @@ import '../ui/home.dart';
 import '../ui/login.dart';
 import '../ui/register.dart';
 
-class MyApp extends StatelessWidget {
-  MyApp({Key? key, required this.initialRoute}) : super(key: key);
+class NavRouter extends StatelessWidget {
+  NavRouter({Key? key, required this.initialRoute}) : super(key: key);
 
   final String initialRoute;
 
@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "FoodSense",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.red),
+      theme: ThemeData(primarySwatch: Colors.green),
       home: MaterialApp.router(
           routerConfig:
           GoRouter(initialLocation: initialRoute, routes: _routes)),

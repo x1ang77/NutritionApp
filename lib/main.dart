@@ -17,7 +17,7 @@ void main() async {
   final bool isLoggedIn = FirebaseAuth.instance.currentUser != null;
 
   runApp(
-    MyApp(
+    NavRouter(
       initialRoute: isLoggedIn ? "/home" : "/login",
     ),
   );

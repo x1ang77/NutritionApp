@@ -49,7 +49,10 @@ class _LoginState extends State<Login> {
       debugPrint("Login Successful: ${user?.uid}");
 
       // Navigate to the home screen
-      context.push('/home');
+      // context.push('/home');
+      setState(() {
+        context.push("/home");
+      });
 
     } catch (e) {
       debugPrint("Login Failed: $e");
@@ -147,7 +150,7 @@ class _LoginState extends State<Login> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
+                                borderRadius: BorderRadius.circular(10)),
                             padding: const EdgeInsets.symmetric(vertical: 16)),
                         child: const Text(
                           "Login",
@@ -175,10 +178,6 @@ class _LoginState extends State<Login> {
                   ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [],
-              ),
             ],
           ),
           Positioned(
@@ -192,10 +191,6 @@ class _LoginState extends State<Login> {
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => {},
-      //   child: const Icon(Icons.add),
-      // ),
     );
   }
 }
