@@ -12,6 +12,12 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
+  GlobalKey<ScaffoldMessengerState>();
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
   var _email = "";
   var _emailError = "";
   var _password = "";
@@ -20,29 +26,38 @@ class _LoginState extends State<Login> {
   var _nameError = "";
   var showPass = true;
 
-  _onNameChanged(value) {
-    setState(() {
-      _name = value.toString();
-    });
-  }
+  // _onNameChanged(value) {
+  //   setState(() {
+  //     _name = value.toString();
+  //   });
+  // }
+  //
+  // _onEmailChanged(value) {
+  //   setState(() {
+  //     _email = value.toString();
+  //   });
+  // }
+  //
+  // _onPasswordChanged(value) {
+  //   setState(() {
+  //     _password = value.toString();
+  //   });
+  // }
 
-  _onEmailChanged(value) {
-    setState(() {
-      _email = value.toString();
-    });
-  }
-
-  _onPasswordChanged(value) {
-    setState(() {
-      _password = value.toString();
-    });
+  void _showSnackbar(String message, Color color) {
+    _scaffoldKey.currentState?.showSnackBar(
+      SnackBar(
+        backgroundColor: color,
+        content: Text(message),
+      ),
+    );
   }
 
   _onClickTest() async {
     try {
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _email,
-        password: _password,
+        email: _emailController.text,
+        password: _passwordController.text,
       );
 
       final user = userCredential.user;
@@ -51,11 +66,12 @@ class _LoginState extends State<Login> {
       // Navigate to the home screen
       // context.push('/home');
       setState(() {
-        context.push("/home");
+        context.go("/home");
+        _showSnackbar('Login successful', Colors.green);
       });
-
     } catch (e) {
       debugPrint("Login Failed: $e");
+      _showSnackbar('Login failed', Colors.red);
     }
   }
 
@@ -71,125 +87,132 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          CustomPaint(
-            painter: CurvePainter(),
-            child: Container(),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+    return ScaffoldMessenger(
+      key: _scaffoldKey,
+      child: SafeArea(
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Stack(
             children: [
-              const Text(
-                "Welcome",
-                textDirection: TextDirection.ltr,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+              CustomPaint(
+                painter: CurvePainter(),
+                child: Container(),
               ),
-              Container(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(
-                  children: [
-                    Material(
-                      elevation: 10,
-                      borderRadius: BorderRadius.circular(10),
-                      child: TextField(
-                        onChanged: (value) => {_onEmailChanged(value)},
-                        decoration: InputDecoration(
-                          hintText: "Email",
-                          errorText: _emailError.isEmpty ? null : _emailError,
-                          suffixIcon: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.verified),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(width: 5.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Material(
-                      elevation: 10,
-                      borderRadius: BorderRadius.circular(10),
-                      child: TextField(
-                        obscureText: showPass,
-                        onChanged: (value) => {_onPasswordChanged(value)},
-                        decoration: InputDecoration(
-                          hintText: "Password",
-                          suffixIcon: IconButton(
-                            onPressed: () => _showPass(showPass),
-                            icon: const Icon(Icons.remove_red_eye),
-                          ),
-                          errorText:
-                              _passwordError.isEmpty ? null : _passwordError,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Welcome",
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Column(
+                      children: [
+                        Material(
+                          elevation: 10,
+                          borderRadius: BorderRadius.circular(10),
+                          child: TextField(
+                            // onChanged: (value) => {_onEmailChanged(value)},
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              hintText: "Email",
+                              errorText: _emailError.isEmpty ? null : _emailError,
+                              suffixIcon: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.verified),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(width: 5.0),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: const Text("Forgot your password"),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => _onClickTest(),
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                            padding: const EdgeInsets.symmetric(vertical: 16)),
-                        child: const Text(
-                          "Login",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                        const SizedBox(
+                          height: 20,
                         ),
-                      ),
+                        Material(
+                          elevation: 10,
+                          borderRadius: BorderRadius.circular(10),
+                          child: TextField(
+                            obscureText: showPass,
+                            controller: _passwordController,
+                            // onChanged: (value) => {_onPasswordChanged(value)},
+                            decoration: InputDecoration(
+                              hintText: "Password",
+                              suffixIcon: IconButton(
+                                onPressed: () => _showPass(showPass),
+                                icon: const Icon(Icons.remove_red_eye),
+                              ),
+                              errorText:
+                                  _passwordError.isEmpty ? null : _passwordError,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        GestureDetector(
+                          onTap: () {},
+                          child: const Text("Forgot your password"),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => _onClickTest(),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(vertical: 16)),
+                            child: const Text(
+                              "Login",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        GestureDetector(
+                          onTap: () => _navigateToRegister(),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Don't have an account? "),
+                              Text(
+                                "Sign up",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () => _navigateToRegister(),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("Don't have an account? "),
-                          Text(
-                            "Sign up",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(),
                 ),
               ),
             ],
           ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: CustomPaint(
-              painter: CurvePainter(),
-              child: Container(),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

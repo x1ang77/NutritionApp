@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -9,7 +10,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  _logout() async {
+  _signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
       // Navigate to login screen or any other screen
@@ -21,6 +22,19 @@ class _HomeState extends State<Home> {
     } catch (e) {
       // Handle logout error
       print('Logout Error: $e');
+    }
+  }
+
+  void _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      setState(() {
+        context.go("/login");
+      });
+    } catch (e) {
+      // An error occurred while signing out
+      print('Error signing out: $e');
+      // Show an error message or handle the error accordingly
     }
   }
 

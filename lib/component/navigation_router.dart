@@ -21,13 +21,9 @@ class NavRouter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "FoodSense",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.green),
-      home: MaterialApp.router(
-          routerConfig:
-          GoRouter(initialLocation: initialRoute, routes: _routes)),
+    return MaterialApp.router(
+        routerConfig:
+        GoRouter(initialLocation: initialRoute, routes: _routes)
     );
   }
 }
