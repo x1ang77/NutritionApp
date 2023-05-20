@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/details.dart';
 
+import '../ui/dashboard.dart';
 import '../ui/home.dart';
 import '../ui/login.dart';
 import '../ui/register.dart';
@@ -16,14 +17,18 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/register", builder: (context,state) => const Register()),
     GoRoute(path: "/login", builder: (context, state) => const Login()),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
+    GoRoute(path: "/dashboard", builder: (context, state) => const Dashboard()),
     // GoRoute(path: "/details", builder:(context, state) => const Details()),
   ];
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-        routerConfig:
-        GoRouter(initialLocation: initialRoute, routes: _routes)
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        primaryColor: Colors.green,
+      ),
+      routerConfig: GoRouter(initialLocation: initialRoute, routes: _routes),
     );
   }
 }
