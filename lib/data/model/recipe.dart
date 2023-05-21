@@ -1,14 +1,14 @@
 class Recipe {
-  final int? id;
+  final String? id;
   final String name;
-  final int calories;
+  final double calorie;
   final List<String> ingredients;
   final List<String> steps;
 
   static const String tableName = "recipes";
 
   Recipe({
-    this.id, required this.name, required this.calories,
+    this.id, required this.name, required this.calorie,
     required this.ingredients, required this.steps
   });
 
@@ -16,7 +16,7 @@ class Recipe {
     return {
       "id": id,
       "name": name,
-      "calories": calories,
+      "calories": calorie,
       "ingredients": ingredients,
       "steps": steps
     };
@@ -26,7 +26,7 @@ class Recipe {
     return Recipe(
       id: map["id"],
       name: map["name"],
-      calories: map["calories"],
+      calorie: map["calories"],
       ingredients: map["ingredients"],
       steps: map["steps"]
     );

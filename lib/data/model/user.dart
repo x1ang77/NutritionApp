@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 class User {
-  final int? id;
+  final String? id;
   final String username;
   final String email;
   final String password;
