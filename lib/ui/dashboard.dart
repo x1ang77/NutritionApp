@@ -40,25 +40,116 @@ class _DashboardState extends State<Dashboard> {
     context.go("/login");
   }
 
+  final int consumedCalories = 2000;
+  final int recommendedCalories = 2500;
+
   @override
   Widget build(BuildContext context) {
     const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+    double progress = consumedCalories / recommendedCalories;
+    int remainingCalories = recommendedCalories - consumedCalories;
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Dashboard"),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              const Text(
-                'Dashboard',
-                style: optionStyle,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Dashboard"),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            const Text(
+              'Dashboard',
+              style: optionStyle,
+            ),
+            Text("Today"),
+            Container(
+
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                      children: [
+                        Text(
+                            "$consumedCalories",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold
+                            )
+                        ),
+                        const Text(
+                            'Consumed',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey
+                            )
+                        )
+                      ]
+                  ),
+
+                  Stack(
+                    alignment: AlignmentDirectional.center,
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        height: 150,
+                        child: CircularProgressIndicator(
+                          value: progress,
+                          strokeWidth: 10,
+                          backgroundColor: Colors.green[100],
+                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "$remainingCalories",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                            )
+                          ),
+                          const Text(
+                              'Remaining',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey
+                              )
+                          )
+                        ]
+                      ),
+                    ]
+                  ),
+
+                  Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                            "0",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold
+                            )
+                        ),
+                        const Text(
+                            'Burned',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey
+                            )
+                        )
+                      ]
+                  ),
+                ],
               ),
-              ElevatedButton(onPressed: () => _logout(), child: const Text('Logout'))
-            ],
-          ),
+            )
+          ],
         ),
       ),
     );
