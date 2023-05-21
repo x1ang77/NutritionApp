@@ -81,138 +81,136 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
-      child: SafeArea(
-        child: Scaffold(
-          // resizeToAvoidBottomInset: false,
-          body: Stack(
-            children: [
-              CustomPaint(
+      child: Scaffold(
+        // resizeToAvoidBottomInset: false,
+        body: Stack(
+          children: [
+            CustomPaint(
+              painter: CurvePainter(),
+              child: Container(),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Welcome",
+                  textDirection: TextDirection.ltr,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                ),
+                SingleChildScrollView(
+                  child: Container(
+                    padding: const EdgeInsets.all(40.0),
+                    child: Column(
+                      children: [
+                        Material(
+                          elevation: 10,
+                          borderRadius: BorderRadius.circular(10),
+                          child: TextField(
+                            // onChanged: (value) => {_onEmailChanged(value)},
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              hintText: "Email",
+                              errorText: _emailError.isEmpty ? null : _emailError,
+                              suffixIcon: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.verified),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(width: 5.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Material(
+                          elevation: 10,
+                          borderRadius: BorderRadius.circular(10),
+                          child: TextField(
+                            obscureText: showPass,
+                            controller: _passwordController,
+                            // onChanged: (value) => {_onPasswordChanged(value)},
+                            decoration: InputDecoration(
+                              hintText: "Password",
+                              suffixIcon: IconButton(
+                                onPressed: () => _showPass(showPass),
+                                icon: const Icon(Icons.remove_red_eye),
+                              ),
+                              errorText:
+                                  _passwordError.isEmpty ? null : _passwordError,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        GestureDetector(
+                          onTap: () {},
+                          child: const Text("Forgot your password"),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => login(),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(vertical: 16)),
+                            child: isLoading
+                            ? const SizedBox(
+                              height: 30,
+                              width: 30,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 3, color: Colors.white),
+                            )
+                            : const Text(
+                              "Login",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        GestureDetector(
+                          onTap: () => _navigateToRegister(),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("Don't have an account? "),
+                              Text(
+                                "Sign up",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: CustomPaint(
                 painter: CurvePainter(),
                 child: Container(),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Welcome",
-                    textDirection: TextDirection.ltr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
-                  ),
-                  SingleChildScrollView(
-                    child: Container(
-                      padding: const EdgeInsets.all(40.0),
-                      child: Column(
-                        children: [
-                          Material(
-                            elevation: 10,
-                            borderRadius: BorderRadius.circular(10),
-                            child: TextField(
-                              // onChanged: (value) => {_onEmailChanged(value)},
-                              controller: _emailController,
-                              decoration: InputDecoration(
-                                hintText: "Email",
-                                errorText: _emailError.isEmpty ? null : _emailError,
-                                suffixIcon: IconButton(
-                                  onPressed: () {},
-                                  icon: const Icon(Icons.verified),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(width: 5.0),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Material(
-                            elevation: 10,
-                            borderRadius: BorderRadius.circular(10),
-                            child: TextField(
-                              obscureText: showPass,
-                              controller: _passwordController,
-                              // onChanged: (value) => {_onPasswordChanged(value)},
-                              decoration: InputDecoration(
-                                hintText: "Password",
-                                suffixIcon: IconButton(
-                                  onPressed: () => _showPass(showPass),
-                                  icon: const Icon(Icons.remove_red_eye),
-                                ),
-                                errorText:
-                                    _passwordError.isEmpty ? null : _passwordError,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () {},
-                            child: const Text("Forgot your password"),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () => login(),
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  padding: const EdgeInsets.symmetric(vertical: 16)),
-                              child: isLoading
-                              ? const SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 3, color: Colors.white),
-                              )
-                              : const Text(
-                                "Login",
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          GestureDetector(
-                            onTap: () => _navigateToRegister(),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("Don't have an account? "),
-                                Text(
-                                  "Sign up",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: CustomPaint(
-                  painter: CurvePainter(),
-                  child: Container(),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

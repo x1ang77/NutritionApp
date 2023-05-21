@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         primaryColor: Colors.green,
       ),
-      home: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login"),
+      home: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login")
     );
   }
 }
