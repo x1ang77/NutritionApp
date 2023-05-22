@@ -8,10 +8,10 @@ class User {
   final String email;
   final String password;
   final Uint8List? image;
-  final int gender;
+  final String gender;
   final int age;
-  final String height;
-  final String weight;
+  final double height;
+  final double weight;
   final String? diet;
   final int? calorieIntake;
 

@@ -1,15 +1,33 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+class Diary extends StatefulWidget {
+  const Diary({Key? key}) : super(key: key);
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<Diary> createState() => _DiaryState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _DiaryState extends State<Diary> {
+  DateTime selectedDate = DateTime.now();
+  String _formatDate(DateTime date) {
+    DateTime currentDate = DateTime.now();
+
+    if (date.year == currentDate.year &&
+        date.month == currentDate.month &&
+        date.day == currentDate.day) {
+      return 'Today';
+    } else if(date.day == currentDate.day - 1) {
+      return 'Yesterday';
+    } else {
+      // return '${date.day}/${date.month}/${date.year}';
+      return '${DateFormat("dd/MM/yyyy").format(date)}';
+    }
+  }
+
   // _signOut() async {
   //   try {
   //     await FirebaseAuth.instance.signOut();
@@ -56,15 +74,45 @@ class _DashboardState extends State<Dashboard> {
       body: Center(
         child: Column(
           children: [
-            const Text(
-              'Dashboard',
-              style: optionStyle,
-            ),
-            Text("Today"),
-            Container(
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.chevron_left),
+                      onPressed: () {
+                        setState(() {
+                          selectedDate = selectedDate.subtract(Duration(days: 1));
+                        });
+                      },
+                    ),
+                    Text(
+                      _formatDate(selectedDate),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.chevron_right),
+                      onPressed: () {
+                        DateTime displayDate = selectedDate.add(Duration(days: 1));
+                        DateTime currentDate = DateTime.now();
 
+                        if (displayDate.isBefore(currentDate) || DateTime(displayDate.year, displayDate.month, displayDate.day) == DateTime(currentDate.year, currentDate.month, currentDate.day)) {
+                          setState(() {
+                            selectedDate = displayDate;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                // Add your calorie tracking widgets or content here
+              ],
+            ),
+
+            Container(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Column(
