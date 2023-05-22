@@ -1,12 +1,8 @@
-import 'dart:convert';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/data/model/user.dart';
 
-// import '../data/model/user.dart';
+import '../data/repository/user/user_repository_impl.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -18,6 +14,7 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
   GlobalKey<ScaffoldMessengerState>();
+  UserRepoImpl userRepo = UserRepoImpl();
 
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -34,24 +31,6 @@ class _RegisterState extends State<Register> {
   var showPass = true;
   var showConPass = true;
 
-  // _onNameChanged(value) {
-  //   setState(() {
-  //     _name = value.toString();
-  //   });
-  // }
-  //
-  // _onEmailChanged(value) {
-  //   setState(() {
-  //     _email = value.toString();
-  //   });
-  // }
-  //
-  // _onPasswordChanged(value) {
-  //   setState(() {
-  //     _password = value.toString();
-  //   });
-  // }
-
   void _showSnackbar(String message, Color color) {
     _scaffoldKey.currentState?.showSnackBar(
       SnackBar(
@@ -61,62 +40,18 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  Future checkIfEmailInUse(String emailAddress) async {
-    try {
-      // Fetch sign-in methods for the email address
-      final list = await FirebaseAuth.instance.fetchSignInMethodsForEmail(emailAddress);
-
-      // In case list is not empty
-      if (list.isNotEmpty) {
-        // Return true because there is an existing
-        // user using the email address
-        _showSnackbar("Email in use", Colors.red);
-      } else {
-        // Return false because email adress is not in use
-
-      }
-    } catch (error) {
-      debugPrint(error.toString());
-    }
-  }
-
   _onClickTest() async {
     try {
-      // Fetch sign-in methods for the email address
-      final list = await FirebaseAuth.instance.fetchSignInMethodsForEmail(_emailController.text);
-
-      // In case list is not empty
-      if (list.isNotEmpty) {
-        // Return true because there is an existing
-        // user using the email address
-        _showSnackbar("Email in use", Colors.red);
-      } else {
-        // Return false because email adress is not in use
-        final UserCredential userCredential =
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _email,
-          password: _password,
-        );
-
-        final user = userCredential.user;
-        debugPrint("Registration Successful: ${user?.uid}");
-
-        // Hash the password
-        final hashedPassword = md5.convert(utf8.encode(_passwordController.text)).toString();
-
-        // Save user data to Firestore
-        await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
-          'name': _usernameController.text,
-          'email': _emailController.text,
-          'password': hashedPassword,
-          // Add other user data fields as needed
-        });
-
-        // Navigate to the next screen or perform any other actions
-        _showSnackbar("Register successful", Colors.green);
-      }
+      final _user = User(
+          username: _usernameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          gender: "", age: 0, height: 0, weight: 0
+      );
+      await userRepo.register(_user);
+      _showSnackbar("Register successful", Colors.green);
     } catch (e) {
-      debugPrint("Registration Failed: $e");
+      _showSnackbar("Register failed", Colors.red);
     }
   }
 

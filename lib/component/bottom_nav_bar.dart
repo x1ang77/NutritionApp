@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:nutrition_app/ui/dashboard.dart';
+import 'package:nutrition_app/ui/diary.dart';
 
 import '../ui/profile.dart';
 
@@ -15,11 +15,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Dashboard(),
+    Diary(),
     Text(
-      'Index 1: Business',
+      'Recipes',
       style: optionStyle,
     ),
+    // Text(
+    //   'Add food to diary',
+    //   style: optionStyle,
+    // ),
     Profile()
   ];
 
@@ -45,9 +49,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
             icon: Icon(Icons.business),
             label: 'Business',
           ),
+          // BottomNavigationBarItem(
+          //   icon: SizedBox.shrink(
+          //     child: Icon(Icons.add),
+          //   ),
+          //   label: ""
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: 'Me',
           ),
         ],
         currentIndex: _selectedIndex,

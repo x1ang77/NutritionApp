@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'component/navigation_router.dart';
 import 'firebase_options.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         primaryColor: Colors.green,
       ),
-      home: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login")
+      home: SafeArea(child: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login"))
     );
   }
 }

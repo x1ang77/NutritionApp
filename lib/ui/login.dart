@@ -1,8 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-// import '../data/model/user.dart';
+import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -14,6 +12,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
   GlobalKey<ScaffoldMessengerState>();
+  UserRepoImpl userRepo = UserRepoImpl();
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -25,18 +24,6 @@ class _LoginState extends State<Login> {
   var _passwordError = "";
   var showPass = true;
 
-  // _onEmailChanged(value) {
-  //   setState(() {
-  //     _email = value.toString();
-  //   });
-  // }
-  //
-  // _onPasswordChanged(value) {
-  //   setState(() {
-  //     _password = value.toString();
-  //   });
-  // }
-
   void _showSnackbar(String message, Color color) {
     _scaffoldKey.currentState?.showSnackBar(
       SnackBar(
@@ -46,12 +33,12 @@ class _LoginState extends State<Login> {
     );
   }
 
-  Future login() async {
+  Future<void> login() async {
     try {
       isLoading = true;
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+      await userRepo.login(
+          _emailController.text.trim(),
+          _passwordController.text.trim()
       );
       isLoading = false;
       _navigateToHome();

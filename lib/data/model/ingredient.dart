@@ -1,15 +1,15 @@
 class Ingredient {
-  final int? id;
+  final String? id;
   final String name;
-  final int calorie;
-  final int? weight;
+  final double calorie;
+  final double? weight;
   final int? piece;
   final int? cup;
   final int? teaspoon;
 
   static const String tableName = "ingredients";
 
-  Ingredient({this.id, required this.name, required this.calorie, this.weight, this.piece, this.cup, this.teaspoon});
+  Ingredient({this.id, required this.name, required this.calorie, this.weight = 0, this.piece = 0, this.cup = 0, this.teaspoon = 0});
 
   Map<String, dynamic> toMap() {
     return {
