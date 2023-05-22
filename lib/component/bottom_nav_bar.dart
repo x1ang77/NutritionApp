@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nutrition_app/ui/diary.dart';
 
 import '../ui/profile.dart';
@@ -42,12 +43,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: FaIcon(FontAwesomeIcons.book),
+            label: 'Diary',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.business),
-            label: 'Business',
+            label: 'Recipes',
           ),
           // BottomNavigationBarItem(
           //   icon: SizedBox.shrink(
