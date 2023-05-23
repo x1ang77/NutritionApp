@@ -23,46 +23,48 @@ class _LoginState extends State<Login> {
   var showPass = true;
   bool isLoading = false;
 
-  // showSnackbar(String message, Color color) {
-  //   _scaffoldKey.currentState?.showSnackBar(
-  //     SnackBar(
-  //       backgroundColor: color,
-  //       content: Text(message),
-  //     ),
-  //   );
-  // }
-
   login() async {
     try {
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
-
-      if (email.isEmpty) {
-        _emailError = "This field cannot be empty";
-        return;
-      } else {
-        _emailError = "";
-      }
-
-      if (password.isEmpty) {
-        _passwordError = "This field cannot be empty";
-        return;
-      } else {
-        _passwordError = "";
-      }
+      var emailExists = await userRepo.checkEmailInFirebase(email);
 
       setState(() {
+        if (email.isEmpty) {
+          _emailError = "This field cannot be empty";
+          return;
+        } else {
+          _emailError = "";
+        }
+
+        if (password.isEmpty) {
+          _passwordError = "This field cannot be empty";
+          return;
+        } else {
+          _passwordError = "";
+        }
+
         isLoading = true;
       });
 
-      await userRepo.login(email, password);
-      showSnackbar('Login successful', Colors.green);
-      _navigateToHome();
+      if (!emailExists) {
+        showSnackbar(
+            _scaffoldKey,
+            "No account was registered with this email",
+            Colors.red
+        );
+        isLoading = false;
+      } else {
+        _emailError = "";
+        await userRepo.login(email, password);
+        showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
+        _navigateToHome();
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      showSnackbar(e.toString(), Colors.red);
+      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
     }
   }
 
@@ -86,128 +88,139 @@ class _LoginState extends State<Login> {
       key: _scaffoldKey,
       child: Scaffold(
         // resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            CustomPaint(
-              painter: CurvePainter(),
-              child: Container(),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Welcome",
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
-                ),
-                SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Column(
-                      children: [
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              hintText: "Email",
-                              errorText: _emailError.isEmpty ? null : _emailError,
-                              suffixIcon: const IconButton(
-                                onPressed: null,
-                                icon: Icon(Icons.email),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(width: 5.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            obscureText: showPass,
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              suffixIcon: IconButton(
-                                onPressed: () => _showPass(showPass),
-                                icon: const Icon(Icons.remove_red_eye),
-                              ),
-                              errorText:
-                                  _passwordError.isEmpty ? null : _passwordError,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text("Forgot your password"),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => login(),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(vertical: 16)),
-                            child: isLoading
-                              ? const CircularProgressIndicator(
-                                  strokeWidth: 3, color: Colors.white)
-                              : const Text(
-                                  "Login",
-                                  style: TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () => _navigateToRegister(),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Don't have an account? "),
-                              Text(
-                                "Sign up",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: CustomPaint(
+        body: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              CustomPaint(
                 painter: CurvePainter(),
                 child: Container(),
               ),
-            ),
-          ],
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Welcome",
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                  ),
+                  SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Column(
+                        children: [
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            child: TextField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                                errorText: _emailError.isEmpty ? null : _emailError,
+                                prefixIcon: const Icon(Icons.email),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 5.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            child: TextField(
+                              obscureText: showPass,
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: "Password",
+                                prefixIcon: const Icon(Icons.password),
+                                suffixIcon: IconButton(
+                                  onPressed: () => _showPass(showPass),
+                                  icon: const Icon(Icons.remove_red_eye),
+                                ),
+                                errorText:
+                                    _passwordError.isEmpty ? null : _passwordError,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              "Forgot password",
+                              style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => login(),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(vertical: 16)),
+                              child: isLoading
+                                ? const CircularProgressIndicator(
+                                    strokeWidth: 3, color: Colors.white)
+                                : const Text(
+                                    "Login",
+                                    style: TextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () => _navigateToRegister(),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Don't have an account? "),
+                                Text(
+                                  "Sign up",
+                                  style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
