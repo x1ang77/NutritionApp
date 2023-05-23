@@ -6,6 +6,7 @@ class Diary {
   final List<String>? lunch;
   final List<String>? dinner;
   final List<String>? snack;
+
   final double? caloriesRemaining;
   final double? caloriesConsumed;
   final double? caloriesBurned;
