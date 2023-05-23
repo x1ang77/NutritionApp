@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:nutrition_app/ui/diary.dart';
+import 'package:nutrition_app/ui/recipe.dart';
 
 import '../ui/profile.dart';
 
@@ -18,10 +19,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     Diary(),
-    Text(
-      'Recipes',
-      style: optionStyle,
-    ),
+   RecipePage(),
     // Text(
     //   'Add food to diary',
     //   style: optionStyle,
