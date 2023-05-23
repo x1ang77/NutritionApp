@@ -1,13 +1,46 @@
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:nutrition_app/data/model/recipe.dart';
 
 class Details extends StatefulWidget {
-  const Details({Key? key}) : super(key: key);
-
+  const Details({Key? key, required this.id}) : super(key: key);
+  final String id;
   @override
   State<Details> createState() => _DetailsState();
 }
 
 class _DetailsState extends State<Details> {
+  late Recipe _recipeData;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getRecipeById();
+  }
+
+  Future getRecipeById() async{
+    try {
+      final documentSnapshot =
+      await FirebaseFirestore.instance.collection('meals').doc(widget.id).get();
+
+      if (documentSnapshot.exists) {
+        final data = documentSnapshot.data();
+        // Assuming you have a Recipe model, you can initialize it with the retrieved data
+        setState(() {
+          _recipeData = Recipe.fromMap(data!);
+
+        });
+        debugPrint("${_recipeData.image}");
+      } else {
+        print('Document does not exist');
+      }
+    } catch (error) {
+      print('Error fetching document: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +55,7 @@ class _DetailsState extends State<Details> {
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
-                    child: Image.asset("assets/images/fruit2.jpg"),
+                    child: Image.asset(_recipeData.thumbnail),
                   ),
                 ],
               ),
@@ -68,48 +101,48 @@ class _DetailsState extends State<Details> {
             ],
           ),
           const SizedBox(height: 20,),
-          const Center(
+          Center(
             child: Text(
-              "Yogurt with fruits",
+              _recipeData.name,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
           ),
           const SizedBox(height: 20,),
-          const Center(
+          Center(
             child: Text(
-              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Aliquam vestibulum morbi blandit cursus risus.",
+              _recipeData.desc,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
               ),
             ),
           ),
           const SizedBox(height: 20,),
-          const Card(
+          Card(
             margin: EdgeInsets.symmetric(horizontal: 30),
             elevation: 10,
             child:
               Column(
                 children: [
-                  SizedBox(height: 7,),
-                  Text("Nutritional information",style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                  SizedBox(height: 10,),
+                  const SizedBox(height: 7,),
+                  const Text("Nutritional information",style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                  const SizedBox(height: 10,),
                   Row(
                     children: [
                       Expanded(child:
                         Column(
                           children: [
-                            Text("243",
-                              style: TextStyle(
+                            Text(_recipeData.calories.toString(),
+                              style: const TextStyle(
                                   color:Colors.red,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            Text("calories",
+                            const Text("calories",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -120,12 +153,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("2.8g",
-                              style: TextStyle(
+                            Text("${_recipeData.grams}g",
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            Text("grams",
+                            const Text("grams",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -136,12 +169,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                       Column(
                         children: [
-                          Text("167.5",
-                            style: TextStyle(
+                          Text(_recipeData.carbs.toString(),
+                            style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                           ),
-                          Text("carbs",
+                          const Text("carbs",
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -152,12 +185,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("9.3g",
-                              style: TextStyle(
+                            Text("${_recipeData.protein}g",
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            Text("protein",
+                            const Text("protein",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -167,12 +200,12 @@ class _DetailsState extends State<Details> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10,)
+                  const SizedBox(height: 10,)
                 ],
               ),
           ),
           const SizedBox(height: 30,),
-          const Card(
+          Card(
             margin: EdgeInsets.symmetric(horizontal: 30),
             elevation: 10,
             child:
@@ -186,14 +219,15 @@ class _DetailsState extends State<Details> {
                     Expanded(child:
                     Column(
                       children: [
-                        Text("243",
-                          style: TextStyle(
-                              color:Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
+                        SizedBox(height:36, child: ClipOval(
+                          child: Image.asset(
+                            _recipeData.image![0],
+                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                          ),
                         ),
-                        Text("calories",
-                          style: TextStyle(
+                        ),
+                        Text(_recipeData.ingredients![0],
+                          style: const TextStyle(
                             fontSize: 12,
                           ),
                         )
@@ -203,13 +237,15 @@ class _DetailsState extends State<Details> {
                     Expanded(child:
                     Column(
                       children: [
-                        Text("2.8g",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
+                        SizedBox(height:36, child: ClipOval(
+                          child: Image.asset(
+                            _recipeData.image![1],
+                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                          ),
                         ),
-                        Text("grams",
-                          style: TextStyle(
+                        ),
+                        Text(_recipeData.ingredients![1],
+                          style: const TextStyle(
                             fontSize: 12,
                           ),
                         )
@@ -219,13 +255,15 @@ class _DetailsState extends State<Details> {
                     Expanded(child:
                     Column(
                       children: [
-                        Text("167.5",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16),
+                        SizedBox(height:36, child: ClipOval(
+                          child: Image.asset(
+                            _recipeData.image![2],
+                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                          ),
                         ),
-                        Text("carbs",
-                          style: TextStyle(
+                        ),
+                        Text(_recipeData.ingredients![2],
+                          style: const TextStyle(
                             fontSize: 12,
                           ),
                         )
@@ -235,13 +273,15 @@ class _DetailsState extends State<Details> {
                     Expanded(child:
                       Column(
                         children: [
-                          Text("9.3g",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
+                          SizedBox(height:36, child: ClipOval(
+                            child: Image.asset(
+                              _recipeData.image![3],
+                              fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                            ),
                           ),
-                          Text("protein",
-                            style: TextStyle(
+                          ),
+                          Text(_recipeData.ingredients![3],
+                            style: const TextStyle(
                               fontSize: 12,
                             ),
                           )
@@ -266,14 +306,14 @@ class _DetailsState extends State<Details> {
                   const SizedBox(height: 7,),
                   const Text("Preparation",style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                   const SizedBox(height: 2,),
-                  const Text("Step 1: Cut Fruits",
-                    style: TextStyle(
+                  Text("Step 1: ${_recipeData.steps![0]}",
+                    style: const TextStyle(
                         fontSize: 16
                     ),
                   ),
                   const SizedBox(height: 2,),
-                  const Text("Step 2: Cut Fruits",
-                    style: TextStyle(
+                  Text("Step 2: ${_recipeData.steps![1]}",
+                    style: const TextStyle(
                         fontSize: 16
                     ),
                   ),
