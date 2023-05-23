@@ -29,21 +29,55 @@ class UserRepoImpl extends UserRepo {
 
   Future<user_model.User?> getUserById(String userId) async {
     try {
-      var docSnapshot = await collection.doc(userId).get();
+      var docSnapshot = await collection.doc("fpPvRnd4J9UwVhIw3s7xBltppu03")
+          .get();
       var data = docSnapshot.data();
-      debugPrint("WHY $data");
-
-      if (data != null) {
-        var user = user_model.User.fromMap(data);
-        debugPrint(user.gender);
-        return user;
-      } else {
-        debugPrint("Data is null");
-        return null;
-      }
+      var user = user_model.User.fromMap(data!);
+      return user;
     } catch (e) {
-      debugPrint("Error fetching user: $e");
       return null;
+    }
+
+    // try {
+  //     // var querySnapshot = await collection.get();
+  //     //
+  //     // for (var item in querySnapshot.docs) {
+  //     //   var data = item.data();
+  //     //   debugPrint("${data['title']} ${data['description']}");
+  //     //
+  //     //   var user = user_model.User.fromMap(data);
+  //     //   debugPrint(user.toString());
+  //     //   return user;
+  //     // }
+  //
+  //     var docSnapshot = await collection.doc("fpPvRnd4J9UwVhIw3s7xBltppu03")
+  //         .get();
+  //     if (docSnapshot.exists) {
+  //       var data = docSnapshot.data();
+  //       debugPrint("WHY $data");
+  //       // debugPrint("")
+  //
+  //       // var user = user_model.User.fromMap(jsonDecode(item));
+  //       var user = user_model.User.fromMap(data!);
+  //       debugPrint("$user");
+  //       return user;
+  //     } catch (e) {
+  //     debugPrint("Error fetching user: $e");
+  //     return null;
+  //   }
+  // }
+  }
+
+  @override
+  Future<bool> checkEmailInFirebase(String email) async {
+    try {
+      final list = await firebaseAuth.fetchSignInMethodsForEmail(email);
+      if (list.isEmpty) {
+        return false;
+      }
+      return true;
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
@@ -76,7 +110,7 @@ class UserRepoImpl extends UserRepo {
       final _user = userCredential.user;
       final hashedPassword = md5.convert(utf8.encode(user.password)).toString();
       await collection.doc(_user?.uid).set({
-        'name': user.username,
+        'username': user.username,
         'email': user.email,
         'password': hashedPassword,
       });

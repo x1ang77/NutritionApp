@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/model/user.dart';
 
@@ -20,16 +21,13 @@ class _RegisterState extends State<Register> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
-  bool isLoading = false;
-
-  var _username = "";
   var _usernameError = "";
-  var _email = "";
   var _emailError = "";
-  var _password = "";
   var _passwordError = "";
+  var _passwordConfirmError = "";
   var showPass = true;
   var showConPass = true;
+  bool isLoading = false;
 
   void _showSnackbar(String message, Color color) {
     _scaffoldKey.currentState?.showSnackBar(
@@ -40,8 +38,11 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  _onClickTest() async {
+  register() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       final _user = User(
           username: _usernameController.text.trim(),
           email: _emailController.text.trim(),
@@ -50,13 +51,13 @@ class _RegisterState extends State<Register> {
       );
       await userRepo.register(_user);
       _showSnackbar("Register successful", Colors.green);
+      _navigateToHome();
     } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
       _showSnackbar("Register failed", Colors.red);
     }
-  }
-
-  _navigateToLogin(){
-    context.go("/login");
   }
 
   _showPass(bool visibility){
@@ -69,6 +70,14 @@ class _RegisterState extends State<Register> {
     setState(() {
       showConPass = !visibility;
     });
+  }
+
+  _navigateToHome() {
+    context.go("/home");
+  }
+
+  _navigateToLogin() {
+    context.go("/login");
   }
 
   @override
@@ -86,7 +95,7 @@ class _RegisterState extends State<Register> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Welcome",
+                    "Get Setup Here",
                     textDirection: TextDirection.ltr,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
                   ),
@@ -98,18 +107,17 @@ class _RegisterState extends State<Register> {
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
-                            // onChanged: (value) => {_onEmailChanged(value)},
                             controller: _usernameController,
                             decoration: InputDecoration(
                               hintText: "Username",
                               errorText: _usernameError.isEmpty ? null : _usernameError,
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.person),
+                              suffixIcon: const IconButton(
+                                onPressed: null,
+                                icon: Icon(Icons.person),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(width: 5.0),
+                                borderSide: const BorderSide(width: 5.0),
                               ),
                             ),
                           ),
@@ -120,17 +128,16 @@ class _RegisterState extends State<Register> {
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
                             controller: _emailController,
-                            // onChanged: (value) => {_onEmailChanged(value)},
                             decoration: InputDecoration(
                               hintText: "Email",
                               errorText: _emailError.isEmpty ? null : _emailError,
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.verified),
+                              suffixIcon: const IconButton(
+                                onPressed: null,
+                                icon: Icon(Icons.email),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(width: 5.0),
+                                borderSide: const BorderSide(width: 5.0),
                               ),
                             ),
                           ),
@@ -143,7 +150,6 @@ class _RegisterState extends State<Register> {
                           child: TextField(
                             obscureText: showPass,
                             controller: _passwordController,
-                            // onChanged: (value) => {_onPasswordChanged(value)},
                             decoration: InputDecoration(
                               hintText: "Password",
                               suffixIcon: IconButton(
@@ -164,14 +170,13 @@ class _RegisterState extends State<Register> {
                           child: TextField(
                             obscureText: showConPass,
                             controller: _passwordConfirmController,
-                            // onChanged: (value) => {_onPasswordChanged(value)},
                             decoration: InputDecoration(
                               hintText: "Confirm Password",
                               suffixIcon: IconButton(
                                 onPressed: () => _showConPass(showConPass),
                                 icon:const Icon(Icons.remove_red_eye),
                               ),
-                              errorText: _passwordError.isEmpty ? null : _passwordError,
+                              errorText: _passwordConfirmError.isEmpty ? null : _passwordConfirmError,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -179,10 +184,10 @@ class _RegisterState extends State<Register> {
                           ),
                         ),
                         const SizedBox(height: 20,),
-                        Container(
+                        SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () => _onClickTest(),
+                            onPressed: () => register(),
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.black,
                                 shape: RoundedRectangleBorder(
@@ -190,7 +195,12 @@ class _RegisterState extends State<Register> {
                                 ),
                                 padding: const EdgeInsets.symmetric(vertical: 16)
                             ),
-                            child: const Text("Register", style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                            child: isLoading
+                              ? const CircularProgressIndicator(
+                                  strokeWidth: 3, color: Colors.white)
+                              : const Text(
+                                  "Register",
+                                  style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                           ),
                         ),
                         const SizedBox(height: 20,),
@@ -199,8 +209,8 @@ class _RegisterState extends State<Register> {
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("have an account? "),
-                              Text("Sign in",style: TextStyle(fontWeight: FontWeight.bold),)
+                              Text("Already registered? "),
+                              Text("Sign in", style: TextStyle(fontWeight: FontWeight.bold),)
                             ],
                           ),
                         ),
@@ -222,10 +232,5 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => {},
-      //   child: const Icon(Icons.add),
-      // ),
-
   }
 }

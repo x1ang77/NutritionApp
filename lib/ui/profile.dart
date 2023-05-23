@@ -24,6 +24,7 @@ class _ProfileState extends State<Profile> {
   final _newPasswordController = TextEditingController();
   String? userEmail;
   String? userName;
+  List<user_model.User> users = [];
 
   File? image;
   String base64ImageString = "";
@@ -107,47 +108,57 @@ class _ProfileState extends State<Profile> {
   @override
   void initState() {
     super.initState();
-    fetchUserData();
+    // fetchUserData();
     getUser();
   }
 
   Future getUser() async {
+    // final collection = await FirebaseFirestore.instance.collection("users").get();
+    // var data = collection.docs;
+    // var user = data.elementAt(0).data();
+    // var currentUser = user_model.User.fromMap(user);
+    // _user = currentUser;
+    // debugPrint("${_user?.email}");
     User? user = FirebaseAuth.instance.currentUser;
-    var currentUser = await repo.getUserById(user!.uid);
-    _user = currentUser;
+    var currentUser = await repo.getUserById("fpPvRnd4J9UwVhIw3s7xBltppu03");
+    setState(() {
+      _user = currentUser;
+    });
     final Reference storageReference = FirebaseStorage.instance.ref().child('images/${_user?.image}');
-    // Get the download URL of the uploaded image
-    downloadUrl = await storageReference.getDownloadURL();
-    debugPrint(_user?.image.toString());
+    var temp = await storageReference.getDownloadURL();
+    debugPrint(temp.toString());
+    setState(() {
+      downloadUrl = temp;
+    });
   }
 
-  Future fetchUserData() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-
-      if (snapshot.exists) {
-        Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
-        String name = userData['name'];
-        String password = userData['password'];
-        setState(() {
-          userEmail = user.email;
-          userName = name;
-          _user = user_model.User(
-            // Assign other fields from the fetched user data if needed
-            id: user.uid,
-            username: name,
-            email: userEmail.toString(),
-            password: password
-          );
-          debugPrint(name);
-        });
-      }
-    }
-  }
+  // Future fetchUserData() async {
+  //   User? user = FirebaseAuth.instance.currentUser;
+  //   if (user != null) {
+  //     DocumentSnapshot snapshot = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(user.uid)
+  //         .get();
+  //
+  //     if (snapshot.exists) {
+  //       Map<String, dynamic> userData = snapshot.data() as Map<String, dynamic>;
+  //       // String name = userData['name'];
+  //       String password = userData['password'];
+  //       setState(() {
+  //         userEmail = user.email;
+  //         // userName = name;
+  //         // _user = user_model.User(
+  //         //   // Assign other fields from the fetched user data if needed
+  //         //   id: user.uid,
+  //         //   // username: name,
+  //         //   email: userEmail.toString(),
+  //         //   password: password
+  //         // );
+  //         // debugPrint(name);
+  //       });
+  //     }
+  //   }
+  // }
 
   void _changePassword() async {
     String currentPassword = _currentPasswordController.text;
@@ -224,7 +235,7 @@ class _ProfileState extends State<Profile> {
               child: image != null
                   ? Image.file(image!)
                   : _user?.image != null
-                  ? Image.network(downloadUrl!)
+                  ? Image.network(downloadUrl ?? "")
                   : Container(),
             ),
             // Container(

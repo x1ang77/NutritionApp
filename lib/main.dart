@@ -32,6 +32,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
         primaryColor: Colors.green,
       ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.green,
+        primaryColor: Colors.green[900],
+      ),
       home: SafeArea(child: NavRouter(initialRoute: isLoggedIn ? "/home" : "/login"))
     );
   }

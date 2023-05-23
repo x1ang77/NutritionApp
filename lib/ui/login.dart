@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
+import '../component/snackbar.dart';
+
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
@@ -16,38 +18,60 @@ class _LoginState extends State<Login> {
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool isLoading = false;
-
-  var _email = "";
   var _emailError = "";
-  var _password = "";
   var _passwordError = "";
   var showPass = true;
+  bool isLoading = false;
 
-  void _showSnackbar(String message, Color color) {
-    _scaffoldKey.currentState?.showSnackBar(
-      SnackBar(
-        backgroundColor: color,
-        content: Text(message),
-      ),
-    );
+  login() async {
+    try {
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+      var emailExists = await userRepo.checkEmailInFirebase(email);
+
+      setState(() {
+        if (email.isEmpty) {
+          _emailError = "This field cannot be empty";
+          return;
+        } else {
+          _emailError = "";
+        }
+
+        if (password.isEmpty) {
+          _passwordError = "This field cannot be empty";
+          return;
+        } else {
+          _passwordError = "";
+        }
+
+        isLoading = true;
+      });
+
+      if (!emailExists) {
+        showSnackbar(
+            _scaffoldKey,
+            "No account was registered with this email",
+            Colors.red
+        );
+        isLoading = false;
+      } else {
+        _emailError = "";
+        await userRepo.login(email, password);
+        showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
+        _navigateToHome();
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
+    }
   }
 
-  Future<void> login() async {
-    try {
-      isLoading = true;
-      await userRepo.login(
-          _emailController.text.trim(),
-          _passwordController.text.trim()
-      );
-      isLoading = false;
-      _navigateToHome();
-      _showSnackbar('Login successful', Colors.green);
-    } catch (e) {
-      isLoading = false;
-      debugPrint('Email or Password Incorrect');
-      _showSnackbar('Login failed', Colors.red);
-    }
+  _showPass(bool visibility){
+    setState(() {
+      showPass = !visibility;
+    });
   }
 
   _navigateToHome() {
@@ -58,146 +82,145 @@ class _LoginState extends State<Login> {
     context.go("/register");
   }
 
-  _showPass(bool visibility){
-    setState(() {
-      showPass = !visibility;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
         // resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            CustomPaint(
-              painter: CurvePainter(),
-              child: Container(),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Welcome",
-                  textDirection: TextDirection.ltr,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
-                ),
-                SingleChildScrollView(
-                  child: Container(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Column(
-                      children: [
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            // onChanged: (value) => {_onEmailChanged(value)},
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              hintText: "Email",
-                              errorText: _emailError.isEmpty ? null : _emailError,
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.verified),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(width: 5.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            obscureText: showPass,
-                            controller: _passwordController,
-                            // onChanged: (value) => {_onPasswordChanged(value)},
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              suffixIcon: IconButton(
-                                onPressed: () => _showPass(showPass),
-                                icon: const Icon(Icons.remove_red_eye),
-                              ),
-                              errorText:
-                                  _passwordError.isEmpty ? null : _passwordError,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text("Forgot your password"),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => login(),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                                padding: const EdgeInsets.symmetric(vertical: 16)),
-                            child: isLoading
-                            ? const SizedBox(
-                              height: 30,
-                              width: 30,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 3, color: Colors.white),
-                            )
-                            : const Text(
-                              "Login",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () => _navigateToRegister(),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Don't have an account? "),
-                              Text(
-                                "Sign up",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: CustomPaint(
+        body: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              CustomPaint(
                 painter: CurvePainter(),
                 child: Container(),
               ),
-            ),
-          ],
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Welcome",
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                  ),
+                  SingleChildScrollView(
+                    child: Container(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Column(
+                        children: [
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            child: TextField(
+                              controller: _emailController,
+                              decoration: InputDecoration(
+                                labelText: "Email",
+                                errorText: _emailError.isEmpty ? null : _emailError,
+                                prefixIcon: const Icon(Icons.email),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 5.0),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            child: TextField(
+                              obscureText: showPass,
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: "Password",
+                                prefixIcon: const Icon(Icons.password),
+                                suffixIcon: IconButton(
+                                  onPressed: () => _showPass(showPass),
+                                  icon: const Icon(Icons.remove_red_eye),
+                                ),
+                                errorText:
+                                    _passwordError.isEmpty ? null : _passwordError,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              "Forgot password",
+                              style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () => login(),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(vertical: 16)),
+                              child: isLoading
+                                ? const CircularProgressIndicator(
+                                    strokeWidth: 3, color: Colors.white)
+                                : const Text(
+                                    "Login",
+                                    style: TextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () => _navigateToRegister(),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Don't have an account? "),
+                                Text(
+                                  "Sign up",
+                                  style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

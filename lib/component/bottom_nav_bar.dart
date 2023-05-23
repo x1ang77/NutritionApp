@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:nutrition_app/ui/diary.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 
@@ -35,6 +36,28 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // body: Center(
+      //   child: _widgetOptions.elementAt(_selectedIndex),
+      // ),
+      // bottomNavigationBar: GNav(
+      //     gap: 20,
+      //     tabs: [
+      //       GButton(
+      //           icon: FontAwesomeIcons.book,
+      //           text: "Diary",
+      //       ),
+      //       GButton(
+      //         icon: Icons.restaurant_menu,
+      //         text: "Recipes",
+      //       ),
+      //       GButton(
+      //         icon: FontAwesomeIcons.person,
+      //         text: "Me",
+      //       ),
+      //     ]
+      // ),
+
+
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),

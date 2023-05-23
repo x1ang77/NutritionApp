@@ -7,13 +7,13 @@ class User {
   final String username;
   final String email;
   final String password;
-  String? image;
+  final String? image;
   final String gender;
   final int age;
   final double height;
   final double weight;
   final String? diet;
-  final int? calorieIntake;
+  final double? calorieIntake;
 
   static const String tableName = "users";
 
@@ -28,7 +28,7 @@ class User {
     this.height = 0.0,
     this.weight = 0.0,
     this.diet = '',
-    this.calorieIntake = 0,
+    this.calorieIntake = 0.0,
   });
 
   Map<String, dynamic> toMap() {
@@ -44,7 +44,7 @@ class User {
       "height": height,
       "weight": weight,
       "diet": diet,
-      "calorie_intake": calorieIntake
+      "calorieIntake": calorieIntake
     };
   }
 
@@ -55,12 +55,12 @@ class User {
       email: map["email"],
       password: map["password"],
       image: map["image"],
-      gender: map["gender"],
+      gender: map["gender"] ?? "",
       age: map["age"] ?? 0,
       height: map["height"] ?? 0.0,
       weight: map["weight"] ?? 0.0,
       diet: map["diet"] ?? '',
-      calorieIntake: map["calorie_intake"] ?? 0,
+      calorieIntake: map["calorieIntake"] ?? 0.0,
     );
   }
 }
