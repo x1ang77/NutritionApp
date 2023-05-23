@@ -7,7 +7,7 @@ class User {
   final String username;
   final String email;
   final String password;
-  final Uint8List? image;
+  String? image;
   final String gender;
   final int age;
   final double height;
@@ -18,9 +18,17 @@ class User {
   static const String tableName = "users";
 
   User({
-    this.id, required this.username, required this.email, required this.password,
-    this.image, required this.gender, required this.age, required this.height, required this.weight, this.diet,
-    this.calorieIntake
+    this.id,
+    required this.username,
+    required this.email,
+    required this.password,
+    this.image,
+    this.gender = '',
+    this.age = 0,
+    this.height = 0.0,
+    this.weight = 0.0,
+    this.diet = '',
+    this.calorieIntake = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -48,11 +56,11 @@ class User {
       password: map["password"],
       image: map["image"],
       gender: map["gender"],
-      age: map["age"],
-      height: map["height"],
-      weight: map["weight"],
-      diet: map["diet"],
-      calorieIntake: map["calorie_intake"]
+      age: map["age"] ?? 0,
+      height: map["height"] ?? 0.0,
+      weight: map["weight"] ?? 0.0,
+      diet: map["diet"] ?? '',
+      calorieIntake: map["calorie_intake"] ?? 0,
     );
   }
 }
