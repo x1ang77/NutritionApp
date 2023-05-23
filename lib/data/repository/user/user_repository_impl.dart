@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:nutrition_app/component/snackbar.dart';
 import 'package:nutrition_app/data/model/user.dart' as user_model;
 import 'package:nutrition_app/data/repository/user/user_repository.dart';
 
@@ -21,6 +23,7 @@ class UserRepoImpl extends UserRepo {
         password: password,
       );
     } catch (e) {
+      showSnackbar(e.toString(), Colors.red);
       throw Exception(e.toString());
     }
   }

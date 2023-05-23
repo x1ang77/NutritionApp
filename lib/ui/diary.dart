@@ -28,6 +28,13 @@ class _DiaryState extends State<Diary> {
     }
   }
 
+  final List<String> breakfastItems = ['Eggs', 'Toast', 'Cereal'];
+  final List<String> lunchItems = ['Salad', 'Sandwich', 'Soup'];
+  final List<String> dinnerItems = ['Steak', 'Pasta', 'Chicken'];
+  final List<String> snackItems = ['Fruit', 'Yogurt', 'Nuts'];
+  final List<String> entries = <String>['A', 'B', 'C'];
+  final List<int> colorCodes = <int>[600, 500, 100];
+
   // _signOut() async {
   //   try {
   //     await FirebaseAuth.instance.signOut();
@@ -61,9 +68,34 @@ class _DiaryState extends State<Diary> {
   final int consumedCalories = 2000;
   final int recommendedCalories = 2500;
 
+  Widget buildListSection(String title, List<String> items) {
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Divider(),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return ListTile(
+              title: Text(items[index]),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
     double progress = consumedCalories / recommendedCalories;
     int remainingCalories = recommendedCalories - consumedCalories;
 
@@ -71,7 +103,7 @@ class _DiaryState extends State<Diary> {
       appBar: AppBar(
         title: const Text("Dashboard"),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             Column(
@@ -195,6 +227,57 @@ class _DiaryState extends State<Diary> {
                       ]
                   ),
                 ],
+              ),
+            ),
+
+            ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ListView.builder(
+                  //   scrollDirection: Axis.vertical,
+                  //   prototypeItem: buildListSection('Breakfast', breakfastItems),
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   itemCount: 4, // Number of sections (breakfast, lunch, dinner, snack)
+                  //   itemBuilder: (BuildContext context, int index) {
+                  //     if (index == 0) {
+                  //       return buildListSection('Breakfast', breakfastItems);
+                  //     } else if (index == 1) {
+                  //       return buildListSection('Lunch', lunchItems);
+                  //     } else if (index == 2) {
+                  //       return buildListSection('Dinner', dinnerItems);
+                  //     } else if (index == 3) {
+                  //       return buildListSection('Snack', snackItems);
+                  //     }
+                  //     // return Container();
+                  //   },
+                  // ),
+
+                  SingleChildScrollView(
+                    child: Expanded(
+                        child: ListView.builder(
+                          // scrollDirection: Axis.horizontal,
+                          itemCount: 4,
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return buildListSection('Breakfast', breakfastItems);
+                              case 1:
+                                return buildListSection('Lunch', lunchItems);
+                              case 2:
+                                return buildListSection('Dinner', dinnerItems);
+                              case 3:
+                                return buildListSection('Snack', snackItems);
+                              default:
+                                return Container();
+                            }
+                          },
+                        ),
+                    ),
+                  )
+                ]
               ),
             )
           ],
