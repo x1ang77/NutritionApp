@@ -255,28 +255,26 @@ class _DiaryState extends State<Diary> {
                   //   },
                   // ),
 
-                  SingleChildScrollView(
-                    child: Expanded(
-                        child: ListView.builder(
-                          // scrollDirection: Axis.horizontal,
-                          itemCount: 4,
-                          itemBuilder: (context, index) {
-                            switch (index) {
-                              case 0:
-                                return buildListSection('Breakfast', breakfastItems);
-                              case 1:
-                                return buildListSection('Lunch', lunchItems);
-                              case 2:
-                                return buildListSection('Dinner', dinnerItems);
-                              case 3:
-                                return buildListSection('Snack', snackItems);
-                              default:
-                                return Container();
-                            }
-                          },
-                        ),
-                    ),
-                  )
+                  // Expanded(
+                  //     child: ListView.builder(
+                  //       // scrollDirection: Axis.horizontal,
+                  //       itemCount: 4,
+                  //       itemBuilder: (context, index) {
+                  //         switch (index) {
+                  //           case 0:
+                  //             return buildListSection('Breakfast', breakfastItems);
+                  //           case 1:
+                  //             return buildListSection('Lunch', lunchItems);
+                  //           case 2:
+                  //             return buildListSection('Dinner', dinnerItems);
+                  //           case 3:
+                  //             return buildListSection('Snack', snackItems);
+                  //           default:
+                  //             return Container();
+                  //         }
+                  //       },
+                  //     ),
+                  // )
                 ]
               ),
             )
