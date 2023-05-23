@@ -2,21 +2,19 @@ class Diary {
   final String? id;
   final String? userId;
   final String date;
-  final List<String>? breakfast;
-  final List<String>? lunch;
-  final List<String>? dinner;
-  final List<String>? snack;
-
-  final double? caloriesRemaining;
+  final String breakfast;
+  final String lunch;
+  final String dinner;
+  final double? caloriesGoals;
   final double? caloriesConsumed;
-  final double? caloriesBurned;
 
   static const String tableName = "diaries";
 
   Diary({
-    this.id, this.userId, required this.date, this.breakfast,
-    this.lunch, this.dinner, this.snack, this.caloriesRemaining,
-    this.caloriesConsumed = 0, this.caloriesBurned = 0
+    this.id, this.userId, required this.date,
+    required this.breakfast, required this.lunch,
+    required this.dinner,  this.caloriesGoals,
+    this.caloriesConsumed = 0
   });
 
   Map<String ,dynamic> toMap() {
@@ -27,10 +25,8 @@ class Diary {
       "breakfast": breakfast,
       "lunch": lunch,
       "dinner": dinner,
-      "snack": snack,
-      "calories_remaining": caloriesRemaining,
+      "calories_goals": caloriesGoals,
       "calories_consumed": caloriesConsumed,
-      "calories_burned": caloriesBurned
     };
   }
 
@@ -42,10 +38,8 @@ class Diary {
       breakfast: map["breakfast"],
       lunch: map["lunch"],
       dinner: map["dinner"],
-      snack: map["snack"],
-      caloriesRemaining: map["calories_remaining"],
+      caloriesGoals: map["calories_goals"],
       caloriesConsumed: map["calories_consumed"],
-      caloriesBurned: map["calories_burned"]
     );
   }
 }
