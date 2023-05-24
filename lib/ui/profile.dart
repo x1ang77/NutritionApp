@@ -1,13 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
+import '../component/snackbar.dart';
 import '../data/model/user.dart' as user_model;
 
 class Profile extends StatefulWidget {
@@ -19,8 +22,12 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   var repo = UserRepoImpl();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
+  GlobalKey<ScaffoldMessengerState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
+  final _newCalorieGoalController = TextEditingController();
+
   String? userEmail;
   String? userName;
   List<user_model.User> users = [];
@@ -65,7 +72,7 @@ class _ProfileState extends State<Profile> {
   _logout() async {
     try {
       await FirebaseAuth.instance.signOut();
-        navigateToLogin();
+      navigateToLogin();
     } catch (e) {
       // An error occurred while signing out
       debugPrint('Error signing out: $e');
@@ -142,6 +149,7 @@ class _ProfileState extends State<Profile> {
   void dispose() {
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
+    _newCalorieGoalController.dispose();
     super.dispose();
   }
 
@@ -162,11 +170,11 @@ class _ProfileState extends State<Profile> {
     var temp = await storageReference.getDownloadURL();
     debugPrint(temp.toString());
     setState(() {
-      downloadUrl = temp;
+      downloadUrl = temp
     });
   }
 
-  void _showChangePasswordDialog(BuildContext context) {
+  void _showChangePasswordDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -204,7 +212,8 @@ class _ProfileState extends State<Profile> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey),
+                          backgroundColor: Colors.grey,
+                        ),
                         onPressed: () {
                           Navigator.of(context).pop(); // Close the dialog
                         },
@@ -227,9 +236,151 @@ class _ProfileState extends State<Profile> {
   }
 
   void _changePassword() {
-    // Show the dialog
-    _showChangePasswordDialog(context);
+    String currentPassword = _currentPasswordController.text;
+    String newPassword = _newPasswordController.text;
+
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      user.reauthenticateWithCredential(EmailAuthProvider.credential(
+              email: user.email!, password: currentPassword))
+          .then((authResult) {
+        user.updatePassword(newPassword).then((_) {
+          debugPrint('Password changed successfully');
+          // Show a success message or perform any additional actions
+          // Clear the text fields after the password change
+          _currentPasswordController.clear();
+          _newPasswordController.clear();
+          // Close the dialog
+          context.pop();
+        }).catchError((error) {
+          showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
+          // Show an error message to the user
+        });
+      }).catchError((error) {
+        showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
+        debugPrint('Failed to reauthenticate user: $error');
+        // Show an error message to the user indicating that the current password is incorrect
+      });
+    } else {
+      print('User is not signed in');
+    }
   }
+
+  void _calorieDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 400.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Edit Calorie Goal", style: TextStyle(fontSize: 24)),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          _user?.calorieGoal?.toInt().toString() ?? "",
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ),
+                      SizedBox(width: 16.0),
+                      Icon(Icons.arrow_forward),
+                      SizedBox(width: 16.0),
+                      Expanded(
+                        child: TextField(
+                          controller: _newCalorieGoalController,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: BorderSide(color: Colors.grey),
+                            ),
+                            labelText: 'New Goal',
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 25.0, vertical: 12.0),
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      SizedBox(width: 8.0),
+                      ElevatedButton(
+                        onPressed: () {_updateCalorieGoal();
+                        Navigator.of(context).pop();
+                        _newCalorieGoalController.clear();
+                          },
+                        child: Text('Confirm'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // void _changePassword() {
+  //   // Show the dialog
+  //   _showChangePasswordDialog(context);
+  // }
+
+  void _updateCalorieGoal() {
+
+    String newCalorieGoal = _newCalorieGoalController.text;
+    print('New Calorie Goal: $newCalorieGoal');
+    double parsedCalorieGoal = double.tryParse(newCalorieGoal) ?? 0.0;
+    print('Parsed Calorie Goal: $parsedCalorieGoal');
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+     FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'calorie_goal': parsedCalorieGoal})
+          .then((_) {
+        print('Calorie goal updated successfully');
+        // Update the _user object with the new calorie goal
+        // Close the dialog
+        // Show a success Snackbar or perform any additional actions
+      }).catchError((error) {
+        print('Failed to update calorie goal: $error');
+        // Show an error message to the user
+      });
+
+    } else {
+      print('User is not signed in');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -262,8 +413,8 @@ class _ProfileState extends State<Profile> {
                                 backgroundImage: image != null
                                     ? FileImage(image!)
                                     : _user?.image != null
-                                    ? Image.network(downloadUrl ?? "").image
-                                    : AssetImage("/assets/images/nuts.jpg"),
+                                        ? Image.network(downloadUrl ?? "").image
+                                        : AssetImage("/assets/images/nuts.jpg"),
                               ),
                             ),
                           ),
@@ -286,14 +437,14 @@ class _ProfileState extends State<Profile> {
                     Text("@${_user?.username ?? ""}"),
                     SizedBox(height: 16.0),
                     ElevatedButton(
-                      onPressed: _changePassword,
+                      onPressed: _showChangePasswordDialog,
                       child: Text('Change Password'),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ElevatedButton(
-                          onPressed: _changePassword,
+                          onPressed: () {_calorieDialog();},
                           child: Text('Edit Calorie Goal'),
                         ),
                         SizedBox(width: 10.0),
