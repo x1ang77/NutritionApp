@@ -1,8 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/model/user.dart';
 
+import '../component/snackbar.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
 class Register extends StatefulWidget {
@@ -28,36 +30,109 @@ class _RegisterState extends State<Register> {
   var showPass = true;
   var showConPass = true;
   bool isLoading = false;
-
-  void _showSnackbar(String message, Color color) {
-    _scaffoldKey.currentState?.showSnackBar(
-      SnackBar(
-        backgroundColor: color,
-        content: Text(message),
-      ),
-    );
-  }
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  final FocusNode _focusNode3 = FocusNode();
+  final FocusNode _focusNode4 = FocusNode();
+  bool isFocused = false;
+  bool isEmailVerified = false;
 
   register() async {
     try {
+      String username = _usernameController.text.trim();
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+      String passwordConfirm = _passwordConfirmController.text.trim();
+
       setState(() {
+        if (username.length < 8) {
+          _usernameError = "Username needs to be at least 8 characters long";
+          return;
+        } else {
+          _usernameError = "";
+        }
+
+        if (!EmailValidator.validate(email)) {
+          _emailError = "Invalid email format";
+          return;
+        } else {
+          _emailError = "";
+        }
+
+        if (password.length < 8) {
+          _passwordError = "Password needs to be at least 8 characters long";
+          return;
+        } else {
+          _passwordError = "";
+        }
+
+        if (passwordConfirm != password) {
+          _passwordConfirmError = "Passwords must match";
+          return;
+        } else {
+          _passwordConfirmError = "";
+        }
+
         isLoading = true;
       });
-      final _user = User(
-          username: _usernameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          gender: "", age: 0, height: 0, weight: 0
-      );
-      await userRepo.register(_user);
-      _showSnackbar("Register successful", Colors.green);
-      _navigateToHome();
+
+      var emailExists = await userRepo.checkEmailInFirebase(email);
+      if (emailExists) {
+        showSnackbar(
+            _scaffoldKey,
+            "An account was already registered to this email",
+            Colors.red
+        );
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        // if (_validate(username, email, password, passwordConfirm)) {
+        //   await userRepo.register(username, email, password);
+        //   showSnackbar(_scaffoldKey, "Register successful", Colors.green);
+        //   _navigateToHome();
+        // }
+        await userRepo.register(username, email, password);
+        showSnackbar(_scaffoldKey, "Register successful", Colors.green);
+        _navigateToHome();
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      _showSnackbar("Register failed", Colors.red);
+      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
     }
+  }
+
+  _validate(String username, String email, String password, String passwordConfirm) {
+    if (username.length < 8) {
+      _usernameError = "Username needs to be at least 8 characters long";
+      return false;
+    } else {
+      _usernameError = "";
+    }
+
+    if (!EmailValidator.validate(email)) {
+      _emailError = "Invalid email format";
+      return false;
+    } else {
+      _emailError = "";
+    }
+
+    if (password.length < 8) {
+      _passwordError = "Password needs to be at least 8 characters long";
+      return false;
+    } else {
+      _passwordError = "";
+    }
+
+    if (passwordConfirm != password) {
+      _passwordConfirmError = "Passwords must match";
+      return false;
+    } else {
+      _passwordConfirmError = "";
+    }
+    return true;
   }
 
   _showPass(bool visibility){
@@ -80,155 +155,169 @@ class _RegisterState extends State<Register> {
     context.go("/login");
   }
 
+  // @override
+  // void dispose() {
+  //   _usernameController.dispose();
+  //   _emailController.dispose();
+  //   _passwordController.dispose();
+  //   _passwordConfirmController.dispose();
+  //   super.dispose();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-            children: [
-              Image.asset(
-                "assets/images/loginTop.png",
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        body: SingleChildScrollView(
+          physics: _focusNode1.hasFocus || _focusNode2.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
                 children: [
-                  const Text(
-                    "Get Setup Here",
-                    textDirection: TextDirection.ltr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                  Image.asset(
+                    "assets/images/loginTop.png",
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(40.0),
-                    child: Column(
-                      children: [
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            controller: _usernameController,
-                            decoration: InputDecoration(
-                              hintText: "Username",
-                              errorText: _usernameError.isEmpty ? null : _usernameError,
-                              suffixIcon: const IconButton(
-                                onPressed: null,
-                                icon: Icon(Icons.person),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(width: 5.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20,),
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              hintText: "Email",
-                              errorText: _emailError.isEmpty ? null : _emailError,
-                              suffixIcon: const IconButton(
-                                onPressed: null,
-                                icon: Icon(Icons.email),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: const BorderSide(width: 5.0),
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20,),
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            obscureText: showPass,
-                            controller: _passwordController,
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              suffixIcon: IconButton(
-                                onPressed: () => _showPass(showPass),
-                                icon:const Icon(Icons.remove_red_eye),
-                              ),
-                              errorText: _passwordError.isEmpty ? null : _passwordError,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20,),
-                        Material(
-                          elevation: 10,
-                          borderRadius: BorderRadius.circular(10),
-                          child: TextField(
-                            obscureText: showConPass,
-                            controller: _passwordConfirmController,
-                            decoration: InputDecoration(
-                              hintText: "Confirm Password",
-                              suffixIcon: IconButton(
-                                onPressed: () => _showConPass(showConPass),
-                                icon:const Icon(Icons.remove_red_eye),
-                              ),
-                              errorText: _passwordConfirmError.isEmpty ? null : _passwordConfirmError,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20,),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () => register(),
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Get Setup Here",
+                        textDirection: TextDirection.ltr,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(40.0),
+                        child: Column(
+                          children: [
+                            Material(
+                              elevation: 10,
+                              borderRadius: BorderRadius.circular(10),
+                              child: TextField(
+                                controller: _usernameController,
+                                decoration: InputDecoration(
+                                  hintText: "Username",
+                                  errorText: _usernameError.isEmpty ? null : _usernameError,
+                                  suffixIcon: const IconButton(
+                                    onPressed: null,
+                                    icon: Icon(Icons.person),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(width: 5.0),
+                                  ),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 16)
+                              ),
                             ),
-                            child: isLoading
-                              ? const CircularProgressIndicator(
-                                  strokeWidth: 3, color: Colors.white)
-                              : const Text(
-                                  "Register",
-                                  style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                          ),
+                            const SizedBox(height: 20,),
+                            Material(
+                              elevation: 10,
+                              borderRadius: BorderRadius.circular(10),
+                              child: TextField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  hintText: "Email",
+                                  errorText: _emailError.isEmpty ? null : _emailError,
+                                  suffixIcon: const IconButton(
+                                    onPressed: null,
+                                    icon: Icon(Icons.email),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: const BorderSide(width: 5.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20,),
+                            Material(
+                              elevation: 10,
+                              borderRadius: BorderRadius.circular(10),
+                              child: TextField(
+                                obscureText: showPass,
+                                controller: _passwordController,
+                                decoration: InputDecoration(
+                                  hintText: "Password",
+                                  suffixIcon: IconButton(
+                                    onPressed: () => _showPass(showPass),
+                                    icon:const Icon(Icons.remove_red_eye),
+                                  ),
+                                  errorText: _passwordError.isEmpty ? null : _passwordError,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            Material(
+                              elevation: 10,
+                              borderRadius: BorderRadius.circular(10),
+                              child: TextField(
+                                obscureText: showConPass,
+                                controller: _passwordConfirmController,
+                                decoration: InputDecoration(
+                                  hintText: "Confirm Password",
+                                  suffixIcon: IconButton(
+                                    onPressed: () => _showConPass(showConPass),
+                                    icon:const Icon(Icons.remove_red_eye),
+                                  ),
+                                  errorText: _passwordConfirmError.isEmpty ? null : _passwordConfirmError,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () => register(),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 16)
+                                ),
+                                child: isLoading
+                                  ? const CircularProgressIndicator(
+                                      strokeWidth: 3, color: Colors.white)
+                                  : const Text(
+                                      "Register",
+                                      style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            GestureDetector(
+                              onTap: () => _navigateToLogin(),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text("Already registered? "),
+                                  Text("Sign in", style: TextStyle(fontWeight: FontWeight.bold),)
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 20,),
-                        GestureDetector(
-                          onTap: () => _navigateToLogin(),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("Already registered? "),
-                              Text("Sign in", style: TextStyle(fontWeight: FontWeight.bold),)
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Image.asset(
+                      "assets/images/loginBottom.png",
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ],
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Image.asset(
-                  "assets/images/loginBottom.png",
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
+            ),
+          ),
         ),
       ),
     );

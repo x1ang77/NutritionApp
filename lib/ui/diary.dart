@@ -65,8 +65,17 @@ class _DiaryState extends State<Diary> {
     context.go("/login");
   }
 
-  final int consumedCalories = 2000;
-  final int recommendedCalories = 2500;
+  final double recommendedCalories = 2500; // kJ / kcal
+  final double consumedCalories = 2000;
+  final double burnedCalories = 200;
+
+  final double carbohydrateGoal = 600; // g
+  final double proteinGoal = 100;
+  final double fatGoal = 40;
+
+  final double carbohydrate = 409.1;
+  final double protein = 28.3;
+  final double fat = 25.6;
 
   Widget buildListSection(String title, List<String> items) {
     return Column(
@@ -74,13 +83,13 @@ class _DiaryState extends State<Diary> {
         ListTile(
           title: Text(
             title,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        Divider(),
+        const Divider(),
         ListView.builder(
           shrinkWrap: true,
           itemCount: items.length,
@@ -97,7 +106,14 @@ class _DiaryState extends State<Diary> {
   @override
   Widget build(BuildContext context) {
     double progress = consumedCalories / recommendedCalories;
-    int remainingCalories = recommendedCalories - consumedCalories;
+    int remainingCalories = (recommendedCalories - consumedCalories).round();
+
+    double carboProgress = carbohydrate / carbohydrateGoal;
+    double proteinProgress = protein / proteinGoal;
+    double fatProgress = fat / fatGoal;
+    int remainingCarbo = (carbohydrateGoal - carbohydrate).round();
+    int remainingProtein = (proteinGoal - protein).round();
+    int remainingFat = (fatGoal - fat).round();
 
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +128,10 @@ class _DiaryState extends State<Diary> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.chevron_left),
+                      icon: const Icon(
+                        size: 32,
+                        Icons.chevron_left,
+                      ),
                       onPressed: () {
                         setState(() {
                           selectedDate = selectedDate.subtract(Duration(days: 1));
@@ -121,10 +140,13 @@ class _DiaryState extends State<Diary> {
                     ),
                     Text(
                       _formatDate(selectedDate),
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
-                      icon: Icon(Icons.chevron_right),
+                      icon: const Icon(
+                        size: 32,
+                        Icons.chevron_right
+                    ),
                       onPressed: () {
                         DateTime displayDate = selectedDate.add(Duration(days: 1));
                         DateTime currentDate = DateTime.now();
@@ -138,93 +160,241 @@ class _DiaryState extends State<Diary> {
                     ),
                   ],
                 ),
-                // Add your calorie tracking widgets or content here
               ],
             ),
 
             Container(
+              margin: const EdgeInsets.symmetric(vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Column(
+                  Stack(
+                      alignment: AlignmentDirectional.center,
                       children: [
-                        Text(
-                            "$consumedCalories",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
-                            )
+                        SizedBox(
+                          width: 150,
+                          height: 150,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 10,
+                            backgroundColor: Colors.green[100],
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                          ),
                         ),
-                        const Text(
-                            'Consumed',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey
-                            )
-                        )
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  "$remainingCalories",
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.green,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  )
+                              ),
+                              Text(
+                                  'Remaining',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.green[400]
+                                  )
+                              )
+                            ]
+                        ),
                       ]
                   ),
+                ],
+              ),
+            ),
 
-                  Stack(
-                    alignment: AlignmentDirectional.center,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 150,
-                        height: 150,
-                        child: CircularProgressIndicator(
-                          value: progress,
-                          strokeWidth: 10,
-                          backgroundColor: Colors.green[100],
-                          valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-                        ),
+                      Text(
+                          "$consumedCalories",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.orange[700],
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          )
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "$remainingCalories",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
+                      Text(
+                          'Consumed',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.orange[500]
+                          )
+                      )
+                    ]
+                ),
+
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          "$burnedCalories",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.purple[800],
                               fontSize: 20,
                               fontWeight: FontWeight.bold
-                            )
-                          ),
-                          const Text(
-                              'Remaining',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey
-                              )
                           )
-                        ]
                       ),
+                      Text(
+                          'Burned',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.purple[300]
+                          )
+                      )
                     ]
+                ),
+              ],
+            ),
+
+            Container(
+              margin: const EdgeInsets.only(top: 32),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(
+                            value: carboProgress,
+                            strokeWidth: 10,
+                            backgroundColor: Colors.brown[100],
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.brown),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    "$remainingCarbo",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.brown,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                                Text(
+                                    'Carbohydrate',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.brown[400]
+                                    )
+                                )
+                              ]
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
-                  Column(
+                  Expanded(
+                    flex: 1,
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                            "0",
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
-                            )
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(
+                            value: proteinProgress,
+                            strokeWidth: 10,
+                            backgroundColor: Colors.pink[100],
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.pink),
+                          ),
                         ),
-                        const Text(
-                            'Burned',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey
-                            )
-                        )
-                      ]
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    "$remainingProtein",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.pink,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                                Text(
+                                    'Protein',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.pink[400]
+                                    )
+                                )
+                              ]
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(
+                            value: fatProgress,
+                            strokeWidth: 10,
+                            backgroundColor: Colors.blue[100],
+                            valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    "$remainingFat",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                                Text(
+                                    'Fat',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.blue[400]
+                                    )
+                                )
+                              ]
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
