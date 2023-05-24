@@ -22,12 +22,31 @@ class _LoginState extends State<Login> {
   var _passwordError = "";
   var showPass = true;
   bool isLoading = false;
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  bool isFocused = false;
+  bool isEmailVerified = false;
 
-  login() async {
+  @override
+  void initState() {
+    _emailController.addListener(_emailChanged);
+    super.initState();
+  }
+
+  void _emailChanged() async {
+    String email = _emailController.text.trim();
+    var result = await userRepo.checkEmailInFirebase(email);
+    if (result) {
+      isEmailVerified = true;
+    } else {
+      isEmailVerified = false;
+    }
+  }
+
+  Future<void> login() async {
     try {
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
-      var emailExists = await userRepo.checkEmailInFirebase(email);
 
       setState(() {
         if (email.isEmpty) {
@@ -47,24 +66,15 @@ class _LoginState extends State<Login> {
         isLoading = true;
       });
 
-      if (!emailExists) {
-        showSnackbar(
-            _scaffoldKey,
-            "No account was registered with this email",
-            Colors.red
-        );
-        isLoading = false;
-      } else {
-        _emailError = "";
-        await userRepo.login(email, password);
-        showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
-        _navigateToHome();
-      }
+      await userRepo.login(email, password);
+      showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
+      _navigateToHome();
+      isLoading = false;
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
+      showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
     }
   }
 
@@ -83,30 +93,38 @@ class _LoginState extends State<Login> {
   }
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              CustomPaint(
-                painter: CurvePainter(),
-                child: Container(),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Welcome",
-                    textDirection: TextDirection.ltr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+        body: SingleChildScrollView(
+          physics: _focusNode1.hasFocus || _focusNode2.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              children: [
+                CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
                   ),
-                  SingleChildScrollView(
-                    child: Container(
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Welcome",
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                    ),
+                    Container(
                       padding: const EdgeInsets.all(40.0),
                       child: Column(
                         children: [
@@ -114,11 +132,13 @@ class _LoginState extends State<Login> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              // focusNode: _focusNode1,
                               controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: "Email",
                                 errorText: _emailError.isEmpty ? null : _emailError,
                                 prefixIcon: const Icon(Icons.email),
+                                suffixIcon: isEmailVerified ? const Icon(Icons.verified) : null,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                   borderSide: const BorderSide(width: 5.0),
@@ -133,6 +153,7 @@ class _LoginState extends State<Login> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              // focusNode: _focusNode2,
                               obscureText: showPass,
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -207,25 +228,48 @@ class _LoginState extends State<Login> {
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: CustomPaint(
-                  painter: CurvePainter(),
-                  child: Container(),
+                  ],
                 ),
-              ),
-            ],
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: CustomPaint(
+                    painter: CurvePainter(),
+                    child: Container(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+
+// class EmailField extends StatelessWidget {
+//   const EmailField({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return TextField(
+//       focusNode: _focusNode1,
+//       controller: _emailController,
+//       decoration: InputDecoration(
+//         labelText: "Email",
+//         errorText: _emailError.isEmpty ? null : _emailError,
+//         prefixIcon: const Icon(Icons.email),
+//         suffixIcon: isEmailVerified ? Icon(Icons.verified) : null,
+//         border: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(10),
+//           borderSide: const BorderSide(width: 5.0),
+//         ),
+//       ),
+//     ),
+//   }
+// }
+
 
 class CurvePainter extends CustomPainter {
   @override
@@ -286,7 +330,6 @@ class CurvePainter extends CustomPainter {
     path2.close();
 
     canvas.drawPath(path2, paint2);
-
   }
 
   @override
