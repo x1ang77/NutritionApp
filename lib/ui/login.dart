@@ -310,10 +310,10 @@ class CurvePainter extends CustomPainter {
     // Second Curve
     final path2 = Path();
 
-    final startPoint2 = Offset(0, size.height * 0.88);
-    final endPoint2 = Offset(size.width, size.height - 20);
+    final startPoint2 = Offset(0, size.height * 0.80);
+    final endPoint2 = Offset(size.width, size.height - 80);
 
-    final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.95);
+    final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
     final controlPoint2_2 = Offset(size.width * 0.65, size.height * 0.88);
 
     path2.moveTo(startPoint2.dx, startPoint2.dy);
