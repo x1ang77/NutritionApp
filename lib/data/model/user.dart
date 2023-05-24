@@ -17,6 +17,7 @@ class User {
   final double? carbGoal;
   final double? proteinGoal;
   final double? fatGoal;
+  final List<String>? favourite;
 
   static const String tableName = "users";
 
@@ -35,6 +36,7 @@ class User {
     this.carbGoal = 600,
     this.proteinGoal = 200,
     this.fatGoal = 100,
+    this.favourite = const [],
   });
 
   User copyWith({String? username, String? email, String? password,}) {
@@ -61,7 +63,8 @@ class User {
       "calorie_goal": calorieGoal ?? 2000,
       "carb_goal": carbGoal ?? 600,
       "protein_goal": proteinGoal ?? 200,
-      "fat_goal": fatGoal ?? 100
+      "fat_goal": fatGoal ?? 100,
+      "favourite": favourite ?? []
     };
   }
 
@@ -80,7 +83,8 @@ class User {
       calorieGoal: map["calorie_goal"] ?? 0.0,
       carbGoal: map["carb_goal"] ?? 0.0,
       proteinGoal: map["protein_goal"] ?? 0.0,
-      fatGoal: map["fat_goal"] ?? 0.0
+      fatGoal: map["fat_goal"] ?? 0.0,
+      favourite: (map["favourite"] as List<dynamic>?)?.cast<String>(),
     );
   }
 }

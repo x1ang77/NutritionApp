@@ -1,7 +1,11 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/model/recipe.dart';
+import '../data/model/user.dart' as user_model;
+import '../data/repository/user/user_repository_impl.dart';
 
 class Details extends StatefulWidget {
   const Details({Key? key, required this.id}) : super(key: key);
@@ -12,6 +16,7 @@ class Details extends StatefulWidget {
 
 class _DetailsState extends State<Details> {
   late Recipe _recipeData;
+  var repo = UserRepoImpl();
 
   @override
   void initState() {
@@ -41,6 +46,30 @@ class _DetailsState extends State<Details> {
     }
   }
 
+  _navigateToRecipe(){
+    context.pop();
+  }
+
+  _addToFavourite(String id) async {
+    var user = FirebaseAuth.instance.currentUser?.uid;
+
+    DocumentReference documentRef = FirebaseFirestore.instance.collection("users").doc(user);
+    // Retrieve the document
+    var documentSnapshot = await repo.getUserById(user!);
+
+    if (documentSnapshot != null) {
+      var array =documentSnapshot.favourite;
+      if(array != null){
+        if (!array.contains(id)) {
+            documentRef.update({
+              'favourite': FieldValue.arrayUnion([id])
+            }
+          );
+        }
+      }
+
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,9 +94,7 @@ class _DetailsState extends State<Details> {
                 left: 24.0,
                 child: FloatingActionButton(
                       backgroundColor: Colors.white,
-                      onPressed: () {
-                        // FAB onPressed action
-                      },
+                      onPressed: () => _navigateToRecipe(),
                       child: const Icon(
                         Icons.arrow_back,
                         color: Colors.red,
@@ -81,9 +108,8 @@ class _DetailsState extends State<Details> {
                 right: 24.0,
                 child: FloatingActionButton(
                       backgroundColor: Colors.white,
-                      onPressed: () {
-                        // FAB onPressed action
-                      },
+                      onPressed: () => _addToFavourite(widget.id)
+                      ,
                       child: const Icon(Icons.book_outlined, color: Colors.red, size: 32,),
                     ),
               ),
