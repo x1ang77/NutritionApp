@@ -120,7 +120,7 @@ class _ProfileState extends State<Profile> {
     // _user = currentUser;
     // debugPrint("${_user?.email}");
     User? user = FirebaseAuth.instance.currentUser;
-    var currentUser = await repo.getUserById("fpPvRnd4J9UwVhIw3s7xBltppu03");
+    var currentUser = await repo.getUserById(user!.uid);
     setState(() {
       _user = currentUser;
     });
