@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
+import 'package:nutrition_app/data/model/user.dart' as user_model;
+import '../data/model/diary.dart';
 import '../data/model/recipe.dart';
+import '../data/repository/user/user_repository_impl.dart';
 
 class Logbook extends StatefulWidget {
   const Logbook({Key? key}) : super(key: key);
@@ -15,7 +19,9 @@ class _LogbookState extends State<Logbook> {
   List<Recipe> _breakfastRecipes = [];
   List<Recipe> _lunchRecipes = [];
   List<Recipe> _dinnerRecipes = [];
-  int _index = 0;
+  List<String> _mealsId=[];
+  int _arraylength = 0;
+  var repo = UserRepoImpl();
 
   @override
   void initState() {
@@ -44,6 +50,46 @@ class _LogbookState extends State<Logbook> {
       });
     }
   }
+
+  _pushToMealsId(String id){
+    _mealsId.add(id);
+    setState(() {
+      _arraylength = _mealsId.length;
+    });
+  }
+
+  _addToDiaries() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser;
+    var currentUser = await repo.getUserById(firebaseUser!.uid);
+    var timeStamp = DateTime.now();
+    var date = DateFormat.yMd().format(timeStamp);
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference diaries = firestore.collection("diaries");
+
+    // Check if a diary with the same timestamp and userId already exists
+    var querySnapshot = await diaries
+        .where('date', isEqualTo: date)
+        .where('user_id', isEqualTo: currentUser?.id)
+        .limit(1)
+        .get();
+    debugPrint("${querySnapshot.docs}");
+    if (querySnapshot.docs.isEmpty) {
+      var id = diaries.doc().id;
+
+      var diaryData = Diary(
+        date: date,
+        id: id,
+        userId: currentUser?.id,
+        breakfast: _mealsId[0],
+        lunch: _mealsId[1],
+        dinner: _mealsId[2],
+        caloriesGoals: currentUser?.calorieGoal,
+      ).toMap(); // Convert Diary object to Map
+
+      diaries.doc(id).set(diaryData);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +134,7 @@ class _LogbookState extends State<Logbook> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => _pushToMealsId(breakfastRecipe.id!),
                             child: const Icon(Icons.add),
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -140,7 +186,7 @@ class _LogbookState extends State<Logbook> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => _pushToMealsId(lunchRecipe.id!),
                             child: const Icon(Icons.add),
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -192,7 +238,7 @@ class _LogbookState extends State<Logbook> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () => _pushToMealsId(dinnerRecipe.id!),
                             child: const Icon(Icons.add),
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -207,6 +253,9 @@ class _LogbookState extends State<Logbook> {
                 );
               },
             ),
+            _arraylength > 2 ?
+            ElevatedButton(onPressed: () => _addToDiaries(), child: Text("Add to Diaries")):
+                Container()
           ],
         ),
       ),
