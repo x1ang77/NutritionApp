@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
@@ -8,31 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:nutrition_app/data/model/user.dart' as user_model;
 import 'package:nutrition_app/data/repository/user/user_repository.dart';
 
-
 class UserRepoImpl extends UserRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final collection = FirebaseFirestore.instance.collection("users");
-
-  @override
-  Future<void> updateUserProfile(String userId, String image) async {
-    try {
-      await collection.doc(userId).update({"image": image});
-    } catch(e) {
-      debugPrint("Nope");
-    }
-  }
-
-  @override
-  Future<user_model.User?> getUserById(String userId) async {
-    try {
-      var docSnapshot = await collection.doc(userId).get();
-      var data = docSnapshot.data();
-      var user = user_model.User.fromMap(data!);
-      return user;
-    } catch (e) {
-      return null;
-    }
-  }
 
   @override
   Future<bool> checkEmailInFirebase(String email) async {
@@ -68,15 +45,34 @@ class UserRepoImpl extends UserRepo {
           email: email,
           password: password
       );
-      final _user = userCredential.user;
+      final firebaseUser = userCredential.user;
+      final userUID = firebaseUser?.uid;
       final hashedPassword = md5.convert(utf8.encode(password)).toString();
-      await collection.doc(_user?.uid).set({
-        'username': username,
-        'email': email,
-        'password': hashedPassword,
-      });
+      final user = user_model.User(id: userUID, username: username, email: email, password: hashedPassword);
+      await collection.doc(userUID).set(user.toMap());
     } catch (e) {
       throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<user_model.User?> getUserById(String userId) async {
+    try {
+      var docSnapshot = await collection.doc(userId).get();
+      var data = docSnapshot.data();
+      var user = user_model.User.fromMap(data!);
+      return user;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<void> updateUserProfile(String userId, String image) async {
+    try {
+      await collection.doc(userId).update({"image": image});
+    } catch(e) {
+      debugPrint("Nope");
     }
   }
 }
