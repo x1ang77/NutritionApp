@@ -63,11 +63,7 @@ class _DetailsState extends State<Details> {
               Positioned(
                 top: 48.0,
                 left: 24.0,
-                child:
-                GestureDetector(
-                  onTap: () {},
-                  child:
-                    FloatingActionButton(
+                child: FloatingActionButton(
                       backgroundColor: Colors.white,
                       onPressed: () {
                         // FAB onPressed action
@@ -78,24 +74,18 @@ class _DetailsState extends State<Details> {
                         size: 32,
                       ),
                     ),
-                )
               ),
 
               Positioned(
                 top: 48.0,
                 right: 24.0,
-                child:
-                GestureDetector(
-                  onTap: () {},
-                  child:
-                    FloatingActionButton(
+                child: FloatingActionButton(
                       backgroundColor: Colors.white,
                       onPressed: () {
                         // FAB onPressed action
                       },
                       child: const Icon(Icons.book_outlined, color: Colors.red, size: 32,),
                     ),
-                )
               ),
 
             ],

@@ -170,7 +170,7 @@ class _ProfileState extends State<Profile> {
     var temp = await storageReference.getDownloadURL();
     debugPrint(temp.toString());
     setState(() {
-      downloadUrl = temp
+      downloadUrl = temp;
     });
   }
 
