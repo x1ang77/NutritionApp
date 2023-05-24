@@ -22,6 +22,9 @@ class _LoginState extends State<Login> {
   var _passwordError = "";
   var showPass = true;
   bool isLoading = false;
+  FocusNode _focusNode1 = FocusNode();
+  FocusNode _focusNode2 = FocusNode();
+  bool isFocused = false;
 
   login() async {
     try {
@@ -56,7 +59,7 @@ class _LoginState extends State<Login> {
         isLoading = false;
       } else {
         _emailError = "";
-        await userRepo.login(email, password);
+        await userRepo.login(email, password).then((value) => showSnackbar(_scaffoldKey, 'Login successful', Colors.green));
         showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
         _navigateToHome();
       }
@@ -64,7 +67,7 @@ class _LoginState extends State<Login> {
       setState(() {
         isLoading = false;
       });
-      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
+      showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
     }
   }
 
@@ -87,26 +90,28 @@ class _LoginState extends State<Login> {
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
-        // resizeToAvoidBottomInset: false,
-        body: SizedBox(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              CustomPaint(
-                painter: CurvePainter(),
-                child: Container(),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Welcome",
-                    textDirection: TextDirection.ltr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+        body: SingleChildScrollView(
+          physics: _focusNode1.hasFocus || _focusNode2.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+          child: SizedBox(
+            // width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: Stack(
+              children: [
+                CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
                   ),
-                  SingleChildScrollView(
-                    child: Container(
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Welcome",
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
+                    ),
+                    Container(
                       padding: const EdgeInsets.all(40.0),
                       child: Column(
                         children: [
@@ -114,6 +119,7 @@ class _LoginState extends State<Login> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode1,
                               controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: "Email",
@@ -133,6 +139,7 @@ class _LoginState extends State<Login> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode2,
                               obscureText: showPass,
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -207,19 +214,19 @@ class _LoginState extends State<Login> {
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: CustomPaint(
-                  painter: CurvePainter(),
-                  child: Container(),
+                  ],
                 ),
-              ),
-            ],
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: CustomPaint(
+                    painter: CurvePainter(),
+                    child: Container(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -286,7 +293,6 @@ class CurvePainter extends CustomPainter {
     path2.close();
 
     canvas.drawPath(path2, paint2);
-
   }
 
   @override

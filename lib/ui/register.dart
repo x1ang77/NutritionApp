@@ -1,8 +1,10 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/model/user.dart';
 
+import '../component/snackbar.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
 class Register extends StatefulWidget {
@@ -29,34 +31,62 @@ class _RegisterState extends State<Register> {
   var showConPass = true;
   bool isLoading = false;
 
-  void _showSnackbar(String message, Color color) {
-    _scaffoldKey.currentState?.showSnackBar(
-      SnackBar(
-        backgroundColor: color,
-        content: Text(message),
-      ),
-    );
-  }
-
   register() async {
     try {
+      String username = _usernameController.text.trim();
+      String email = _emailController.text.trim();
+      String password = _passwordController.text.trim();
+      String passwordConfirm = _passwordConfirmController.text.trim();
+      var emailExists = await userRepo.checkEmailInFirebase(email);
+
       setState(() {
+        if (username.length < 8) {
+          _usernameError = "Username needs to be at least 8 characters long";
+          return;
+        } else {
+          _usernameError = "";
+        }
+
+        if (!EmailValidator.validate(email)) {
+          _emailError = "Invalid email format";
+          return;
+        } else {
+          _emailError = "";
+        }
+
+        if (password.length < 8) {
+          _passwordError = "Password needs to be at least 8 characters long";
+          return;
+        } else {
+          _passwordError = "";
+        }
+
+        if (passwordConfirm != password) {
+          _passwordConfirmError = "Passwords must match";
+          return;
+        } else {
+          _passwordConfirmError = "";
+        }
+
         isLoading = true;
       });
-      final _user = User(
-          username: _usernameController.text.trim(),
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-          gender: "", age: 0, height: 0, weight: 0
-      );
-      await userRepo.register(_user);
-      _showSnackbar("Register successful", Colors.green);
-      _navigateToHome();
+
+      if (!emailExists) {
+        showSnackbar(
+            _scaffoldKey,
+            "No account was registered with this email",
+            Colors.red
+        );
+      } else {
+        await userRepo.register(username, email, password);
+        showSnackbar(_scaffoldKey, "Register successful", Colors.green);
+        _navigateToHome();
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      _showSnackbar("Register failed", Colors.red);
+      showSnackbar(_scaffoldKey, "Failed to register", Colors.red);
     }
   }
 

@@ -13,11 +13,6 @@ class UserRepoImpl extends UserRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final collection = FirebaseFirestore.instance.collection("users");
 
-  // Future<User> getUser() async {
-  // }
-
-  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('users');
-
   @override
   Future<void> updateUserProfile(String userId, String image) async {
     try {
@@ -27,45 +22,16 @@ class UserRepoImpl extends UserRepo {
     }
   }
 
+  @override
   Future<user_model.User?> getUserById(String userId) async {
     try {
-      var docSnapshot = await collection.doc("fpPvRnd4J9UwVhIw3s7xBltppu03")
-          .get();
+      var docSnapshot = await collection.doc(userId).get();
       var data = docSnapshot.data();
       var user = user_model.User.fromMap(data!);
       return user;
     } catch (e) {
       return null;
     }
-
-    // try {
-  //     // var querySnapshot = await collection.get();
-  //     //
-  //     // for (var item in querySnapshot.docs) {
-  //     //   var data = item.data();
-  //     //   debugPrint("${data['title']} ${data['description']}");
-  //     //
-  //     //   var user = user_model.User.fromMap(data);
-  //     //   debugPrint(user.toString());
-  //     //   return user;
-  //     // }
-  //
-  //     var docSnapshot = await collection.doc("fpPvRnd4J9UwVhIw3s7xBltppu03")
-  //         .get();
-  //     if (docSnapshot.exists) {
-  //       var data = docSnapshot.data();
-  //       debugPrint("WHY $data");
-  //       // debugPrint("")
-  //
-  //       // var user = user_model.User.fromMap(jsonDecode(item));
-  //       var user = user_model.User.fromMap(data!);
-  //       debugPrint("$user");
-  //       return user;
-  //     } catch (e) {
-  //     debugPrint("Error fetching user: $e");
-  //     return null;
-  //   }
-  // }
   }
 
   @override
@@ -94,24 +60,19 @@ class UserRepoImpl extends UserRepo {
   }
 
   @override
-  Future<void> register(user_model.User user) async {
+  Future<void> register(
+      String username, String email, String password
+      ) async {
     try {
-      final list = await firebaseAuth.fetchSignInMethodsForEmail(user.email);
-
-      // if (list.isEmpty) {
-      //   // Return true because there is an existing
-      //   // user using the email address
-      //   _showSnackbar("Email in use", Colors.red);
-      // }
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(
-          email: user.email,
-          password: user.password
+          email: email,
+          password: password
       );
       final _user = userCredential.user;
-      final hashedPassword = md5.convert(utf8.encode(user.password)).toString();
+      final hashedPassword = md5.convert(utf8.encode(password)).toString();
       await collection.doc(_user?.uid).set({
-        'username': user.username,
-        'email': user.email,
+        'username': username,
+        'email': email,
         'password': hashedPassword,
       });
     } catch (e) {
