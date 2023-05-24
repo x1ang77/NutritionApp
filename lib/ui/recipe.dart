@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -52,6 +53,17 @@ class _RecipePageState extends State<RecipePage> {
         _allRecipes.add(recipe);
       });
     }
+  }
+
+  _addToFavourite(String id)async{
+    var user = FirebaseAuth.instance.currentUser?.uid;
+    DocumentReference documentRef = FirebaseFirestore.instance
+        .collection("users").doc(user);
+    documentRef.update(
+      {
+        "favourite":FieldValue.arrayUnion([id])
+      }
+    );
   }
 
   @override

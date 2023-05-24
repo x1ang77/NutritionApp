@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:nutrition_app/ui/diary.dart';
+import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 
 import '../ui/profile.dart';
@@ -20,10 +21,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   static const List<Widget> _widgetOptions = <Widget>[
     Diary(),
    RecipePage(),
-    // Text(
-    //   'Add food to diary',
-    //   style: optionStyle,
-    // ),
+    Favourite(),
     Profile()
   ];
 
@@ -71,12 +69,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
             icon: Icon(Icons.business),
             label: 'Recipes',
           ),
-          // BottomNavigationBarItem(
-          //   icon: SizedBox.shrink(
-          //     child: Icon(Icons.add),
-          //   ),
-          //   label: ""
-          // ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.book_outlined),
+              label: 'Favourite',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Me',
@@ -84,6 +80,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.green[800],
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
         onTap: _onItemTapped,
       ),
     );
