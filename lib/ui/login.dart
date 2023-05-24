@@ -87,7 +87,7 @@ class _LoginState extends State<Login> {
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
-        // resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         body: SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,

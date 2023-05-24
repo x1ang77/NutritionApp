@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/details.dart';
+import 'package:nutrition_app/ui/profile.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 import 'package:path/path.dart';
 
@@ -21,6 +22,7 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/login", builder: (context, state) => const Login()),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
     GoRoute(path: "/diary", builder: (context, state) => const Diary()),
+    GoRoute(path: "/profile", builder: (context, state) => const Profile()),
     GoRoute(path:"/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/details/:id",name:"id", builder: (context, state) => Details(
       id: state.pathParameters["id"] ?? "",

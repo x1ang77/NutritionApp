@@ -29,7 +29,7 @@ class UserRepoImpl extends UserRepo {
 
   Future<user_model.User?> getUserById(String userId) async {
     try {
-      var docSnapshot = await collection.doc("fpPvRnd4J9UwVhIw3s7xBltppu03")
+      var docSnapshot = await collection.doc(userId)
           .get();
       var data = docSnapshot.data();
       var user = user_model.User.fromMap(data!);
