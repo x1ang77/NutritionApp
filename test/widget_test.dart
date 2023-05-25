@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nutrition_app/component/navigation_router.dart';
+import 'package:nutrition_app/ui/component/navigation_router.dart';
 
 import 'package:nutrition_app/main.dart';
 

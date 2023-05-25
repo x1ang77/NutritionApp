@@ -8,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nutrition_app/core/custom_exception.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
-import '../component/snackbar.dart';
 import '../data/model/user.dart' as user_model;
+import 'component/snackbar.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -221,7 +222,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       SizedBox(width: 8.0),
                       ElevatedButton(
-                        onPressed: _changePassword,
+                        onPressed: () => _changePassword(context),
                         child: Text('Confirm'),
                       ),
                     ],
@@ -235,7 +236,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void _changePassword() {
+  void _changePassword(context) {
     String currentPassword = _currentPasswordController.text;
     String newPassword = _newPasswordController.text;
 
@@ -254,11 +255,11 @@ class _ProfileState extends State<Profile> {
           // Close the dialog
           context.pop();
         }).catchError((error) {
-          showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
+          throw CustomException("Password is wrong");
           // Show an error message to the user
         });
       }).catchError((error) {
-        showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
+        showSnackbar(context, error.toString(), Colors.red);
         debugPrint('Failed to reauthenticate user: $error');
         // Show an error message to the user indicating that the current password is incorrect
       });
@@ -448,10 +449,10 @@ class _ProfileState extends State<Profile> {
                           child: Text('Edit Calorie Goal'),
                         ),
                         SizedBox(width: 10.0),
-                        ElevatedButton(
-                          onPressed: _changePassword,
-                          child: Text('Edit Macro Goals'),
-                        ),
+                        // ElevatedButton(
+                        //   onPressed: _changePassword,
+                        //   child: Text('Edit Macro Goals'),
+                        // ),
                       ],
                     ),
                   ],

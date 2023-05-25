@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:nutrition_app/data/model/user.dart' as user_model;
 import 'package:nutrition_app/data/repository/user/user_repository.dart';
 
+import '../../../core/custom_exception.dart';
+
 class UserRepoImpl extends UserRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final collection = FirebaseFirestore.instance.collection("users");
@@ -32,7 +34,7 @@ class UserRepoImpl extends UserRepo {
         password: password,
       );
     } catch (e) {
-      throw Exception(e.toString());
+      throw CustomException("Failed to login");
     }
   }
 
@@ -51,7 +53,7 @@ class UserRepoImpl extends UserRepo {
       final user = user_model.User(id: userUID, username: username, email: email, password: hashedPassword);
       await collection.doc(userUID).set(user.toMap());
     } catch (e) {
-      throw Exception(e.toString());
+      throw CustomException("Failed to register");
     }
   }
 

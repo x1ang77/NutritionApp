@@ -52,6 +52,7 @@ dependencies:
   flutter_riverpod: ^2.3.6
   http: ^0.13.6
   email_validator: ^2.1.17
+  shared_preferences: ^2.1.1
 
 dev_dependencies:
   flutter_test:

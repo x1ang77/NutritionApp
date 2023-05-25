@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/details.dart';
-import 'package:nutrition_app/ui/logbook.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 import 'package:path/path.dart';
 
-import '../ui/diary.dart';
-import '../ui/home.dart';
-import '../ui/login.dart';
-import '../ui/register.dart';
+import '../../core/user_event.dart';
+import '../diary.dart';
+import '../home.dart';
+import '../login.dart';
+import '../register.dart';
 
 class NavRouter extends StatelessWidget {
   NavRouter({Key? key, required this.initialRoute}) : super(key: key);
@@ -20,15 +20,13 @@ class NavRouter extends StatelessWidget {
   final _routes = [
     GoRoute(path: "/register", builder: (context,state) => const Register()),
     GoRoute(path: "/login", builder: (context, state) => const Login()),
+    // GoRoute(path: "/home/:userEvent", builder: (context, state) => Home(userEvent: state.pathParameters["userEvent"].toString())),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
     GoRoute(path: "/diary", builder: (context, state) => const Diary()),
     GoRoute(path:"/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/details/:id",name:"id", builder: (context, state) => Details(
       id: state.pathParameters["id"] ?? "",
-      )
-    ),
-    GoRoute(path: "/logbook", builder: (context, state) => const Logbook())
-    // GoRoute(path: "/details", builder:(context, state) => const Details()),
+    ))
   ];
 
   @override
