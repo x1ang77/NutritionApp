@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/model/recipe.dart';
+import '../data/repository/user/user_repository_impl.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({Key? key}) : super(key: key);
@@ -18,6 +19,8 @@ class _RecipePageState extends State<RecipePage> {
   List<Recipe> _lunchRecipes = [];
   List<Recipe> _dinnerRecipes = [];
   int _index = 0;
+  var repo = UserRepoImpl();
+
 
   @override
   void initState() {
@@ -55,15 +58,25 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
-  _addToFavourite(String id)async{
+  _addToFavourite(String id) async {
     var user = FirebaseAuth.instance.currentUser?.uid;
-    DocumentReference documentRef = FirebaseFirestore.instance
-        .collection("users").doc(user);
-    documentRef.update(
-      {
-        "favourite":FieldValue.arrayUnion([id])
+
+    DocumentReference documentRef = FirebaseFirestore.instance.collection("users").doc(user);
+    // Retrieve the document
+    var documentSnapshot = await repo.getUserById(user!);
+
+    if (documentSnapshot != null) {
+      var array =documentSnapshot.favourite;
+      if(array != null){
+        if (!array.contains(id)) {
+          documentRef.update({
+            'favourite': FieldValue.arrayUnion([id])
+          }
+          );
+        }
       }
-    );
+
+    }
   }
 
   @override
@@ -80,7 +93,7 @@ class _RecipePageState extends State<RecipePage> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               SizedBox(
-                height: 200,
+                height: 220,
                 child: PageView.builder(
                   itemCount: _breakfastRecipes.length,
                   controller: PageController(viewportFraction: 0.7),
@@ -91,21 +104,30 @@ class _RecipePageState extends State<RecipePage> {
                     return Transform.scale(
                       scale: i == _index ? 1 : 0.9,
                       child: GestureDetector(
-                        onTap: () =>
-                            _navigateToDetails(_breakfastRecipes[i].id!),
+                        onTap: () => _navigateToDetails(_breakfastRecipes[i].id!),
                         child: Card(
                           elevation: 6,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(_breakfastRecipes[i].thumbnail),
-                                const Text("is it working"),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Stack(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(_breakfastRecipes[i].thumbnail),
+                                  Text(_breakfastRecipes[i].name),
+                                ],
+                              ),
+                              Positioned(
+                                bottom: 8,
+                                right: 8,
+                                child: ElevatedButton(
+                                  onPressed: () => _addToFavourite(_breakfastRecipes[i].id!),
+                                  child: const Icon(Icons.book_outlined),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -113,6 +135,7 @@ class _RecipePageState extends State<RecipePage> {
                   },
                 ),
               ),
+
               const SizedBox(
                 height: 10,
               ),
@@ -121,7 +144,7 @@ class _RecipePageState extends State<RecipePage> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               SizedBox(
-                height: 200,
+                height: 220,
                 child: PageView.builder(
                   itemCount: _lunchRecipes.length,
                   controller: PageController(viewportFraction: 0.7),
@@ -136,16 +159,26 @@ class _RecipePageState extends State<RecipePage> {
                         child: Card(
                           elevation: 6,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(_lunchRecipes[i].thumbnail),
-                                const Text("is it working"),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Stack(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(_lunchRecipes[i].thumbnail),
+                                  Text(_lunchRecipes[i].name),
+                                ],
+                              ),
+                              Positioned(
+                                bottom: 8,
+                                right: 8,
+                                child: ElevatedButton(
+                                  onPressed: () => _addToFavourite(_lunchRecipes[i].id!),
+                                  child: const Icon(Icons.book_outlined),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -161,7 +194,7 @@ class _RecipePageState extends State<RecipePage> {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               SizedBox(
-                height: 200,
+                height: 220,
                 child: PageView.builder(
                   itemCount: _dinnerRecipes.length,
                   controller: PageController(viewportFraction: 0.7),
@@ -176,16 +209,26 @@ class _RecipePageState extends State<RecipePage> {
                         child: Card(
                           elevation: 6,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.asset(_dinnerRecipes[i].thumbnail),
-                                const Text("is it working"),
-                                const SizedBox(height: 10),
-                              ],
-                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Stack(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Image.asset(_dinnerRecipes[i].thumbnail),
+                                  Text(_dinnerRecipes[i].name),
+                                ],
+                              ),
+                              Positioned(
+                                bottom: 8,
+                                right: 8,
+                                child: ElevatedButton(
+                                  onPressed: () => _addToFavourite(_dinnerRecipes[i].id!),
+                                  child: const Icon(Icons.book_outlined),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
