@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/service/shared_preference.dart';
+
 class MyDrawer extends StatelessWidget {
   const MyDrawer({Key? key}) : super(key: key);
 
@@ -15,6 +17,7 @@ class MyDrawer extends StatelessWidget {
     logout() async {
       try {
         await FirebaseAuth.instance.signOut();
+        // SharedPreference.setIsLoggedIn(false);
         navigateToLogin();
       } catch (e) {
         // An error occurred while signing out
