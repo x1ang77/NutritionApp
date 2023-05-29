@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nutrition_app/core/user_event.dart';
 import 'package:nutrition_app/ui/component/drawer.dart';
 import 'package:nutrition_app/ui/component/snackbar.dart';
-import 'package:nutrition_app/ui/diary.dart';
+import 'package:nutrition_app/ui/diary_page.dart';
+import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/profile.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 
@@ -22,8 +24,9 @@ class _HomeState extends State<Home> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
-    Diary(),
+    DiaryPage(),
     RecipePage(),
+    Favourite(),
     Profile()
   ];
 
@@ -57,12 +60,16 @@ class _HomeState extends State<Home> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: FaIcon(FontAwesomeIcons.book),
+            icon: Icon(CupertinoIcons.book_solid),
             label: 'Diary',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.business),
+            icon: Icon(Icons.restaurant_menu),
             label: 'Recipes',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -70,6 +77,7 @@ class _HomeState extends State<Home> {
           ),
         ],
         currentIndex: _selectedIndex,
+        unselectedItemColor: Colors.grey,
         selectedItemColor: Colors.green[800],
         onTap: _onItemTapped,
       ),

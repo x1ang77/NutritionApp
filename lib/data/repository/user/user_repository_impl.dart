@@ -22,7 +22,8 @@ class UserRepoImpl extends UserRepo {
       }
       return true;
     } catch (e) {
-      throw Exception(e.toString());
+      debugPrint("Error checking email: $e");
+      throw CustomException("Error encountered when checking email");
     }
   }
 
@@ -34,7 +35,8 @@ class UserRepoImpl extends UserRepo {
         password: password,
       );
     } catch (e) {
-      throw CustomException("Failed to login");
+      debugPrint("Error logging in: $e");
+      throw CustomException("Error encountered when logging in");
     }
   }
 
@@ -53,7 +55,18 @@ class UserRepoImpl extends UserRepo {
       final user = user_model.User(id: userUID, username: username, email: email, password: hashedPassword);
       await collection.doc(userUID).set(user.toMap());
     } catch (e) {
-      throw CustomException("Failed to register");
+      debugPrint("Error registering: $e");
+      throw CustomException("Error encountered when registering");
+    }
+  }
+
+  User? getCurrentUser() {
+    try {
+      var user = firebaseAuth.currentUser;
+      return user;
+    } catch (e) {
+      debugPrint("Error getting user by the ID: $e");
+      throw CustomException("Error encountered when getting user");
     }
   }
 
@@ -65,7 +78,8 @@ class UserRepoImpl extends UserRepo {
       var user = user_model.User.fromMap(data!);
       return user;
     } catch (e) {
-      return null;
+      debugPrint("Error getting user by the ID: $e");
+      throw CustomException("Error encountered when getting user");
     }
   }
 
@@ -74,7 +88,17 @@ class UserRepoImpl extends UserRepo {
     try {
       await collection.doc(userId).update({"image": image});
     } catch(e) {
-      debugPrint("Nope");
+      debugPrint("Error updating image: $e");
+      throw CustomException("Error encountered when updating image");
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (e) {
+      debugPrint("Error signing out: $e");
     }
   }
 }

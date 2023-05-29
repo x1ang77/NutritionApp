@@ -163,13 +163,17 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        physics: _focusNode1.hasFocus || _focusNode2.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+        physics: _focusNode1.hasFocus || _focusNode2.hasFocus ||
+          _focusNode3.hasFocus || _focusNode4.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(
               children: [
-                Image.asset(
-                  "assets/images/loginTop.png",
+                CustomPaint(
+                  painter: CurvePainter(),
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                  ),
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -299,19 +303,86 @@ class _RegisterState extends State<Register> {
                     ),
                   ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Image.asset(
-                    "assets/images/loginBottom.png",
-                    fit: BoxFit.cover,
-                  ),
-                ),
+                // Positioned(
+                //   bottom: 0,
+                //   left: 0,
+                //   right: 0,
+                //   child: CustomPaint(
+                //     painter: CurvePainter(),
+                //     child: Container(),
+                //   ),
+                // ),
               ],
           ),
         ),
       ),
     );
+  }
+}
+
+class CurvePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint1 = Paint()
+      ..color = const Color(0xFF6AC57E) // Color for the first curve
+      ..style = PaintingStyle.fill;
+
+    final paint2 = Paint()
+      ..color = const Color(0xFF6AC57E) // Color for the first curve
+      ..style = PaintingStyle.fill;
+
+    // First Curve
+    final path1 = Path();
+
+    const startPoint1 = Offset(0, 120);
+    final endPoint1 = Offset(size.width, 20);
+
+    final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
+    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.15);
+
+    path1.moveTo(startPoint1.dx, startPoint1.dy);
+    path1.cubicTo(
+      controlPoint1_1.dx,
+      controlPoint1_1.dy,
+      controlPoint1_2.dx,
+      controlPoint1_2.dy,
+      endPoint1.dx,
+      endPoint1.dy,
+    );
+    path1.lineTo(size.width, 0);
+    path1.lineTo(0, 0);
+    path1.close();
+
+    canvas.drawPath(path1, paint1);
+
+
+    // Second Curve
+    final path2 = Path();
+
+    final startPoint2 = Offset(0, size.height * 0.80);
+    final endPoint2 = Offset(size.width, size.height - 80);
+
+    final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
+    final controlPoint2_2 = Offset(size.width * 0.65, size.height * 0.88);
+
+    path2.moveTo(startPoint2.dx, startPoint2.dy);
+    path2.cubicTo(
+      controlPoint2_1.dx,
+      controlPoint2_1.dy,
+      controlPoint2_2.dx,
+      controlPoint2_2.dy,
+      endPoint2.dx,
+      endPoint2.dy,
+    );
+    path2.lineTo(size.width, size.height);
+    path2.lineTo(0, size.height);
+    path2.close();
+
+    canvas.drawPath(path2, paint2);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }
