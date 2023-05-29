@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/details.dart';
+import 'package:nutrition_app/ui/favourite.dart';
+import 'package:nutrition_app/ui/logbook.dart';
 import 'package:nutrition_app/ui/recipe.dart';
-import 'package:path/path.dart';
 
 import '../../core/user_event.dart';
-import '../diary.dart';
+import '../diary_page.dart';
 import '../home.dart';
 import '../login.dart';
 import '../register.dart';
@@ -18,15 +18,17 @@ class NavRouter extends StatelessWidget {
   final String initialRoute;
 
   final _routes = [
-    GoRoute(path: "/register", builder: (context,state) => const Register()),
     GoRoute(path: "/login", builder: (context, state) => const Login()),
+    GoRoute(path: "/register", builder: (context,state) => const Register()),
     // GoRoute(path: "/home/:userEvent", builder: (context, state) => Home(userEvent: state.pathParameters["userEvent"].toString())),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
-    GoRoute(path: "/diary", builder: (context, state) => const Diary()),
+    GoRoute(path: "/diary", builder: (context, state) => const DiaryPage()),
+    GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
     GoRoute(path:"/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/details/:id",name:"id", builder: (context, state) => Details(
       id: state.pathParameters["id"] ?? "",
-    ))
+    )),
+    GoRoute(path: "/logbook", builder: (context, state) => const Logbook())
   ];
 
   @override
