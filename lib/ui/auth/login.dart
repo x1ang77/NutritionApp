@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/core/user_event.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
-import 'component/snackbar.dart';
+import '../component/snackbar.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -30,8 +30,8 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    _emailController.addListener(_emailChanged);
     super.initState();
+    _emailController.addListener(_emailChanged);
   }
 
   void _emailChanged() async {
@@ -69,7 +69,6 @@ class _LoginState extends State<Login> {
 
       if (_emailError.isEmpty && _passwordError.isEmpty) {
         await userRepo.login(email, password);
-        // if (i)
         // showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
         showSnackbar(context, 'Login successful', Colors.green);
         _navigateToHome();
@@ -137,7 +136,7 @@ class _LoginState extends State<Login> {
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
-                            // focusNode: _focusNode1,
+                            focusNode: _focusNode1,
                             controller: _emailController,
                             decoration: InputDecoration(
                               labelText: "Email",
@@ -158,7 +157,7 @@ class _LoginState extends State<Login> {
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
-                            // focusNode: _focusNode2,
+                            focusNode: _focusNode2,
                             obscureText: showPass,
                             controller: _passwordController,
                             decoration: InputDecoration(
@@ -235,15 +234,15 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: CustomPaint(
-                  painter: CurvePainter(),
-                  child: Container(),
-                ),
-              ),
+              // Positioned(
+              //   top: 0,
+              //   left: 0,
+              //   right: 0,
+              //   child: CustomPaint(
+              //     painter: CurvePainter(),
+              //     child: Container(),
+              //   ),
+              // ),
             ],
           ),
         ),
