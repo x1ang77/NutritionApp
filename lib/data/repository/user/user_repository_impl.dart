@@ -43,7 +43,7 @@ class UserRepoImpl extends UserRepo {
 
   @override
   Future<void> register(
-      String username, String email, String password
+      String firstName, String lastName, String email, String password
       ) async {
     try {
       final UserCredential userCredential = await firebaseAuth.createUserWithEmailAndPassword(
@@ -53,7 +53,7 @@ class UserRepoImpl extends UserRepo {
       final firebaseUser = userCredential.user;
       final userUID = firebaseUser?.uid;
       final hashedPassword = md5.convert(utf8.encode(password)).toString();
-      final user = user_model.User(id: userUID, username: username, email: email, password: hashedPassword);
+      final user = user_model.User(id: userUID, firstName: firstName, lastName: lastName, email: email, password: hashedPassword);
       await collection.doc(userUID).set(user.toMap());
     } catch (e) {
       debugPrint("Error registering: $e");
@@ -75,9 +75,15 @@ class UserRepoImpl extends UserRepo {
   @override
   Future<user_model.User?> getUserById(String userId) async {
     try {
-      var docSnapshot = await collection.doc(userId).get();
-      var data = docSnapshot.data();
-      var user = user_model.User.fromMap(data!);
+      var querySnapshot = await collection
+          .where("id", isEqualTo: userId)
+          .get();
+      var data = querySnapshot.docs.single.data();
+      debugPrint(data.toString());
+
+      // var docSnapshot = await collection.doc(userId).get();
+      // var data = docSnapshot.data();
+      var user = user_model.User.fromMap(data);
       return user;
     } catch (e) {
       debugPrint("Error getting user by the ID: $e");

@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/core/custom_exception.dart';
-import 'package:nutrition_app/data/model/user.dart';
-
-import '../../core/user_event.dart';
 import '../component/snackbar.dart';
 import '../../data/repository/user/user_repository_impl.dart';
 
@@ -17,41 +14,50 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-  GlobalKey<ScaffoldMessengerState>();
   UserRepoImpl userRepo = UserRepoImpl();
 
-  final _usernameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
-  var _usernameError = "";
+  var _firstNameError = "";
+  var _lastNameError = "";
   var _emailError = "";
   var _passwordError = "";
   var _passwordConfirmError = "";
   var showPass = true;
   var showConPass = true;
   bool isLoading = false;
-  final FocusNode _focusNode1 = FocusNode();
-  final FocusNode _focusNode2 = FocusNode();
-  final FocusNode _focusNode3 = FocusNode();
-  final FocusNode _focusNode4 = FocusNode();
+  final _firstNameFocusNode = FocusNode();
+  final _lastNameFocusNode = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _passwordConfirmFocusNode = FocusNode();
   bool isFocused = false;
   bool isEmailVerified = false;
 
   Future<void> register(context) async {
     try {
-      String username = _usernameController.text.trim();
+      String firstName = _firstNameController.text.trim();
+      String lastName = _lastNameController.text.trim();
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
       String passwordConfirm = _passwordConfirmController.text.trim();
 
       setState(() {
-        if (username.length < 8) {
-          _usernameError = "Username needs to be at least 8 characters long";
+        if (firstName.length < 8) {
+          _firstNameError = "Username needs to be at least 8 characters long";
           return;
         } else {
-          _usernameError = "";
+          _firstNameError = "";
+        }
+
+        if (lastName.length < 8) {
+          _lastNameError = "Username needs to be at least 8 characters long";
+          return;
+        } else {
+          _lastNameError = "";
         }
 
         if (!EmailValidator.validate(email)) {
@@ -78,12 +84,12 @@ class _RegisterState extends State<Register> {
         isLoading = true;
       });
 
-      if (_usernameError.isEmpty && _emailError.isEmpty && _passwordError.isEmpty &&_passwordConfirmError.isEmpty) {
+      if (_firstNameError.isEmpty && _lastNameError.isEmpty && _emailError.isEmpty && _passwordError.isEmpty &&_passwordConfirmError.isEmpty) {
         var emailExists = await userRepo.checkEmailInFirebase(email);
         if (emailExists) {
           throw CustomException("An account was already registered to this email");
         }
-        await userRepo.register(username, email, password);
+        await userRepo.register(firstName, lastName, email, password);
         // showSnackbar(_scaffoldKey, "Register successful", Colors.green);
         showSnackbar(context, "Register successful", Colors.green);
         _navigateToHome();
@@ -98,73 +104,89 @@ class _RegisterState extends State<Register> {
     }
   }
 
-  _validate(String username, String email, String password, String passwordConfirm) {
-    if (username.length < 8) {
-      _usernameError = "Username needs to be at least 8 characters long";
-      return false;
-    } else {
-      _usernameError = "";
-    }
+  // _validate(String username, String email, String password, String passwordConfirm) {
+  //   if (username.length < 8) {
+  //     _firstNameError = "Username needs to be at least 8 characters long";
+  //     return false;
+  //   } else {
+  //     _firstNameError = "";
+  //   }
+  //
+  //   if (!EmailValidator.validate(email)) {
+  //     _emailError = "Invalid email format";
+  //     return false;
+  //   } else {
+  //     _emailError = "";
+  //   }
+  //
+  //   if (password.length < 8) {
+  //     _passwordError = "Password needs to be at least 8 characters long";
+  //     return false;
+  //   } else {
+  //     _passwordError = "";
+  //   }
+  //
+  //   if (passwordConfirm != password) {
+  //     _passwordConfirmError = "Passwords must match";
+  //     return false;
+  //   } else {
+  //     _passwordConfirmError = "";
+  //   }
+  //   return true;
+  // }
 
-    if (!EmailValidator.validate(email)) {
-      _emailError = "Invalid email format";
-      return false;
-    } else {
-      _emailError = "";
-    }
-
-    if (password.length < 8) {
-      _passwordError = "Password needs to be at least 8 characters long";
-      return false;
-    } else {
-      _passwordError = "";
-    }
-
-    if (passwordConfirm != password) {
-      _passwordConfirmError = "Passwords must match";
-      return false;
-    } else {
-      _passwordConfirmError = "";
-    }
-    return true;
-  }
-
-  _showPass(bool visibility){
+  void _showPass(bool visibility){
     setState(() {
       showPass = !visibility;
     });
   }
 
-  _showConPass(bool visibility){
+  void _showConPass(bool visibility){
     setState(() {
       showConPass = !visibility;
     });
   }
 
-  _navigateToHome() {
+  void _navigateToHome() {
     // context.go("/home/${UserEvent.register.name}");
     context.go("/home");
   }
 
-  _navigateToLogin() {
+  void _navigateToLogin() {
     context.go("/login");
+  }
+
+  void _navigateToOnboarding() {
+    var username = _firstNameController.text;
+    var email = _emailController.text;
+    var password = _passwordController.text;
+    context.pushNamed("image", extra: {"username": username, "email": email, "password": password});
+    // context.push("/onboarding");
   }
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    super.dispose();
+
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
-    super.dispose();
+
+    _firstNameFocusNode.dispose();
+    _lastNameFocusNode.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _passwordConfirmFocusNode.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        physics: _focusNode1.hasFocus || _focusNode2.hasFocus ||
-          _focusNode3.hasFocus || _focusNode4.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+        physics: _firstNameFocusNode.hasFocus || _lastNameFocusNode.hasFocus || _emailFocusNode.hasFocus ||
+          _passwordFocusNode.hasFocus || _passwordConfirmFocusNode.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(
@@ -204,11 +226,11 @@ class _RegisterState extends State<Register> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
-                              focusNode: _focusNode1,
-                              controller: _usernameController,
+                              focusNode: _firstNameFocusNode,
+                              controller: _firstNameController,
                               decoration: InputDecoration(
-                                hintText: "Username",
-                                errorText: _usernameError.isEmpty ? null : _usernameError,
+                                hintText: "First Name",
+                                errorText: _firstNameError.isEmpty ? null : _firstNameError,
                                 suffixIcon: const IconButton(
                                   onPressed: null,
                                   icon: Icon(Icons.person),
@@ -220,12 +242,37 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 20,),
+
                           Material(
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
-                              focusNode: _focusNode2,
+                              focusNode: _lastNameFocusNode,
+                              controller: _lastNameController,
+                              decoration: InputDecoration(
+                                hintText: "Last Name",
+                                errorText: _lastNameError.isEmpty ? null : _lastNameError,
+                                suffixIcon: const IconButton(
+                                  onPressed: null,
+                                  icon: Icon(Icons.person),
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(width: 5.0),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20,),
+
+                          Material(
+                            elevation: 10,
+                            borderRadius: BorderRadius.circular(10),
+                            child: TextField(
+                              focusNode: _emailFocusNode,
                               controller: _emailController,
                               decoration: InputDecoration(
                                 hintText: "Email",
@@ -243,11 +290,12 @@ class _RegisterState extends State<Register> {
                           ),
 
                           const SizedBox(height: 20,),
+
                           Material(
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
-                              focusNode: _focusNode3,
+                              focusNode: _passwordFocusNode,
                               obscureText: showPass,
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -263,12 +311,14 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 20,),
+
                           Material(
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
-                              focusNode: _focusNode4,
+                              focusNode: _passwordConfirmFocusNode,
                               obscureText: showConPass,
                               controller: _passwordConfirmController,
                               decoration: InputDecoration(
@@ -284,11 +334,14 @@ class _RegisterState extends State<Register> {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 20,),
+
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () => register(context),
+                              // onPressed: () => register(context),
+                              onPressed: () => _navigateToOnboarding(),
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
@@ -304,7 +357,9 @@ class _RegisterState extends State<Register> {
                                     style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                             ),
                           ),
+
                           const SizedBox(height: 20,),
+
                           GestureDetector(
                             onTap: () => _navigateToLogin(),
                             child: const Row(

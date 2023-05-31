@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nutrition_app/core/user_event.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
 import '../component/snackbar.dart';
@@ -13,8 +12,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-  GlobalKey<ScaffoldMessengerState>();
   UserRepoImpl userRepo = UserRepoImpl();
 
   final _emailController = TextEditingController();
@@ -23,8 +20,8 @@ class _LoginState extends State<Login> {
   var _passwordError = "";
   var showPass = true;
   bool isLoading = false;
-  final FocusNode _focusNode1 = FocusNode();
-  final FocusNode _focusNode2 = FocusNode();
+  final _emailFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
   bool isFocused = false;
   bool isEmailVerified = false;
 
@@ -83,33 +80,37 @@ class _LoginState extends State<Login> {
     }
   }
 
-  _showPass(bool visibility){
+  void _showPass(bool visibility){
     setState(() {
       showPass = !visibility;
     });
   }
 
-  _navigateToHome() {
+  void _navigateToHome() {
     // context.go("/home/${UserEvent.login.name}");
     context.go("/home");
   }
 
-  _navigateToRegister() {
+  void _navigateToRegister() {
     context.go("/register");
   }
 
   @override
   void dispose() {
+    super.dispose();
+
     _emailController.dispose();
     _passwordController.dispose();
-    super.dispose();
+
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        physics: _focusNode1.hasFocus || _focusNode2.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
+        physics: _emailFocusNode.hasFocus || _passwordFocusNode.hasFocus ? const ScrollPhysics() : const NeverScrollableScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Stack(
@@ -149,7 +150,7 @@ class _LoginState extends State<Login> {
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
-                            focusNode: _focusNode1,
+                            focusNode: _emailFocusNode,
                             controller: _emailController,
                             decoration: InputDecoration(
                               labelText: "Email",
@@ -170,7 +171,7 @@ class _LoginState extends State<Login> {
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
                           child: TextField(
-                            focusNode: _focusNode2,
+                            focusNode: _passwordFocusNode,
                             obscureText: showPass,
                             controller: _passwordController,
                             decoration: InputDecoration(
@@ -301,11 +302,11 @@ class CurvePainter extends CustomPainter {
     // First Curve
     final path1 = Path();
 
-    const startPoint1 = Offset(0, 120);
-    final endPoint1 = Offset(size.width, 20);
+    const startPoint1 = Offset(0, 40);
+    final endPoint1 = Offset(size.width, 30);
 
     final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
-    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.15);
+    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.25);
 
     path1.moveTo(startPoint1.dx, startPoint1.dy);
     path1.cubicTo(
@@ -326,11 +327,11 @@ class CurvePainter extends CustomPainter {
     // Second Curve
     final path2 = Path();
 
-    final startPoint2 = Offset(0, size.height * 0.80);
-    final endPoint2 = Offset(size.width, size.height - 80);
+    final startPoint2 = Offset(0, size.height * 0.85);
+    final endPoint2 = Offset(size.width, size.height - 40);
 
     final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
-    final controlPoint2_2 = Offset(size.width * 0.65, size.height * 0.88);
+    final controlPoint2_2 = Offset(size.width * 0.45, size.height * 0.95);
 
     path2.moveTo(startPoint2.dx, startPoint2.dy);
     path2.cubicTo(

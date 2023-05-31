@@ -29,9 +29,9 @@ class _ProfileState extends State<Profile> {
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();
 
-  String? userEmail;
-  String? userName;
-  List<user_model.User> users = [];
+  // String? userEmail;
+  // String? userName;
+  // List<user_model.User> users = [];
 
   File? image;
   String base64ImageString = "";
@@ -429,9 +429,7 @@ Widget build(BuildContext context) {
                               backgroundImage: image != null
                                   ? FileImage(image!)
                                   : _user?.image != null
-                                  ? Image
-                                  .network(downloadUrl ?? "")
-                                  .image
+                                  ? Image.network(downloadUrl ?? "").image
                                   : AssetImage("/assets/images/nuts.jpg"),
                             ),
                           ),
@@ -452,7 +450,7 @@ Widget build(BuildContext context) {
                     ],
                   ),
                   SizedBox(height: 8.0),
-                  Text("@${_user?.username ?? ""}"),
+                  Text("${_user?.firstName ?? ""} ${_user?.lastName ?? ""}"),
                   SizedBox(height: 16.0),
                   ElevatedButton(
                     onPressed: _showChangePasswordDialog,
