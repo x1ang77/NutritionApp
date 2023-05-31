@@ -128,7 +128,7 @@ class _ProfileState extends State<Profile> {
 
       // Create a reference to the Firebase Storage location where you want to store the image
       final Reference storageReference =
-          FirebaseStorage.instance.ref().child('images/$fileName');
+      FirebaseStorage.instance.ref().child('images/$fileName');
 
       // Upload the image file to Firebase Storage
       await storageReference.putFile(imageFile);
@@ -167,7 +167,7 @@ class _ProfileState extends State<Profile> {
       _user = currentUser;
     });
     final Reference storageReference =
-        FirebaseStorage.instance.ref().child('images/${_user?.image}');
+    FirebaseStorage.instance.ref().child('images/${_user?.image}');
     var temp = await storageReference.getDownloadURL();
     debugPrint(temp.toString());
     setState(() {
@@ -184,7 +184,10 @@ class _ProfileState extends State<Profile> {
             borderRadius: BorderRadius.circular(16.0),
           ),
           child: Container(
-            width: MediaQuery.of(context).size.width,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -222,7 +225,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       SizedBox(width: 8.0),
                       ElevatedButton(
-                        onPressed: () => _changePassword(context),
+                        onPressed: () => _changePassword(),
                         child: Text('Confirm'),
                       ),
                     ],
@@ -236,7 +239,7 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void _changePassword(context) {
+  void _changePassword() {
     String currentPassword = _currentPasswordController.text;
     String newPassword = _newPasswordController.text;
 
@@ -244,7 +247,7 @@ class _ProfileState extends State<Profile> {
 
     if (user != null) {
       user.reauthenticateWithCredential(EmailAuthProvider.credential(
-              email: user.email!, password: currentPassword))
+          email: user.email!, password: currentPassword))
           .then((authResult) {
         user.updatePassword(newPassword).then((_) {
           debugPrint('Password changed successfully');
@@ -259,213 +262,228 @@ class _ProfileState extends State<Profile> {
           // Show an error message to the user
         });
       }).catchError((error) {
-        showSnackbar(context, error.toString(), Colors.red);
+        if (_currentPasswordController.text.isEmpty || _newPasswordController.text.isEmpty) {
+          showSnackbar(context, "Nothing", Colors.red);
+        } else {
+          showSnackbar(context, "Failed to change password", Colors.red);
+        }
         debugPrint('Failed to reauthenticate user: $error');
         // Show an error message to the user indicating that the current password is incorrect
       });
-    } else {
-      print('User is not signed in');
     }
+    else {
+      print('User is not signed in');
   }
+}
 
-  void _calorieDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+void _calorieDialog() {
+  getUser();
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: 400.0),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Edit Calorie Goal", style: TextStyle(fontSize: 24)),
+                SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _user?.calorieGoal?.toInt().toString() ?? "",
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                    SizedBox(width: 16.0),
+                    Icon(Icons.arrow_forward),
+                    SizedBox(width: 16.0),
+                    Expanded(
+                      child: TextField(
+                        controller: _newCalorieGoalController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                          labelText: 'New Goal',
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 25.0, vertical: 12.0),
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey,
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: Text('Cancel'),
+                    ),
+                    SizedBox(width: 8.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        _updateCalorieGoal();
+                        Navigator.of(context).pop();
+                        _newCalorieGoalController.clear();
+                      },
+                      child: Text('Confirm'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          child: Container(
-            constraints: BoxConstraints(maxWidth: 400.0),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
+        ),
+      );
+    },
+  );
+}
+
+// void _changePassword() {
+//   // Show the dialog
+//   _showChangePasswordDialog(context);
+// }
+
+void _updateCalorieGoal() {
+  getUser();
+  String newCalorieGoal = _newCalorieGoalController.text;
+  debugPrint('New Calorie Goal: $newCalorieGoal');
+  double parsedCalorieGoal = double.tryParse(newCalorieGoal) ?? 0.0;
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .update({'calorie_goal': parsedCalorieGoal})
+        .then((_) {
+      debugPrint('Calorie goal updated successfully');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     backgroundColor: Colors.green,
+      //     content: Text('Calorie goal updated successfully'),
+      //   ),
+      // );
+      showSnackbar(context, "Updated calorie goal", Colors.green);
+      // Update the _user object with the new calorie goal
+      // Close the dialog
+      // Show a success Snackbar or perform any additional actions
+    }).catchError((error) {
+      debugPrint('Failed to update calorie goal: $error');
+      // Show an error message to the user
+    });
+  } else {
+    debugPrint('User is not signed in');
+  }
+}
+
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Profile'),
+    ),
+    body: Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Edit Calorie Goal", style: TextStyle(fontSize: 24)),
-                  SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Stack(
+                    alignment: Alignment.bottomRight,
                     children: [
-                      Flexible(
-                        child: Text(
-                          _user?.calorieGoal?.toInt().toString() ?? "",
-                          style: TextStyle(fontSize: 16.0),
+                      Container(
+                        alignment: Alignment.center,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.black,
+                            radius: 115,
+                            child: CircleAvatar(
+                              radius: 110,
+                              backgroundImage: image != null
+                                  ? FileImage(image!)
+                                  : _user?.image != null
+                                  ? Image
+                                  .network(downloadUrl ?? "")
+                                  .image
+                                  : AssetImage("/assets/images/nuts.jpg"),
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(width: 16.0),
-                      Icon(Icons.arrow_forward),
-                      SizedBox(width: 16.0),
-                      Expanded(
-                        child: TextField(
-                          controller: _newCalorieGoalController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: Colors.grey),
-                            ),
-                            labelText: 'New Goal',
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 25.0, vertical: 12.0),
+                      Positioned(
+                        bottom: 20,
+                        right: 70,
+                        child: ElevatedButton(
+                          onPressed: _pickImage,
+                          child: Icon(Icons.edit),
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            padding: EdgeInsets.all(12),
                           ),
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
                         ),
                       ),
                     ],
                   ),
+                  SizedBox(height: 8.0),
+                  Text("@${_user?.username ?? ""}"),
                   SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: _showChangePasswordDialog,
+                    child: Text('Change Password'),
+                  ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
-                        ),
                         onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
+                          _calorieDialog();
                         },
-                        child: Text('Cancel'),
+                        child: Text('Edit Calorie Goal'),
                       ),
-                      SizedBox(width: 8.0),
-                      ElevatedButton(
-                        onPressed: () {_updateCalorieGoal();
-                        Navigator.of(context).pop();
-                        _newCalorieGoalController.clear();
-                          },
-                        child: Text('Confirm'),
-                      ),
+                      SizedBox(width: 10.0),
+                      // ElevatedButton(
+                      //   onPressed: _changePassword,
+                      //   child: Text('Edit Macro Goals'),
+                      // ),
                     ],
                   ),
                 ],
               ),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  // void _changePassword() {
-  //   // Show the dialog
-  //   _showChangePasswordDialog(context);
-  // }
-
-  void _updateCalorieGoal() {
-
-    String newCalorieGoal = _newCalorieGoalController.text;
-    print('New Calorie Goal: $newCalorieGoal');
-    double parsedCalorieGoal = double.tryParse(newCalorieGoal) ?? 0.0;
-    print('Parsed Calorie Goal: $parsedCalorieGoal');
-
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-     FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({'calorie_goal': parsedCalorieGoal})
-          .then((_) {
-        print('Calorie goal updated successfully');
-        // Update the _user object with the new calorie goal
-        // Close the dialog
-        // Show a success Snackbar or perform any additional actions
-      }).catchError((error) {
-        print('Failed to update calorie goal: $error');
-        // Show an error message to the user
-      });
-
-    } else {
-      print('User is not signed in');
-    }
-  }
-
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Container(
-                          alignment: Alignment.center,
-                          child: GestureDetector(
-                            onTap: _pickImage,
-                            child: CircleAvatar(
-                              backgroundColor: Colors.black,
-                              radius: 115,
-                              child: CircleAvatar(
-                                radius: 110,
-                                backgroundImage: image != null
-                                    ? FileImage(image!)
-                                    : _user?.image != null
-                                        ? Image.network(downloadUrl ?? "").image
-                                        : AssetImage("/assets/images/nuts.jpg"),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 20,
-                          right: 70,
-                          child: ElevatedButton(
-                            onPressed: _pickImage,
-                            child: Icon(Icons.edit),
-                            style: ElevatedButton.styleFrom(
-                              shape: CircleBorder(),
-                              padding: EdgeInsets.all(12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.0),
-                    Text("@${_user?.username ?? ""}"),
-                    SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: _showChangePasswordDialog,
-                      child: Text('Change Password'),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {_calorieDialog();},
-                          child: Text('Edit Calorie Goal'),
-                        ),
-                        SizedBox(width: 10.0),
-                        // ElevatedButton(
-                        //   onPressed: _changePassword,
-                        //   child: Text('Edit Macro Goals'),
-                        // ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              ElevatedButton(
-                onPressed: _logout,
-                child: Text('Logout'),
-              ),
-            ],
-          ),
+            ElevatedButton(
+              onPressed: _logout,
+              child: Text('Logout'),
+            ),
+          ],
         ),
       ),
-    );
-  }
-}
+    ),
+  );
+}}
