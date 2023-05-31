@@ -123,13 +123,26 @@ class _LoginState extends State<Login> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Welcome",
-                    textDirection: TextDirection.ltr,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36.0),
-                  ),
                   Container(
-                    padding: const EdgeInsets.all(40.0),
+                      child: Image.asset(
+                          "assets/images/foodsense_logo.png",
+                        height: 150,
+                      )
+                  ),
+
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      "Welcome to Foodsense",
+                      textAlign: TextAlign.center,
+                      textDirection: TextDirection.ltr,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0),
+                    ),
+                  ),
+
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(40, 0, 40, 0),
                     child: Column(
                       children: [
                         Material(
