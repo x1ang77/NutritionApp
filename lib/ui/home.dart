@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:nutrition_app/ui/component/drawer.dart';
 import 'package:nutrition_app/ui/diary_page.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/profile.dart';
@@ -9,8 +8,6 @@ import 'package:nutrition_app/ui/recipe_page.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
-  // const Home({Key? key, required this.userEvent}) : super(key: key);
-  // final String userEvent;
 
   @override
   State<Home> createState() => _HomeState();
@@ -36,7 +33,6 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      drawer: const MyDrawer(),
       body: Center(
           child: _widgetOptions.elementAt(_selectedIndex)
       ),

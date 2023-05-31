@@ -23,10 +23,31 @@ class _LogbookState extends State<Logbook> {
   int _arraylength = 0;
   var repo = UserRepoImpl();
 
+  void initFakeData() {
+    _breakfastRecipes = [
+      Recipe(
+        id: "1",
+        name: "Fake Recipe 1",
+        thumbnail: "assets/images/nuts.jpg",
+        mealTime: "morning",
+        desc: '',
+      ),
+      Recipe(
+        id: "2",
+        name: "Fake Recipe 2",
+        thumbnail: "assets/images/kiwi.jpeg",
+        mealTime: "morning",
+        desc: '',
+      ),
+      // Add more fake recipes as needed
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
     getRecipe();
+    initFakeData();
   }
 
   Future getRecipe() async {

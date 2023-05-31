@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/core/custom_exception.dart';
 import 'package:nutrition_app/data/model/user.dart';
 
-import '../core/user_event.dart';
-import 'component/snackbar.dart';
-import '../data/repository/user/user_repository_impl.dart';
+import '../../core/user_event.dart';
+import '../component/snackbar.dart';
+import '../../data/repository/user/user_repository_impl.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);

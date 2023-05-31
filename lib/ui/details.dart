@@ -34,8 +34,7 @@ class _DetailsState extends State<Details> {
         final data = documentSnapshot.data();
         // Assuming you have a Recipe model, you can initialize it with the retrieved data
         setState(() {
-          _recipeData = Recipe.fromMap(data!);
-
+            _recipeData = Recipe.fromMap(data!);
         });
         debugPrint("${_recipeData.image}");
       } else {

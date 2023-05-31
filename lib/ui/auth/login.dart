@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/core/user_event.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
-import 'component/snackbar.dart';
+import '../component/snackbar.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);

@@ -11,6 +11,7 @@ import '../../../core/custom_exception.dart';
 
 class UserRepoImpl extends UserRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  User? user = FirebaseAuth.instance.currentUser;
   final collection = FirebaseFirestore.instance.collection("users");
 
   @override
