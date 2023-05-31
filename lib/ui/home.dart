@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:nutrition_app/data/model/user.dart';
 import 'package:nutrition_app/ui/diary_page.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/profile.dart';
 import 'package:nutrition_app/ui/recipe_page.dart';
+
+import '../core/custom_exception.dart';
+import '../data/repository/user/user_repository_impl.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -14,6 +20,9 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  UserRepoImpl userRepo = UserRepoImpl();
+  User? user;
+
   int _selectedIndex = 0;
   // static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
@@ -22,6 +31,32 @@ class _HomeState extends State<Home> {
     Favourite(),
     Profile()
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _getUser();
+    debugPrint("Who this $user");
+  }
+
+  Future<void> _getUser() async {
+    try {
+      var _firebaseUser = userRepo.getCurrentUser();
+      if (_firebaseUser != null) {
+        var _user = await userRepo.getUserById(_firebaseUser.uid);
+        setState(() {
+          user = _user;
+          if(user != null && user?.completedOnboarding == false) {
+            context.go("/image");
+          }
+        });
+      } else {
+        throw CustomException("Can't fetch user data");
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {

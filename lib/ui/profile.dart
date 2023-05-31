@@ -463,7 +463,7 @@ class _ProfileState extends State<Profile> {
               ),
               SizedBox(height: 16.0),
               Text(
-                "@${_user?.username ?? ""}",
+                "${_user?.firstName ?? ""} ${_user?.lastName ?? ""}",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

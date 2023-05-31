@@ -4,7 +4,8 @@ import 'package:crypto/crypto.dart';
 
 class User {
   final String? id;
-  final String username;
+  final String firstName;
+  final String lastName;
   final String email;
   final String password;
   final String? image;
@@ -18,12 +19,14 @@ class User {
   final double? proteinGoal;
   final double? fatGoal;
   final List<String>? favourite;
+  final bool completedOnboarding;
 
   static const String tableName = "users";
 
   User({
     this.id,
-    required this.username,
+    required this.firstName,
+    required this.lastName,
     required this.email,
     required this.password,
     this.image,
@@ -37,13 +40,32 @@ class User {
     this.proteinGoal = 200,
     this.fatGoal = 100,
     this.favourite = const [],
+    this.completedOnboarding = false
   });
 
-  User copyWith({String? username, String? email, String? password,}) {
+  User copyWith({
+    String? id, String? firstName, String? lastName, String? email, String? password, String? image,
+    String? gender, int? age, double? height, double? weight, String? diet, double? calorieGoal,
+    double? carbGoal, double? proteinGoal, double? fatGoal, List<String>? favorite, bool? completedOnboarding
+  }) {
     return User(
-      username: username ?? this.username,
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       password: password ?? this.password,
+      image: image ?? this.image,
+      gender: gender ?? this.gender,
+      age: age ?? this.age,
+      height: height ?? this.height,
+      weight: weight ?? this.weight,
+      diet: diet ?? this.diet,
+      calorieGoal: calorieGoal ?? this.calorieGoal,
+      carbGoal: carbGoal ?? this.carbGoal,
+      proteinGoal: proteinGoal ?? this.proteinGoal,
+      fatGoal: fatGoal ?? this.fatGoal,
+      favourite: favourite,
+      completedOnboarding: completedOnboarding ?? this.completedOnboarding
     );
   }
 
@@ -51,7 +73,8 @@ class User {
     final String hashedPassword = md5.convert(utf8.encode(password)).toString();
     return {
       "id": id,
-      "username": username,
+      "first_name": firstName,
+      "last_name": lastName,
       "email": email,
       "password": hashedPassword,
       "image": image,
@@ -64,14 +87,16 @@ class User {
       "carb_goal": carbGoal ?? 600,
       "protein_goal": proteinGoal ?? 200,
       "fat_goal": fatGoal ?? 100,
-      "favourite": favourite ?? []
+      "favourite": favourite ?? [],
+      "completed_onboarding": completedOnboarding
     };
   }
 
   static User fromMap(Map<String, dynamic> map) {
     return User(
       id: map["id"],
-      username: map["username"],
+      firstName: map["first_name"],
+      lastName: map["last_name"],
       email: map["email"],
       password: map["password"],
       image: map["image"],
@@ -85,6 +110,7 @@ class User {
       proteinGoal: map["protein_goal"] ?? 0.0,
       fatGoal: map["fat_goal"] ?? 0.0,
       favourite: (map["favourite"] as List<dynamic>?)?.cast<String>(),
+      completedOnboarding: map["completed_onboarding"]
     );
   }
 }
