@@ -8,6 +8,7 @@ import 'package:nutrition_app/ui/profile.dart';
 import 'package:nutrition_app/ui/recipe.dart';
 
 import '../core/service/shared_preference.dart';
+import 'favourite.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -24,6 +25,7 @@ class _HomeState extends State<Home> {
   static const List<Widget> _widgetOptions = <Widget>[
     Diary(),
     RecipePage(),
+    Favourite(),
     Profile()
   ];
 
@@ -65,11 +67,17 @@ class _HomeState extends State<Home> {
             label: 'Recipes',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.bookmark_add),
+            label: 'Bookmarks',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Me',
           ),
         ],
         currentIndex: _selectedIndex,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
         selectedItemColor: Colors.green[800],
         onTap: _onItemTapped,
       ),

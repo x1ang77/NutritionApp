@@ -9,6 +9,7 @@ import 'package:path/path.dart';
 import '../../core/user_event.dart';
 import '../diary.dart';
 import '../home.dart';
+import '../logbook.dart';
 import '../login.dart';
 import '../register.dart';
 
@@ -23,8 +24,9 @@ class NavRouter extends StatelessWidget {
     // GoRoute(path: "/home/:userEvent", builder: (context, state) => Home(userEvent: state.pathParameters["userEvent"].toString())),
     GoRoute(path: "/home", builder: (context, state) => const Home()),
     GoRoute(path: "/diary", builder: (context, state) => const Diary()),
+    GoRoute(path: "/logbook", builder: (context, state) => const Logbook()),
     GoRoute(path:"/recipe", builder: (context, state) => const RecipePage()),
-    GoRoute(path: "/details/:id",name:"id", builder: (context, state) => Details(
+    GoRoute(path: "/details/:id", name:"id", builder: (context, state) => Details(
       id: state.pathParameters["id"] ?? "",
     ))
   ];
