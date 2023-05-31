@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges;
 
+import '../custom_icons.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
@@ -23,6 +23,7 @@ class _FavouriteState extends State<Favourite> {
     getRecipe();
   }
 
+  // Show snackbar when bookmark has been deleted
   _deleteFavourite(String id) async {
     var user = FirebaseAuth.instance.currentUser?.uid;
 
@@ -87,6 +88,7 @@ class _FavouriteState extends State<Favourite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       appBar: AppBar(title: Text("Bookmarks")),
       body: SingleChildScrollView(
         child: Column(
@@ -173,10 +175,10 @@ class _FavouriteState extends State<Favourite> {
                     ),
                     trailing: GestureDetector(
                       onTap: () => _showDeleteConfirmationDialog(allRecipe),
-                      child: Icon(
-                        Icons.delete_outline_sharp,
+                      child: const Icon(
+                        CustomIcons.trash,
                         color: Colors.grey,
-                        size: 32,
+                        size: 20,
                       ),
                     ),
                   ),

@@ -19,35 +19,17 @@ class _LogbookState extends State<Logbook> {
   List<Recipe> _breakfastRecipes = [];
   List<Recipe> _lunchRecipes = [];
   List<Recipe> _dinnerRecipes = [];
-  List<String> _mealsId=[];
+  List<String> _mealsId = [];
   int _arraylength = 0;
+  bool _isBreakfastExpanded = false;
+  bool _isLunchExpanded = false;
+  bool _isDinnerExpanded = false;
   var repo = UserRepoImpl();
-
-  void initFakeData() {
-    _breakfastRecipes = [
-      Recipe(
-        id: "1",
-        name: "Fake Recipe 1",
-        thumbnail: "assets/images/nuts.jpg",
-        mealTime: "morning",
-        desc: '',
-      ),
-      Recipe(
-        id: "2",
-        name: "Fake Recipe 2",
-        thumbnail: "assets/images/kiwi.jpeg",
-        mealTime: "morning",
-        desc: '',
-      ),
-      // Add more fake recipes as needed
-    ];
-  }
 
   @override
   void initState() {
     super.initState();
     getRecipe();
-    initFakeData();
   }
 
   Future getRecipe() async {
@@ -72,7 +54,7 @@ class _LogbookState extends State<Logbook> {
     }
   }
 
-  _pushToMealsId(String id){
+  _pushToMealsId(String id) {
     _mealsId.add(id);
     setState(() {
       _arraylength = _mealsId.length;
@@ -111,175 +93,176 @@ class _LogbookState extends State<Logbook> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Logbook")),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Breakfast"),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _breakfastRecipes.length,
-              itemBuilder: (context, index) {
-                final breakfastRecipe = _breakfastRecipes[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text("${breakfastRecipe.name}"),
-                              Row(
-                                children: [
-                                  Text("${breakfastRecipe.carbs} cals"),
-                                  Text("${breakfastRecipe.grams}g"),
-                                  Text("${breakfastRecipe.carbs} carbs"),
-                                  Text("${breakfastRecipe.protein} pro"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () => _pushToMealsId(breakfastRecipe.id!),
-                            child: const Icon(Icons.add),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                "Welcome to your Logbook!",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "Please log your meals for each time of the day:",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ),
+            SizedBox(height: 16),
+            _buildMealTimeSection(
+              "Breakfast",
+              _breakfastRecipes,
+              _isBreakfastExpanded,
+              () {
+                setState(() {
+                  _isBreakfastExpanded = !_isBreakfastExpanded;
+                });
               },
             ),
-            const Text("Lunch"),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _lunchRecipes.length,
-              itemBuilder: (context, index) {
-                final lunchRecipe = _lunchRecipes[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text("${lunchRecipe.name}"),
-                              Row(
-                                children: [
-                                  Text("${lunchRecipe.carbs} cals"),
-                                  Text("${lunchRecipe.grams}g"),
-                                  Text("${lunchRecipe.carbs} carbs"),
-                                  Text("${lunchRecipe.protein} pro"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () => _pushToMealsId(lunchRecipe.id!),
-                            child: const Icon(Icons.add),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+            _buildMealTimeSection(
+              "Lunch",
+              _lunchRecipes,
+              _isLunchExpanded,
+              () {
+                setState(() {
+                  _isLunchExpanded = !_isLunchExpanded;
+                });
               },
             ),
-            const Text("Dinner"),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _dinnerRecipes.length,
-              itemBuilder: (context, index) {
-                final dinnerRecipe = _dinnerRecipes[index];
-                return Card(
-                  margin: const EdgeInsets.all(8),
-                  child: Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text("${dinnerRecipe.name}"),
-                              Row(
-                                children: [
-                                  Text("${dinnerRecipe.carbs} cals"),
-                                  Text("${dinnerRecipe.grams}g"),
-                                  Text("${dinnerRecipe.carbs} carbs"),
-                                  Text("${dinnerRecipe.protein} pro"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () => _pushToMealsId(dinnerRecipe.id!),
-                            child: const Icon(Icons.add),
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
+            _buildMealTimeSection(
+              "Dinner",
+              _dinnerRecipes,
+              _isDinnerExpanded,
+              () {
+                setState(() {
+                  _isDinnerExpanded = !_isDinnerExpanded;
+                });
               },
             ),
-            _arraylength > 2 ?
-            ElevatedButton(onPressed: () => _addToDiaries(), child: Text("Add to Diaries")):
-                Container()
+            SizedBox(height: 16),
+            Center(
+              child: _arraylength > 2
+                  ? ElevatedButton(
+                      onPressed: () => _addToDiaries(),
+                      child: Text("Add to Diaries"),
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    )
+                  : Container(),
+            ),
+            SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "Instructions:",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "1. Tap on each meal time section to expand and view available recipes.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "2. Tap on the '+' icon next to a recipe to add it to your diaries.",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                "*Add only one meal for each time of day.",
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMealTimeSection(
+      String title, List<Recipe> recipes, bool isExpanded, VoidCallback onTap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          elevation: isExpanded ? 4 : 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: ListTile(
+            title: Text(
+              title,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            trailing: Icon(
+              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+              size: 30,
+            ),
+            onTap: onTap,
+          ),
+        ),
+
+        if (isExpanded)
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: recipes.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final recipe = recipes[index];
+              return ListTile(
+                tileColor: Colors.white,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                title: Text(
+                  recipe.name,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                subtitle: Row(
+                  children: [
+                    const Icon(Icons.local_fire_department,
+                        size: 16, color: Colors.deepOrange),
+                    const SizedBox(width: 4),
+                    Container(
+                      width: 250, // Set the desired width
+                      child: Text(
+                        "${recipe.calories} kcal | ${recipe.grams}g | ${recipe.carbs} carbs | ${recipe.protein} pro",
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: ElevatedButton.icon(
+                  onPressed: () => _pushToMealsId(recipe.id!),
+                  icon: Icon(Icons.add_rounded, size: 20),
+                  label: Text("Add"),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    padding: const EdgeInsets.all(8),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }
