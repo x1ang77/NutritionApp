@@ -60,6 +60,7 @@ class UserRepoImpl extends UserRepo {
     }
   }
 
+  @override
   User? getCurrentUser() {
     try {
       var user = firebaseAuth.currentUser;

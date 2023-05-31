@@ -24,7 +24,7 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/home", builder: (context, state) => const Home()),
     GoRoute(path: "/diary", builder: (context, state) => const DiaryPage()),
     GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
-    GoRoute(path:"/recipe", builder: (context, state) => const RecipePage()),
+    GoRoute(path: "/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/details/:id",name:"id", builder: (context, state) => Details(
       id: state.pathParameters["id"] ?? "",
     )),
