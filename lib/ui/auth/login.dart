@@ -92,6 +92,10 @@ class _LoginState extends State<Login> {
     context.go("/home");
   }
 
+  void _navigateToForgotPassword() {
+    context.push("/forgot");
+  }
+
   void _navigateToRegister() {
     context.go("/register");
   }
@@ -194,9 +198,9 @@ class _LoginState extends State<Login> {
                           height: 20,
                         ),
                         GestureDetector(
-                          onTap: () {},
+                          onTap: _navigateToForgotPassword,
                           child: const Text(
-                            "Forgot password",
+                            "Forgot password?",
                             style: TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold
