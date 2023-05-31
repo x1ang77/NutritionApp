@@ -69,7 +69,6 @@ class _LoginState extends State<Login> {
 
       if (_emailError.isEmpty && _passwordError.isEmpty) {
         await userRepo.login(email, password);
-        // if (i)
         // showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
         showSnackbar(context, 'Login successful', Colors.green);
         _navigateToHome();

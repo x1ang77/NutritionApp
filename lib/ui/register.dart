@@ -191,6 +191,7 @@ class _RegisterState extends State<Register> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode1,
                               controller: _usernameController,
                               decoration: InputDecoration(
                                 hintText: "Username",
@@ -211,6 +212,7 @@ class _RegisterState extends State<Register> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode2,
                               controller: _emailController,
                               decoration: InputDecoration(
                                 hintText: "Email",
@@ -232,6 +234,7 @@ class _RegisterState extends State<Register> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode3,
                               obscureText: showPass,
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -252,6 +255,7 @@ class _RegisterState extends State<Register> {
                             elevation: 10,
                             borderRadius: BorderRadius.circular(10),
                             child: TextField(
+                              focusNode: _focusNode4,
                               obscureText: showConPass,
                               controller: _passwordConfirmController,
                               decoration: InputDecoration(
@@ -294,7 +298,10 @@ class _RegisterState extends State<Register> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text("Already registered? "),
-                                Text("Sign in", style: TextStyle(fontWeight: FontWeight.bold),)
+                                Text("Sign in", style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold
+                                ),)
                               ],
                             ),
                           ),

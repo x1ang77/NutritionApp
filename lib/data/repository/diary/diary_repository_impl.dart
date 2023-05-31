@@ -18,6 +18,7 @@ class DiaryRepoImpl {
       var diary = Diary.fromMap(data);
       return diary;
     } catch (e) {
+      debugPrint(e.toString());
       throw Exception(e.toString());
     }
   }

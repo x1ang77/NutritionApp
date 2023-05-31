@@ -1,15 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:nutrition_app/core/user_event.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:nutrition_app/ui/component/drawer.dart';
-import 'package:nutrition_app/ui/component/snackbar.dart';
 import 'package:nutrition_app/ui/diary_page.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/profile.dart';
-import 'package:nutrition_app/ui/recipe.dart';
-
-import '../core/service/shared_preference.dart';
+import 'package:nutrition_app/ui/recipe_page.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -22,27 +18,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  // static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     DiaryPage(),
     RecipePage(),
     Favourite(),
     Profile()
   ];
-
-  // @override
-  // didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   showSnack();
-  // }
-
-  // Future<void> showSnack() async {
-  //   if (widget.userEvent == UserEvent.login.name) {
-  //     showSnackbar2(context, "Successfully logged in", Colors.green);
-  //   } else if (widget.userEvent == UserEvent.register.name) {
-  //     showSnackbar2(context, "Successfully registered", Colors.green);
-  //   }
-  // }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -53,55 +35,52 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       drawer: const MyDrawer(),
       body: Center(
           child: _widgetOptions.elementAt(_selectedIndex)
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.book_solid),
-            label: 'Diary',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30)
+          )
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: GNav(
+              color: Colors.grey.shade400,
+              activeColor: Colors.white,
+              tabBackgroundColor: Colors.green,
+              gap: 8,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              tabs: const [
+                GButton(
+                  icon: CupertinoIcons.book_solid,
+                  text: 'Diary',
+                ),
+                GButton(
+                  icon: Icons.restaurant_menu,
+                  text: 'Recipes',
+                ),
+                GButton(
+                  icon: Icons.favorite,
+                  text: 'Favorites',
+                ),
+                GButton(
+                  icon: Icons.person,
+                  text: 'Me',
+                ),
+              ],
+              selectedIndex: _selectedIndex,
+              onTabChange: (index) {
+                _onItemTapped(index);
+              },
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Recipes',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Me',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: Colors.green[800],
-        onTap: _onItemTapped,
+        ),
       ),
-
-      // body: Center(
-      //   child: _widgetOptions.elementAt(_selectedIndex),
-      // ),
-      // bottomNavigationBar: GNav(
-      //     gap: 20,
-      //     tabs: [
-      //       GButton(
-      //           icon: FontAwesomeIcons.book,
-      //           text: "Diary",
-      //       ),
-      //       GButton(
-      //         icon: Icons.restaurant_menu,
-      //         text: "Recipes",
-      //       ),
-      //       GButton(
-      //         icon: FontAwesomeIcons.person,
-      //         text: "Me",
-      //       ),
-      //     ]
-      // ),
     );
   }
 }

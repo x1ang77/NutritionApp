@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/details.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 import 'package:nutrition_app/ui/logbook.dart';
-import 'package:nutrition_app/ui/recipe.dart';
+import 'package:nutrition_app/ui/recipe_page.dart';
 
 import '../../core/user_event.dart';
 import '../diary_page.dart';
