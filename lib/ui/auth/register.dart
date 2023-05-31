@@ -341,11 +341,11 @@ class CurvePainter extends CustomPainter {
     // First Curve
     final path1 = Path();
 
-    const startPoint1 = Offset(0, 120);
-    final endPoint1 = Offset(size.width, 20);
+    const startPoint1 = Offset(0, 40);
+    final endPoint1 = Offset(size.width, 30);
 
     final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
-    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.15);
+    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.25);
 
     path1.moveTo(startPoint1.dx, startPoint1.dy);
     path1.cubicTo(
@@ -366,11 +366,11 @@ class CurvePainter extends CustomPainter {
     // Second Curve
     final path2 = Path();
 
-    final startPoint2 = Offset(0, size.height * 0.80);
-    final endPoint2 = Offset(size.width, size.height - 80);
+    final startPoint2 = Offset(0, size.height * 0.85);
+    final endPoint2 = Offset(size.width, size.height - 40);
 
     final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
-    final controlPoint2_2 = Offset(size.width * 0.65, size.height * 0.88);
+    final controlPoint2_2 = Offset(size.width * 0.45, size.height * 0.95);
 
     path2.moveTo(startPoint2.dx, startPoint2.dy);
     path2.cubicTo(

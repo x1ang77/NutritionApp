@@ -117,6 +117,8 @@ class _RecipePageState extends State<RecipePage> {
   //   });
   // }
 
+
+  // Add snackbar if user has already bookmarked
   _addToFavourite(String id) async {
     var user = FirebaseAuth.instance.currentUser?.uid;
 
@@ -140,6 +142,8 @@ class _RecipePageState extends State<RecipePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
+      appBar: AppBar(title: Text("Recipes"), centerTitle: true),
       body: SingleChildScrollView(
         child: Container(
           margin: const EdgeInsets.all(32.0),
@@ -160,12 +164,15 @@ class _RecipePageState extends State<RecipePage> {
                     viewportFraction: 0.7,
                     enableInfiniteScroll: false,
                     padEnds: false,
+                    enlargeCenterPage: true,
+                    enlargeStrategy: CenterPageEnlargeStrategy.zoom,
                     // scrollPhysics: BouncingScrollPhysics(),
                     onPageChanged:
                         (int index, CarouselPageChangedReason reason) {
                       setState(() {
                         _index = index;
                       });
+
                     },
                   ),
                   itemBuilder: (_, i, __) {
