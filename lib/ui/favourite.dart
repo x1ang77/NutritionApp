@@ -107,7 +107,7 @@ class _FavouriteState extends State<Favourite> {
                     padding: EdgeInsets.only(left: 20, top: 20, right: 20),
                     child: Row(
                       children: [
-                        Text("My Bookmarks", style: TextStyle(fontSize: 24)),
+                        Text("My Bookmarks", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
                         Spacer(),
                         Stack(
                           children: [
@@ -164,7 +164,7 @@ class _FavouriteState extends State<Favourite> {
                     title: Text(allRecipe.name),
                     subtitle: Row(
                       children: [
-                        Text("${allRecipe.carbs} cals"),
+                        Text("${allRecipe.carbs} kcal"),
                         SizedBox(width: 8),
                         Text("${allRecipe.grams}g"),
                         SizedBox(width: 8),

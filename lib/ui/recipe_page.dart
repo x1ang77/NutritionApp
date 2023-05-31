@@ -172,7 +172,6 @@ class _RecipePageState extends State<RecipePage> {
                       setState(() {
                         _index = index;
                       });
-
                     },
                   ),
                   itemBuilder: (_, i, __) {

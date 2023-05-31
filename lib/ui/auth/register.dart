@@ -340,8 +340,8 @@ class _RegisterState extends State<Register> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              // onPressed: () => register(context),
-                              onPressed: () => _navigateToOnboarding(),
+                              onPressed: () => register(context),
+                              // onPressed: () => _navigateToOnboarding(),
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(

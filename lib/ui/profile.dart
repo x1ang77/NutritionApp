@@ -29,6 +29,10 @@ class _ProfileState extends State<Profile> {
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();
+  final _fatGoalController = TextEditingController();
+  final _proteinGoalController = TextEditingController();
+  final _carbGoalController = TextEditingController();
+  final _nameController = TextEditingController();
 
   String? userEmail;
   String? userName;
@@ -82,7 +86,7 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> _pickImage() async {
+  void _pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
       final imageFile = File(image.path);
@@ -98,13 +102,9 @@ class _ProfileState extends State<Profile> {
             content: const Text("Do you want to save this image?"),
             actions: [
               ElevatedButton(
-                onPressed: () {
-                  _savePic();
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                child: const Text("Confirm"),
-              ),
-              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey,
+                ),
                 onPressed: () {
                   setState(() {
                     this.image = null;
@@ -112,6 +112,13 @@ class _ProfileState extends State<Profile> {
                   Navigator.of(context).pop(); // Close the dialog
                 },
                 child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _savePic();
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: const Text("Confirm"),
               ),
             ],
           );
@@ -177,6 +184,7 @@ class _ProfileState extends State<Profile> {
   }
 
   void _showChangePasswordDialog() {
+    getUser();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -197,14 +205,25 @@ class _ProfileState extends State<Profile> {
                     controller: _currentPasswordController,
                     decoration: InputDecoration(
                       labelText: 'Current Password',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
                     ),
                     obscureText: true,
                   ),
                   SizedBox(height: 16.0),
                   TextField(
+                    // focusNode: _passwordFocusNode,
                     controller: _newPasswordController,
                     decoration: InputDecoration(
                       labelText: 'New Password',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
                     ),
                     obscureText: true,
                   ),
@@ -250,12 +269,13 @@ class _ProfileState extends State<Profile> {
           .then((authResult) {
         user.updatePassword(newPassword).then((_) {
           debugPrint('Password changed successfully');
+          showSnackbar(context, "Password changed successfully", Colors.green);
           // Show a success message or perform any additional actions
           // Clear the text fields after the password change
           _currentPasswordController.clear();
           _newPasswordController.clear();
           // Close the dialog
-          context.pop();
+          Navigator.of(context).pop();
         }).catchError((error) {
           throw CustomException("Password is wrong");
           // Show an error message to the user
@@ -263,7 +283,7 @@ class _ProfileState extends State<Profile> {
       }).catchError((error) {
         if (_currentPasswordController.text.isEmpty ||
             _newPasswordController.text.isEmpty) {
-          showSnackbar(context, "Nothing", Colors.red);
+          showSnackbar(context, "Please fill in both fields before updating", Colors.red);
         } else {
           showSnackbar(context, "Failed to change password", Colors.red);
         }
@@ -273,6 +293,239 @@ class _ProfileState extends State<Profile> {
     } else {
       print('User is not signed in');
     }
+  }
+
+  void _showUpdateNameDialog() {
+    getUser();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 400.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Update Name", style: TextStyle(fontSize: 24)),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Name',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      SizedBox(width: 8.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          _updateName();
+                          Navigator.of(context).pop();
+                          _nameController.clear();
+                        },
+                        child: Text('Update'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    // Set the initial value of the text field controller
+    _nameController.text = _user?.firstName ?? '';
+  }
+
+  void _updateName() {
+    getUser();
+    String newName = _nameController.text;
+    debugPrint('New Name: $newName');
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'first_name': newName}).then((_) {
+        debugPrint('Name updated successfully');
+        // Show a success message to the user
+        showSnackbar(context, "Name updated successfully", Colors.green);
+        // Clear the text field
+        _nameController.clear();
+      }).catchError((error) {
+        debugPrint('Failed to update name: $error');
+        // Show an error message to the user
+        showSnackbar(context, "Failed to update name", Colors.red);
+      });
+    } else {
+      debugPrint('User is not signed in');
+    }
+  }
+
+  void _macrosDialog() {
+    getUser();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 400.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text("Edit Macro Goals", style: TextStyle(fontSize: 24)),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _carbGoalController,
+                    decoration: InputDecoration(
+                      labelText: 'Carb Goal',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _fatGoalController,
+                    decoration: InputDecoration(
+                      labelText: 'Fat Goal',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  TextField(
+                    controller: _proteinGoalController,
+                    decoration: InputDecoration(
+                      labelText: 'Protein Goal',
+                      contentPadding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 12.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      SizedBox(width: 8.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          _updateMacroGoals();
+                          Navigator.of(context).pop();
+                          _carbGoalController.clear();
+                          _fatGoalController.clear();
+                          _proteinGoalController.clear();
+                        },
+                        child: Text('Confirm'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    _carbGoalController.text = _user?.carbGoal?.toStringAsFixed(0) ?? '';
+    _fatGoalController.text = _user?.fatGoal?.toStringAsFixed(0) ?? '';
+    _proteinGoalController.text = _user?.proteinGoal?.toStringAsFixed(0) ?? '';
+  }
+
+  void _updateMacroGoals() {
+    getUser();
+    String carbGoal = _carbGoalController.text;
+    String fatGoal = _fatGoalController.text;
+    String proteinGoal = _proteinGoalController.text;
+
+    // Parse the values and update the macro goals in the database
+    double parsedCarbGoal = double.tryParse(carbGoal) ?? 0.0;
+    double parsedFatGoal = double.tryParse(fatGoal) ?? 0.0;
+    double parsedProteinGoal = double.tryParse(proteinGoal) ?? 0.0;
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({
+        'carb_goal': parsedCarbGoal,
+        'fat_goal': parsedFatGoal,
+        'protein_goal': parsedProteinGoal,
+      })
+          .then((_) {
+        debugPrint('Macro goals updated successfully');
+        showSnackbar(context, "Updated macro goals", Colors.green);
+        // Perform any additional actions or show a success Snackbar
+      })
+          .catchError((error) {
+        debugPrint('Failed to update macro goals: $error');
+        // Show an error message to the user
+      });
+    } else {
+      debugPrint('User is not signed in');
+    }
+
+    _carbGoalController.clear();
+    _fatGoalController.clear();
+    _proteinGoalController.clear();
   }
 
   void _calorieDialog() {
@@ -358,11 +611,6 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-// void _changePassword() {
-//   // Show the dialog
-//   _showChangePasswordDialog(context);
-// }
-
   void _updateCalorieGoal() {
     getUser();
     String newCalorieGoal = _newCalorieGoalController.text;
@@ -407,17 +655,22 @@ class _ProfileState extends State<Profile> {
           Container(
             height: 275,
             decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.lightGreenAccent, Colors.green],
+                colors: [Colors.lightGreenAccent, Colors.green.shade400, Colors.green.shade700],
               ),
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("My Profile"),
+              SizedBox(height: 16.0),
+              // Text("My Profile", style: TextStyle(color: Colors.white, fontSize: 18)),
               SizedBox(height: 16.0),
               Stack(
                 alignment: Alignment.bottomRight,
@@ -443,18 +696,19 @@ class _ProfileState extends State<Profile> {
                             ? FileImage(image!)
                             : _user?.image != null
                                 ? Image.network(downloadUrl ?? "").image
-                                : AssetImage("assets/images/nuts.jpg"),
+                                : AssetImage("assets/images/empty_profile_image"),
                       ),
                     ),
                   ),
                   Positioned(
-                    bottom: 20,
-                    right: 70,
+                    bottom: 10,
+                    right: 100,
                     child: ElevatedButton(
                       onPressed: _pickImage,
                       child: Icon(Icons.edit),
                       style: ElevatedButton.styleFrom(
                         shape: CircleBorder(),
+                        backgroundColor: Colors.green.shade700,
                         padding: EdgeInsets.all(12),
                       ),
                     ),
@@ -471,8 +725,8 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               SizedBox(height: 50.0),
-              Flexible(
-                flex: 1,
+              Expanded(
+                child: SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
@@ -493,7 +747,7 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         child: ListTile(
-                          onTap: _showChangePasswordDialog,
+                          onTap: _showUpdateNameDialog,
                           leading: Icon(Icons.font_download_rounded),
                           minLeadingWidth : 10,
                           title: Text('Name'),
@@ -536,7 +790,7 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         child: ListTile(
-                          onTap: _calorieDialog,
+                          onTap: _macrosDialog,
                           leading: Icon(Icons.sports_gymnastics),
                           minLeadingWidth : 10,
                           title: Text('Macros Goal'),
@@ -559,17 +813,10 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
               ),
+              ),
               SizedBox(height: 24.0),
             ],
           ),
-              // ElevatedButton(
-              //   onPressed: _logout,
-              //   child: Text('Logout'),
-              //   style: ElevatedButton.styleFrom(
-              //     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              //     // Customize the button's appearance further as needed
-              //   ),
-              // ),
         ],
       ),
     );
