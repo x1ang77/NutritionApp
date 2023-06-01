@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:nutrition_app/core/custom_exception.dart';
 import 'package:nutrition_app/custom_icons.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
@@ -143,7 +144,7 @@ class _ProfileState extends State<Profile> {
   Future<String?> uploadImageToFirebase(File imageFile) async {
     try {
       // Create a unique filename for the image
-      fileName = DateTime.now().toString();
+      fileName = DateFormat("y_M_d_Hms").format(DateTime.now());
 
       // Create a reference to the Firebase Storage location where you want to store the image
       final Reference storageReference =

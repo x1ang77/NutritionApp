@@ -12,7 +12,8 @@ class ImagePage extends StatefulWidget {
 }
 
 class _ImagePageState extends State<ImagePage> {
-  File? image;
+  XFile? image;
+  File? imageFile;
 
   void _skipToNextPage() {
     context.push("/onboarding");
@@ -25,11 +26,10 @@ class _ImagePageState extends State<ImagePage> {
   Future _pickImage() async {
     final image = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (image != null) {
-      final imageFile = File(image.path);
+      imageFile = File(image.path);
 
       setState(() {
-        this.image = imageFile;
-        debugPrint(this.image.toString());
+        this.image = image;
       });
     }
   }
@@ -70,7 +70,7 @@ class _ImagePageState extends State<ImagePage> {
                       radius: 115,
                       child: CircleAvatar(
                           radius: 110,
-                          backgroundImage: image != null ? Image.file(image!).image : Image.asset("assets/images/empty_profile_image.png").image,
+                          backgroundImage: image != null ? Image.file(imageFile!).image : Image.asset("assets/images/empty_profile_image.png").image,
                       ),
                     ),
                   ),
