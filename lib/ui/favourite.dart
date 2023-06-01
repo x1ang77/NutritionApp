@@ -22,14 +22,11 @@ enum SortOrder {
   Descending,
 }
 
-
 class _FavouriteState extends State<Favourite> {
   List<Recipe> _allRecipes = [];
   List<Recipe> _filteredRecipes = [];
   bool _isSearching = false;
   var repo = UserRepoImpl();
-
-
 
   @override
   void initState() {
@@ -42,7 +39,7 @@ class _FavouriteState extends State<Favourite> {
     var user = FirebaseAuth.instance.currentUser?.uid;
 
     DocumentReference documentRef =
-    FirebaseFirestore.instance.collection("users").doc(user);
+        FirebaseFirestore.instance.collection("users").doc(user);
     // Retrieve the document
     var documentSnapshot = await repo.getUserById(user!);
 
@@ -104,7 +101,8 @@ class _FavouriteState extends State<Favourite> {
   void _filterRecipes(String query) {
     setState(() {
       if (query.isEmpty) {
-        _filteredRecipes = List.from(_allRecipes); // Copy all recipes to the filtered list when the query is empty
+        _filteredRecipes = List.from(
+            _allRecipes); // Copy all recipes to the filtered list when the query is empty
       } else {
         _filteredRecipes = _allRecipes.where((recipe) {
           final nameLower = recipe.name.toLowerCase();
@@ -127,59 +125,64 @@ class _FavouriteState extends State<Favourite> {
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               title: Text('Sort Recipes'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    title: Text('Alphabetical'),
-                    leading: Radio<SortType>(
-                      value: SortType.Alphabetical,
-                      groupValue: selectedSortType,
-                      onChanged: (SortType? value) {
-                        setState(() {
-                          selectedSortType = value!;
-                        });
-                      },
+              content: Column(mainAxisSize: MainAxisSize.min, children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: ListTile(
+                        title: Text('Asc'),
+                        leading: Radio<SortOrder>(
+                          value: SortOrder.Ascending,
+                          groupValue: selectedSortOrder,
+                          onChanged: (SortOrder? value) {
+                            setState(() {
+                              selectedSortOrder = value!;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                  ListTile(
-                    title: Text('Calorie Count'),
-                    leading: Radio<SortType>(
-                      value: SortType.CalorieCount,
-                      groupValue: selectedSortType,
-                      onChanged: (SortType? value) {
-                        setState(() {
-                          selectedSortType = value!;
-                        });
-                      },
+                    Expanded(
+                      child: ListTile(
+                        title: Text('Desc'),
+                        leading: Radio<SortOrder>(
+                          value: SortOrder.Descending,
+                          groupValue: selectedSortOrder,
+                          onChanged: (SortOrder? value) {
+                            setState(() {
+                              selectedSortOrder = value!;
+                            });
+                          },
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+                ListTile(
+                  title: Text('Alphabetical'),
+                  leading: Radio<SortType>(
+                    value: SortType.Alphabetical,
+                    groupValue: selectedSortType,
+                    onChanged: (SortType? value) {
+                      setState(() {
+                        selectedSortType = value!;
+                      });
+                    },
                   ),
-                  ListTile(
-                    title: Text('Ascending'),
-                    leading: Radio<SortOrder>(
-                      value: SortOrder.Ascending,
-                      groupValue: selectedSortOrder,
-                      onChanged: (SortOrder? value) {
-                        setState(() {
-                          selectedSortOrder = value!;
-                        });
-                      },
-                    ),
+                ),
+                ListTile(
+                  title: Text('Calorie Count'),
+                  leading: Radio<SortType>(
+                    value: SortType.CalorieCount,
+                    groupValue: selectedSortType,
+                    onChanged: (SortType? value) {
+                      setState(() {
+                        selectedSortType = value!;
+                      });
+                    },
                   ),
-                  ListTile(
-                    title: Text('Descending'),
-                    leading: Radio<SortOrder>(
-                      value: SortOrder.Descending,
-                      groupValue: selectedSortOrder,
-                      onChanged: (SortOrder? value) {
-                        setState(() {
-                          selectedSortOrder = value!;
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ]),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -213,7 +216,8 @@ class _FavouriteState extends State<Favourite> {
           _allRecipes.sort((a, b) => a.name.compareTo(b.name));
           break;
         case SortType.CalorieCount:
-          _allRecipes.sort((a, b) => (a.calorie ?? 0).compareTo(b.calorie ?? 0));
+          _allRecipes
+              .sort((a, b) => (a.calorie ?? 0).compareTo(b.calorie ?? 0));
           break;
       }
 
@@ -221,12 +225,12 @@ class _FavouriteState extends State<Favourite> {
         _allRecipes = _allRecipes.reversed.toList();
       }
 
-      _filteredRecipes = List.from(_allRecipes); // Update the filtered list with the sorted results
+      _filteredRecipes = List.from(
+          _allRecipes); // Update the filtered list with the sorted results
     });
 
     _showSortSnackBar(sortType, sortOrder);
   }
-
 
   void _showSortSnackBar(SortType sortType, SortOrder sortOrder) {
     String snackBarMessage;
@@ -253,7 +257,6 @@ class _FavouriteState extends State<Favourite> {
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -287,59 +290,59 @@ class _FavouriteState extends State<Favourite> {
           children: [
             _filteredRecipes.isEmpty
                 ? Container(
-              height: MediaQuery.of(context).size.height - 100,
-              child: const Center(
-                child: Text(
-                  "No Favourites",
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            )
-                : Container(
-              padding: EdgeInsets.only(left: 20, top: 20, right: 20),
-              child: Row(
-                children: [
-                  Text(
-                    "My Bookmarks",
-                    style: TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                  Spacer(),
-                  Stack(
-                    children: [
-                      const Icon(
-                        Icons.bookmark,
-                        color: Colors.red,
-                        size: 40,
+                    height: MediaQuery.of(context).size.height - 100,
+                    child: const Center(
+                      child: Text(
+                        "No Favourites",
+                        style: TextStyle(fontSize: 16),
                       ),
-                      Positioned(
-                        top: 15,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: const BoxDecoration(
-                            color: Colors.transparent,
-                          ),
-                          child: Transform.translate(
-                            offset: Offset(0, -6),
-                            // Adjust the offset as needed
-                            child: Text(
-                              "${_filteredRecipes.length}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                    ),
+                  )
+                : Container(
+                    padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+                    child: Row(
+                      children: [
+                        Text(
+                          "My Bookmarks",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w600),
+                        ),
+                        Spacer(),
+                        Stack(
+                          children: [
+                            const Icon(
+                              Icons.bookmark,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                            Positioned(
+                              top: 15,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                                child: Transform.translate(
+                                  offset: Offset(0, -6),
+                                  // Adjust the offset as needed
+                                  child: Text(
+                                    "${_filteredRecipes.length}",
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
             SizedBox(height: 20), // Add spacing between the title and the list
             ListView.builder(
               shrinkWrap: true,
@@ -350,10 +353,13 @@ class _FavouriteState extends State<Favourite> {
                 return Card(
                   color: Color(0xFFFBFBF8),
                   margin:
-                  const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Adjust margin as needed
-                  elevation: 4, // Add elevation for a raised appearance
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  // Adjust margin as needed
+                  elevation: 4,
+                  // Add elevation for a raised appearance
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10), // Add rounded corners
+                    borderRadius:
+                        BorderRadius.circular(10), // Add rounded corners
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(
@@ -362,16 +368,18 @@ class _FavouriteState extends State<Favourite> {
                     subtitle: Row(
                       children: [
                         Icon(Icons.local_fire_department,
-                            size: 16, color: Colors.grey), // Add an icon to represent kcal
+                            size: 16, color: Colors.grey),
+                        // Add an icon to represent kcal
                         SizedBox(width: 4),
                         Text("${allRecipe.calorie} kcal",
-                            style: TextStyle(fontSize: 12)), // Show the calories value
-                        SizedBox(width: 8), // Show the grams value
+                            style: TextStyle(fontSize: 12)),
+                        // Show the calories value
+                        SizedBox(width: 8),
+                        // Show the grams value
                       ],
                     ),
                     trailing: GestureDetector(
-                      onTap: () =>
-                          _showDeleteConfirmationDialog(allRecipe),
+                      onTap: () => _showDeleteConfirmationDialog(allRecipe),
                       child: const Icon(
                         CustomIcons.trash,
                         color: Colors.grey,
@@ -403,6 +411,4 @@ class _FavouriteState extends State<Favourite> {
       ),
     );
   }
-
 }
-
