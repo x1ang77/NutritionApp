@@ -33,20 +33,20 @@ class _LogbookState extends State<Logbook> {
   }
 
   Future getRecipe() async {
-    var collection = FirebaseFirestore.instance.collection("meals");
+    var collection = FirebaseFirestore.instance.collection("recipes");
     var querySnapshot = await collection.get();
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      debugPrint("${recipe.image?[0]}");
+      // debugPrint("${recipe.image?[0]}");
       setState(() {
-        if (recipe.mealTime == "morning") {
+        if (recipe.mealTime == "Breakfast") {
           _breakfastRecipes.add(recipe);
         }
-        if (recipe.mealTime == "afternoon") {
+        if (recipe.mealTime == "Lunch") {
           _lunchRecipes.add(recipe);
         }
-        if (recipe.mealTime == "night") {
+        if (recipe.mealTime == "Dinner") {
           _dinnerRecipes.add(recipe);
         }
         _allRecipes.add(recipe);
@@ -161,29 +161,29 @@ class _LogbookState extends State<Logbook> {
                   : Container(),
             ),
             SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "Instructions:",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "1. Tap on each meal time section to expand and view available recipes.",
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "2. Tap on the '+' icon next to a recipe to add it to your diaries.",
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "*Add only one meal for each time of day.",
                 style: TextStyle(fontSize: 16, color: Colors.red),
@@ -208,7 +208,7 @@ class _LogbookState extends State<Logbook> {
           child: ListTile(
             title: Text(
               title,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             trailing: Icon(
               isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
@@ -231,7 +231,7 @@ class _LogbookState extends State<Logbook> {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 title: Text(
-                  recipe.name,
+                  recipe.name ?? "",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(
@@ -242,7 +242,7 @@ class _LogbookState extends State<Logbook> {
                     Container(
                       width: 250, // Set the desired width
                       child: Text(
-                        "${recipe.calories} kcal | ${recipe.grams}g | ${recipe.carbs} carbs | ${recipe.protein} pro",
+                        "${recipe.calorie} kcal | ${recipe.carb} g | ${recipe.protein} g | ${recipe.fat}g",
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
                       ),

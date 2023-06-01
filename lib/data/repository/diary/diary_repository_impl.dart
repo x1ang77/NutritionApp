@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:nutrition_app/data/model/diary.dart';
+import 'package:nutrition_app/data/repository/diary/diary_repository.dart';
 
-class DiaryRepoImpl {
+class DiaryRepoImpl extends DiaryRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final collection = FirebaseFirestore.instance.collection("diaries");
 
+  @override
   Future<Diary> getDiary(String userId, String date) async {
     try {
       var querySnapshot = await collection

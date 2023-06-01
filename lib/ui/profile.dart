@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -24,8 +23,6 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   var repo = UserRepoImpl();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-      GlobalKey<ScaffoldMessengerState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();
@@ -75,10 +72,11 @@ class _ProfileState extends State<Profile> {
     context.go('/login');
   }
 
-  _logout() async {
+  _logout(context) async {
     try {
       await FirebaseAuth.instance.signOut();
       navigateToLogin();
+      showSnackbar(context, "Logged out successfully", Colors.green);
     } catch (e) {
       // An error occurred while signing out
       debugPrint('Error signing out: $e');
@@ -695,8 +693,8 @@ class _ProfileState extends State<Profile> {
                         backgroundImage: image != null
                             ? FileImage(image!)
                             : _user?.image != null
-                                ? Image.network(downloadUrl ?? "").image
-                                : AssetImage("assets/images/empty_profile_image"),
+                            ? Image.network(downloadUrl ?? "").image
+                            : const AssetImage("assets/images/empty_profile_image.png"),
                       ),
                     ),
                   ),
@@ -715,47 +713,47 @@ class _ProfileState extends State<Profile> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Text(
                 "${_user?.firstName ?? ""} ${_user?.lastName ?? ""}",
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              SizedBox(height: 50.0),
+              const SizedBox(height: 50.0),
               Expanded(
                 child: SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         "Edit Profile Information",
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             top: BorderSide(color: Colors.grey),
                           ),
                         ),
                         child: ListTile(
                           onTap: _showUpdateNameDialog,
-                          leading: Icon(Icons.font_download_rounded),
+                          leading: const Icon(Icons.font_download_rounded),
                           minLeadingWidth : 10,
-                          title: Text('Name'),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                          title: const Text('Name'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
                       ),
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             top: BorderSide(color: Colors.grey),
                             bottom: BorderSide(color: Colors.grey),
@@ -763,50 +761,57 @@ class _ProfileState extends State<Profile> {
                         ),
                         child: ListTile(
                           onTap: _showChangePasswordDialog,
-                          leading: Icon(Icons.lock),
+                          leading: const Icon(Icons.lock),
                           minLeadingWidth : 10,
-                          title: Text('Change Password'),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                          title: const Text('Change Password'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
                       ),
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
                         child: ListTile(
                           onTap: _calorieDialog,
-                          leading: Icon(Icons.fastfood),
+                          leading: const Icon(Icons.fastfood),
                           minLeadingWidth : 10,
-                          title: Text('Calorie Goal'),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                          title: const Text('Calorie Goal'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
                       ),
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
                         child: ListTile(
                           onTap: _macrosDialog,
-                          leading: Icon(Icons.sports_gymnastics),
+                          leading: const Icon(Icons.sports_gymnastics),
                           minLeadingWidth : 10,
-                          title: Text('Macros Goal'),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                          title: const Text('Macros Goal'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
                       ),
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
-                        child: ListTile(
-                          onTap: _logout,
-                          title: Text('Logout'),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+                        // child: ListTile(
+                        //   onTap: _logout,
+                        //   leading: const Icon(Icons.logout),
+                        //   title: const Text('Logout'),
+                        //   trailing: const Icon(Icons.keyboard_arrow_right),
+                        // ),
+                        child: listTile(
+                            () => _logout(context),
+                          const Icon(Icons.logout),
+                          "Logout",
+                          const Icon(Icons.keyboard_arrow_right)
                         ),
                       ),
                     ],
@@ -814,11 +819,20 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
             ],
           ),
         ],
       ),
     );
   }
+}
+
+ListTile listTile(void Function() onTap, Widget leadingIcon, String title, Widget trailingIcon) {
+  return ListTile(
+    onTap: onTap,
+    leading: leadingIcon,
+    title: Text(title),
+    trailing: trailingIcon,
+  );
 }

@@ -1,48 +1,45 @@
 class Recipe {
   final String? id;
-  final String name;
-  final String mealTime;
-  final String thumbnail;
-  final String desc;
-  final double? carbs;
-  final double? grams;
+  final String? name;
+  final String? thumbnail;
+  final String? description;
+  final double? calorie;
+  final double? carb;
   final double? protein;
-  final double? calories;
-  final List<String>? image;
+  final double? fat;
   final List<String>? ingredients;
   final List<String>? steps;
+  final String? mealTime;
 
   static const String tableName = "recipes";
 
   Recipe({
     this.id,
-    required this.name,
-    required this.mealTime,
-    required this.thumbnail,
-    required this.desc,
-    this.carbs,
-    this.grams,
+    this.name,
+    this.thumbnail,
+    this.description,
+    this.calorie,
+    this.carb,
     this.protein,
-    this.calories,
-    this.image,
+    this.fat,
     this.ingredients,
     this.steps,
+    this.mealTime,
   });
 
   Map<String, dynamic> toMap() {
     return {
       "id": id,
       "name": name,
-      "mealTime": mealTime,
       "thumbnail": thumbnail,
-      "desc": desc,
-      "carbs": carbs,
-      "grams": grams,
+      "description": description,
+      "calorie": calorie,
+      "carb": carb,
       "protein": protein,
-      "calories": calories,
-      "image": image,
+      "fat": fat,
       "ingredients": ingredients,
       "steps": steps,
+      "meal_time": mealTime
     };
   }
 
@@ -50,16 +47,15 @@ class Recipe {
     return Recipe(
       id: map["id"],
       name: map["name"],
-      mealTime: map["mealTime"],
       thumbnail: map["thumbnail"],
-      desc: map["desc"],
-      carbs: map["carbs"],
-      grams: map["grams"],
+      description: map["description"],
+      calorie: map["calorie"],
+      carb: map["carb"],
       protein: map["protein"],
-      calories: map["calories"],
-      image: (map["image"] as List<dynamic>?)?.cast<String>(),
+      fat: map["fat"],
       ingredients: (map["ingredients"] as List<dynamic>?)?.cast<String>(),
       steps: (map["steps"] as List<dynamic>?)?.cast<String>(),
+      mealTime: map["meal_time"]
     );
   }
 }

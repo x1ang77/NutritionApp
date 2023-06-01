@@ -38,8 +38,8 @@ class Diary {
       breakfast: map["breakfast"],
       lunch: map["lunch"],
       dinner: map["dinner"],
-      caloriesGoals: map["calories_goals"],
-      caloriesConsumed: map["calories_consumed"],
+      caloriesGoals: map["calories_goals"] is int ? map["calories_goals"].toDouble() : map["calories_goals"],
+      caloriesConsumed: map["calories_consumed"] is int ? map["calories_consumed"].toDouble() : map["calories_consumed"],
     );
   }
 }
