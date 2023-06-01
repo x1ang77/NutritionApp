@@ -89,7 +89,10 @@ class _FavouriteState extends State<Favourite> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      appBar: AppBar(title: Text("Bookmarks")),
+      appBar: AppBar(
+        title: const Text("Favorites"),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

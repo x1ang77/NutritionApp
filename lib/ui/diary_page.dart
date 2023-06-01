@@ -33,7 +33,7 @@ class _DiaryPageState extends State<DiaryPage> {
   // final List<String> lunchMeals = ['Salad', 'Sandwich', 'Soup', "tSFqEBsKuQLymnerRHP6"];
   // final List<String> dinnerMeals = ['Steak', 'Pasta', 'Chicken'];
   List<String> breakfastItems = [];
-  List<String> lunchItems = ["tSFqEBsKuQLymnerRHP6"];
+  List<String> lunchItems = ["tSFqEBsKuQLymnerRHP6", "tSFqEBsKuQLymnerRHP6"];
   List<String> dinnerItems = ["tSFqEBsKuQLymnerRHP6"];
 
   List<Recipe> breakfastMeals = [];
@@ -88,7 +88,7 @@ class _DiaryPageState extends State<DiaryPage> {
       var firebaseUser = userRepo.getCurrentUser();
       if (firebaseUser != null) {
         setState(() {
-        userId = firebaseUser.uid;
+          userId = firebaseUser.uid;
         });
         // var formattedDate = DateFormat("yMd").format(selectedDate);
         // _getDiary(userId, formattedDate);
@@ -557,9 +557,10 @@ class _DiaryPageState extends State<DiaryPage> {
 
           Container(
             color: Colors.white,
-            child: ListView.separated(
+            child: meals.isNotEmpty
+            ? ListView.builder(
               shrinkWrap: true,
-              separatorBuilder: (_, __) => const SizedBox(height: 8),
+              // separatorBuilder: (_, __) => const SizedBox(height: 8),
               itemCount: meals.length,
               itemBuilder: (context, index) {
                 final meal = meals[index];
@@ -579,8 +580,15 @@ class _DiaryPageState extends State<DiaryPage> {
                   //   onPressed: () {},
                   //   child: const Icon(Icons.remove, size: 20),
                   // ),
-                );},
+                );
+              },
               physics: const NeverScrollableScrollPhysics(),
+            )
+                : const ListTile(
+              title: Text(
+                "No meals available",
+                style: TextStyle(color: Colors.grey),
+              ),
             ),
           )
         ],
