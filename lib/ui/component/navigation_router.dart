@@ -5,7 +5,6 @@ import 'package:nutrition_app/ui/auth/image_page.dart';
 import 'package:nutrition_app/ui/details.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 
-import '../../data/model/user.dart';
 import '../auth/onboarding.dart';
 import '../diary_page.dart';
 import '../home.dart';
@@ -27,13 +26,13 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/logbook", builder: (context, state) => const MealPage()),
     GoRoute(path: "/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
-    GoRoute(path: "/image", builder: (context, state) => const ImagePage()),
     GoRoute(path: "/forgot", builder: (context, state) => const ForgotPasswordPage()),
-    GoRoute(path: "/onboarding", builder: (context, state) => OnboardingPage()),
-    // GoRoute(path: "/onboarding", name: "image", builder: (context, state) {
-    //   Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
-    //   return Onboarding(object: extras,);
-    // }),
+    GoRoute(path: "/image", builder: (context, state) => const ImagePage()),
+    // GoRoute(path: "/onboarding", builder: (context, state) => const OnboardingPage()),
+    GoRoute(path: "/onboarding", name: "image", builder: (context, state) {
+      Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
+      return OnboardingPage(object: extras,);
+    }),
     GoRoute(path: "/details/:id", name:"id", builder: (context, state) =>
         Details(id: state.pathParameters["id"] ?? "",)
     )
