@@ -261,6 +261,7 @@ class _FavouriteState extends State<Favourite> {
       backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: _isSearching ? _buildSearchBar() : Text("Bookmarks"),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: Icon(_isSearching ? Icons.close : Icons.search),

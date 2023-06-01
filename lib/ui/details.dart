@@ -19,18 +19,22 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
-  user_model.User? _user;
-  Recipe? _recipeData;
-  List<String> meals = [];
   var userRepo = UserRepoImpl();
   var recipeRepo = RecipeRepoImpl();
   var diaryRepo = DiaryRepoImpl();
 
+  user_model.User? _user;
+  Recipe? _recipeData;
+  List<String> meals = [];
+  bool isLoading = false;
+
   Future getUser() async {
+    isLoading = true;
     User? user = FirebaseAuth.instance.currentUser;
-    var currentUser = await userRepo.getUserById(user!.uid);
+    var currentUser = await userRepo.getUserById(user?.uid ?? "");
     setState(() {
       _user = currentUser;
+      isLoading = false;
     });
   }
 
@@ -88,7 +92,7 @@ class _DetailsState extends State<Details> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          child: Container(
+          child: SizedBox(
             height: 200,
             width: MediaQuery.of(context).size.width,
             child: Padding(
@@ -99,7 +103,7 @@ class _DetailsState extends State<Details> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Text(
                           "Full Steps",
                           style: TextStyle(fontSize: 24),
@@ -113,7 +117,7 @@ class _DetailsState extends State<Details> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -123,7 +127,7 @@ class _DetailsState extends State<Details> {
                           padding: const EdgeInsets.symmetric(vertical: 2),
                           child: Text(
                             "Step ${index + 1}: ${steps[index]}",
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           ),
                         );
                       },
@@ -141,18 +145,19 @@ class _DetailsState extends State<Details> {
   _addToFavourite(String id) async {
     var user = FirebaseAuth.instance.currentUser?.uid;
 
-    DocumentReference documentRef =
-        FirebaseFirestore.instance.collection("users").doc(user);
-    // Retrieve the document
-    var documentSnapshot = await userRepo.getUserById(user!);
-
-    if (documentSnapshot != null) {
-      var array = documentSnapshot.favourite;
-      if (array != null) {
-        if (!array.contains(id)) {
-          documentRef.update({
-            'favourite': FieldValue.arrayUnion([id])
-          });
+    if (user != null) {
+      DocumentReference documentRef =
+      FirebaseFirestore.instance.collection("users").doc(user);
+      // Retrieve the document
+      var documentSnapshot = await userRepo.getUserById(user);
+      if (documentSnapshot != null) {
+        var array = documentSnapshot.favourite;
+        if (array != null) {
+          if (!array.contains(id)) {
+            documentRef.update({
+              'favourite': FieldValue.arrayUnion([id])
+            });
+          }
         }
       }
     }
@@ -173,7 +178,7 @@ class _DetailsState extends State<Details> {
                         bottomLeft: Radius.circular(30),
                         bottomRight: Radius.circular(30),
                       ),
-                      child: Image.network(_recipeData?.thumbnail ?? ""),
+                      child: !isLoading ? Image.network(_recipeData?.thumbnail ?? "") : Image.asset("assets/images/placeholder_image.png"),
                     ),
                   ],
                 ),
@@ -222,7 +227,7 @@ class _DetailsState extends State<Details> {
               height: 20,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Center(
                 child: Text(
                   _recipeData?.description ?? "",
@@ -237,7 +242,7 @@ class _DetailsState extends State<Details> {
               height: 20,
             ),
             Card(
-              margin: EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               elevation: 10,
               child: Column(
                 children: [
@@ -334,37 +339,37 @@ class _DetailsState extends State<Details> {
               height: 30,
             ),
             Card(
-              margin: EdgeInsets.symmetric(horizontal: 30),
+              margin: const EdgeInsets.symmetric(horizontal: 30),
               elevation: 10,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Text(
                       "Ingredients",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Divider(color: Colors.grey),
+                  const Divider(color: Colors.grey),
                   GridView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 1,
                       childAspectRatio: MediaQuery.of(context).size.width /
                           (MediaQuery.of(context).size.height / 20),
                     ),
-                    itemCount: (_recipeData!.ingredients.length / 2).ceil(),
+                    itemCount: ((_recipeData?.ingredients.length ?? 0) / 2).ceil(),
                     itemBuilder: (BuildContext context, int index) {
                       final startIndex = index * 2;
                       final endIndex = startIndex + 1;
-                      final ingredient1 = "• ${_recipeData!.ingredients[startIndex]}";
+                      final ingredient1 = "• ${_recipeData?.ingredients[startIndex]}";
                       final ingredient2 =
-                          (endIndex < _recipeData!.ingredients.length)
-                              ? "• ${_recipeData!.ingredients[endIndex]}"
+                          (_recipeData?.ingredients != null && endIndex < (_recipeData?.ingredients.length ?? 0))
+                              ? "• ${_recipeData?.ingredients[endIndex]}"
                               : null;
                       return Column(
                         children: [
@@ -378,7 +383,7 @@ class _DetailsState extends State<Details> {
                                   ),
                                   child: Text(
                                     ingredient1,
-                                    style: TextStyle(fontSize: 14),
+                                    style: const TextStyle(fontSize: 14),
                                   ),
                                 ),
                               ),
@@ -391,13 +396,13 @@ class _DetailsState extends State<Details> {
                                     ),
                                     child: Text(
                                       ingredient2,
-                                      style: TextStyle(fontSize: 14),
+                                      style: const TextStyle(fontSize: 14),
                                     ),
                                   ),
                                 ),
                             ],
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                         ],
                       );
                     },
@@ -408,7 +413,7 @@ class _DetailsState extends State<Details> {
             const SizedBox(
               height: 30,
             ),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: Card(
                 margin: const EdgeInsets.symmetric(horizontal: 30),
@@ -423,13 +428,13 @@ class _DetailsState extends State<Details> {
                     ),
                     const SizedBox(height: 8),
                     Column(
-                      children: _recipeData!.steps
-                          .sublist(0, 2)
+                      children: (_recipeData?.steps ?? [])
+                          .sublist(0, _recipeData?.steps.length.clamp(0, 2))
                           .map(
                             (step) => Padding(
                               padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
                               child: Text(
-                                "Step ${_recipeData!.steps.indexOf(step) + 1}: $step",
+                                "Step ${(_recipeData?.steps.indexOf(step) ?? 0) + 1}: $step",
                                 style: const TextStyle(fontSize: 16),
                                 textAlign: TextAlign.center,
                               ),
@@ -437,7 +442,7 @@ class _DetailsState extends State<Details> {
                           )
                           .toList(),
                     ),
-                    if (_recipeData!.steps.length > 2)
+                    if ((_recipeData?.steps.length ?? 0) > 2)
                       Align(
                         alignment: Alignment.bottomRight,
                         child: GestureDetector(
@@ -449,10 +454,10 @@ class _DetailsState extends State<Details> {
                                 onPressed: () {
                                   {
                                     showFullStepsDialog(
-                                        context, _recipeData!.steps);
+                                        context, _recipeData?.steps ?? []);
                                   }
                                 },
-                                child: Text(
+                                child: const Text(
                                   "  See More...",
                                   style: TextStyle(color: Colors.red),
                                 ),
@@ -476,7 +481,7 @@ class _DetailsState extends State<Details> {
                   _addMealToDiary(widget.id);
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green.shade400,
+                  backgroundColor: Colors.green.shade400,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                         10), // Set the desired border radius
