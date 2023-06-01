@@ -24,8 +24,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   var repo = UserRepoImpl();
-  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-      GlobalKey<ScaffoldMessengerState>();
+
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();

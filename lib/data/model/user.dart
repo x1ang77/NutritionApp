@@ -35,9 +35,9 @@ class User {
     this.weight,
     this.diet,
     this.calorieGoal = 2000,
-    this.carbGoal = 600,
-    this.proteinGoal = 200,
-    this.fatGoal = 100,
+    this.carbGoal = 2000 * 0.60,
+    this.proteinGoal = 2000 * 0.20,
+    this.fatGoal = 2000 * 0.20,
     this.favourite = const [],
     this.completedOnboarding = false
   });

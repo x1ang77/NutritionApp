@@ -79,10 +79,6 @@ class _RecipePageState extends State<RecipePage> {
     context.pushNamed("id", pathParameters: {"id": id});
   }
 
-  _navigateToLogbook() {
-    context.push("/logbook");
-  }
-
   Future getRecipe() async {
     // var collection = FirebaseFirestore.instance.collection("meals");
     var collection = FirebaseFirestore.instance.collection("recipes");
@@ -479,14 +475,6 @@ class _RecipePageState extends State<RecipePage> {
               ),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: Container(
-        alignment: Alignment.bottomRight,
-        margin: const EdgeInsets.only(bottom: 16, right: 16),
-        child: FloatingActionButton(
-          onPressed: () => _navigateToLogbook(),
-          child: Icon(Icons.add_card),
         ),
       ),
     );
