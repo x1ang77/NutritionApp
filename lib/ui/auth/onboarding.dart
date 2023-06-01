@@ -2,13 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/ui/component/snackbar.dart';
 
 import '../../data/model/user.dart' as user_model;
 import '../../data/repository/user/user_repository_impl.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 class OnboardingPage extends StatefulWidget {
-  const OnboardingPage({Key? key}) : super(key: key);
+  const OnboardingPage({Key? key, required this.object}) : super(key: key);
+  final Map<String, dynamic> object;
 
   @override
   State<OnboardingPage> createState() => _OnboardingPageState();
@@ -97,6 +99,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   void initState() {
     super.initState();
+    debugPrint("did I get the image ${widget.object["imageFile"]}");
     getUser();
   }
 
@@ -164,6 +167,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       });
 
       // Navigate to the home page or any other desired page
+      setState(() {
+        showSnackbar(context, "Onboarding complete", Colors.green);
+      });
       _navigateToHome();
     } catch (error) {
       // Handle any errors that occurred during the saving process
@@ -191,16 +197,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Text(
-                      'Skip >',
-                      style:
-                          TextStyle(fontSize: 16, color: Colors.green.shade700),
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   child: Align(
+                //     alignment: Alignment.topRight,
+                //     child: Text(
+                //       'Skip >',
+                //       style:
+                //           TextStyle(fontSize: 16, color: Colors.green.shade700),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

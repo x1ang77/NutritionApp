@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/ui/component/snackbar.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -20,12 +21,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     emailController.dispose();
   }
 
-  Future resetPassword(context) async {
-    showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator()),);
+  Future resetPassword() async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
-      showSnackbar(context, "Password reset email sent.", Colors.yellow);
-      Navigator.of(context).pop();
+      setState(() {
+        // showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator()));
+        showSnackbar(context, "Password reset email sent.", Colors.yellow);
+        context.pop();
+      });
     } on FirebaseAuthException catch (e) {
       debugPrint(e.toString());
       showSnackbar(context, e.message.toString(), Colors.yellow);
@@ -73,7 +76,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   style: TextStyle(fontSize: 24),
                 ),
                 onPressed: () {
-                  resetPassword(context);
+                  resetPassword();
                 },
               )
             ],

@@ -22,7 +22,7 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  var repo = UserRepoImpl();
+  var userRepo = UserRepoImpl();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();
@@ -41,6 +41,20 @@ class _ProfileState extends State<Profile> {
   String? downloadUrl;
   String? fileName;
 
+  @override
+  void initState() {
+    super.initState();
+    getUser();
+  }
+
+  @override
+  void dispose() {
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _newCalorieGoalController.dispose();
+    super.dispose();
+  }
+
   Uint8List getImageBytes() {
     return base64Decode(base64ImageString);
   }
@@ -58,7 +72,7 @@ class _ProfileState extends State<Profile> {
 
       // Update the user's profile in Firebase Firestore with the download URL
       if (downloadUrl!.isNotEmpty) {
-        await repo.updateUserProfile(user.uid, fileName!);
+        await userRepo.updateUserProfile(user.uid, fileName!);
         debugPrint('User profile updated');
       } else {
         debugPrint('Download URL is empty');
@@ -68,19 +82,18 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  navigateToLogin() {
+  void navigateToLogin() {
     context.go('/login');
   }
 
-  _logout(context) async {
+  Future<void> _logout(context) async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await userRepo.logout();
       navigateToLogin();
       showSnackbar(context, "Logged out successfully", Colors.green);
     } catch (e) {
-      // An error occurred while signing out
       debugPrint('Error signing out: $e');
-      // Show an error message or handle the error accordingly
+      showSnackbar(context, "Failed to logout", Colors.green);
     }
   }
 
@@ -152,23 +165,9 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  @override
-  void dispose() {
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _newCalorieGoalController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    getUser();
-  }
-
   Future getUser() async {
     User? user = FirebaseAuth.instance.currentUser;
-    var currentUser = await repo.getUserById(user!.uid);
+    var currentUser = await userRepo.getUserById(user!.uid);
     setState(() {
       _user = currentUser;
     });
@@ -801,18 +800,19 @@ class _ProfileState extends State<Profile> {
                             bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
-                        // child: ListTile(
-                        //   onTap: _logout,
-                        //   leading: const Icon(Icons.logout),
-                        //   title: const Text('Logout'),
-                        //   trailing: const Icon(Icons.keyboard_arrow_right),
-                        // ),
-                        child: listTile(
-                            () => _logout(context),
-                          const Icon(Icons.logout),
-                          "Logout",
-                          const Icon(Icons.keyboard_arrow_right)
+                        child: ListTile(
+                          onTap: () => _logout(context),
+                          leading: const Icon(Icons.logout),
+                          minLeadingWidth : 10,
+                          title: const Text('Logout'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
+                        // child: listTile(
+                        //     () => _logout(context),
+                        //   const Icon(Icons.logout),
+                        //   "Logout",
+                        //   const Icon(Icons.keyboard_arrow_right)
+                        // ),
                       ),
                     ],
                   ),

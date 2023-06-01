@@ -9,7 +9,7 @@ class DiaryRepoImpl extends DiaryRepo {
   final collection = FirebaseFirestore.instance.collection("diaries");
 
   @override
-  Future addToDiary(
+  Future<void> addToDiary(
       String userId, String date, List<String>? meals,
       double caloriesGoal, double carbGoal, double proteinGoal,
       double fatGoal, String? mealId,
@@ -59,10 +59,10 @@ class DiaryRepoImpl extends DiaryRepo {
     }
   }
 
-  Future removeMealFromDiary(String diaryId, String mealId) async {
+  @override
+  Future<void> removeMealFromDiary(String diaryId, String mealId) async {
     try {
       final documentRef = collection.doc(diaryId);
-      debugPrint("what is the id here? $diaryId $documentRef");
       await documentRef.update({'meals': FieldValue.arrayRemove([mealId])});
     } catch (e) {
       debugPrint(e.toString());

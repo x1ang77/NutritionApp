@@ -8,24 +8,24 @@ import '../core/custom_exception.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
-class Logbook extends StatefulWidget {
-  const Logbook({Key? key}) : super(key: key);
+class MealPage extends StatefulWidget {
+  const MealPage({Key? key}) : super(key: key);
 
   @override
-  State<Logbook> createState() => _LogbookState();
+  State<MealPage> createState() => _MealPageState();
 }
 
-class _LogbookState extends State<Logbook> {
+class _MealPageState extends State<MealPage> {
   final userRepo = UserRepoImpl();
   final diaryRepo = DiaryRepoImpl();
 
   var userId = "";
   user_model.User? user;
   List<String> meals = [];
-  final List<Recipe> _allRecipes = [];
+  // final List<Recipe> _allRecipes = [];
   final List<Recipe> _breakfastRecipes = [];
   final List<Recipe> _lunchRecipes = [];
-  List<Recipe> _dinnerRecipes = [];
+  final List<Recipe> _dinnerRecipes = [];
   bool _isBreakfastExpanded = false;
   bool _isLunchExpanded = false;
   bool _isDinnerExpanded = false;
@@ -35,7 +35,7 @@ class _LogbookState extends State<Logbook> {
     super.initState();
     _getFirebaseUser();
     _getUser(userId);
-    getRecipe();
+    _getRecipe();
   }
 
   void _getFirebaseUser() {
@@ -64,7 +64,7 @@ class _LogbookState extends State<Logbook> {
     }
   }
 
-  Future getRecipe() async {
+  Future _getRecipe() async {
     var collection = FirebaseFirestore.instance.collection("recipes");
     var querySnapshot = await collection.get();
     for (var item in querySnapshot.docs) {
@@ -80,7 +80,7 @@ class _LogbookState extends State<Logbook> {
         if (recipe.mealTime == "Dinner") {
           _dinnerRecipes.add(recipe);
         }
-        _allRecipes.add(recipe);
+        // _allRecipes.add(recipe);
       });
     }
   }
@@ -105,38 +105,6 @@ class _LogbookState extends State<Logbook> {
       showSnackbar(context, "Failed to add meal to diary", Colors.red);
     }
   }
-
-  // _addToDiaries() async {
-  //   var firebaseUser = await FirebaseAuth.instance.currentUser;
-  //   var currentUser = await userRepo.getUserById(firebaseUser!.uid);
-  //   var timeStamp = DateTime.now();
-  //   var date = DateFormat.yMd().format(timeStamp);
-  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //   CollectionReference diaries = firestore.collection("diaries");
-  //
-  //   // Check if a diary with the same timestamp and userId already exists
-  //   var querySnapshot = await diaries
-  //       .where('date', isEqualTo: date)
-  //       .where('user_id', isEqualTo: currentUser?.id)
-  //       .limit(1)
-  //       .get();
-  //   debugPrint("${querySnapshot.docs}");
-  //   if (querySnapshot.docs.isEmpty) {
-  //     var id = diaries.doc().id;
-  //
-  //     var diaryData = Diary(
-  //       date: date,
-  //       id: id,
-  //       userId: currentUser?.id,
-  //       // breakfast: _mealsId[0],
-  //       // lunch: _mealsId[1],
-  //       // dinner: _mealsId[2],
-  //       caloriesGoal: currentUser?.calorieGoal,
-  //     ).toMap(); // Convert Diary object to Map
-  //
-  //     diaries.doc(id).set(diaryData);
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +236,7 @@ class _LogbookState extends State<Logbook> {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 title: Text(
-                  recipe.name ?? "",
+                  recipe.name,
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(
@@ -277,7 +245,7 @@ class _LogbookState extends State<Logbook> {
                         size: 16, color: Colors.deepOrange),
                     const SizedBox(width: 4),
                     SizedBox(
-                      width: 250, // Set the desired width
+                      width: 250,
                       child: Text(
                         "${recipe.calorie} kcal | ${recipe.carb} g | ${recipe.protein} g | ${recipe.fat}g",
                         overflow: TextOverflow.ellipsis,
@@ -287,8 +255,7 @@ class _LogbookState extends State<Logbook> {
                   ],
                 ),
                 trailing: ElevatedButton.icon(
-                  // onPressed: () => _pushToMealsId(recipe.id!),
-                  onPressed: () => _addMealToList(recipe.id ?? "", recipe),
+                  onPressed: () => _addMealToList(recipe.id, recipe),
                   icon: const Icon(Icons.add_rounded, size: 20),
                   label: const Text("Add"),
                   style: ElevatedButton.styleFrom(
