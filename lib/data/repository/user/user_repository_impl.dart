@@ -106,4 +106,29 @@ class UserRepoImpl extends UserRepo {
       debugPrint("Error signing out: $e");
     }
   }
+
+  // Future<String?> uploadImageToFirebase(File imageFile) async {
+  //   try {
+  //     // Create a unique filename for the image
+  //     fileName = DateTime.now().toString();
+  //
+  //     // Create a reference to the Firebase Storage location where you want to store the image
+  //     final Reference storageReference =
+  //     FirebaseStorage.instance.ref().child('images/$fileName');
+  //
+  //     // Upload the image file to Firebase Storage
+  //     await storageReference.putFile(imageFile);
+  //
+  //     // Get the download URL of the uploaded image
+  //     downloadUrl = await storageReference.getDownloadURL();
+  //
+  //     // Return the download URL
+  //     debugPrint("Am i getting here?");
+  //     return downloadUrl;
+  //   } catch (e) {
+  //     // Handle any errors that occur during the upload process
+  //     debugPrint('Failed to upload image: $e');
+  //     return '';
+  //   }
+  // }
 }

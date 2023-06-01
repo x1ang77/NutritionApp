@@ -45,7 +45,8 @@ class _HomeState extends State<Home> {
         setState(() {
           user = _user;
           if(user != null && user?.completedOnboarding == false) {
-            context.go("/onboarding");
+            // context.go("/onboarding");
+            context.go("/image");
           }
         });
       } else {

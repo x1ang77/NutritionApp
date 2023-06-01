@@ -122,13 +122,6 @@ class _RegisterState extends State<Register> {
     context.go("/login");
   }
 
-  // void _navigateToOnboarding() {
-  //   var username = _firstNameController.text;
-  //   var email = _emailController.text;
-  //   var password = _passwordController.text;
-  //   context.pushNamed("image", extra: {"username": username, "email": email, "password": password});
-  // }
-
   @override
   void dispose() {
     super.dispose();
