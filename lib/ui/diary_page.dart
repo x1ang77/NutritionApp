@@ -29,13 +29,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   user_model.User? user;
   var userId = "";
-  // final List<String> breakfastMeals = ['Eggs', 'Toast', 'Cereal'];
-  // final List<String> lunchMeals = ['Salad', 'Sandwich', 'Soup', "tSFqEBsKuQLymnerRHP6"];
-  // final List<String> dinnerMeals = ['Steak', 'Pasta', 'Chicken'];
-  List<String> breakfastItems = [];
-  List<String> lunchItems = ["tSFqEBsKuQLymnerRHP6", "tSFqEBsKuQLymnerRHP6"];
-  List<String> dinnerItems = ["tSFqEBsKuQLymnerRHP6"];
-
+  List<String> mealItems = [];
   List<Recipe> breakfastMeals = [];
   List<Recipe> lunchMeals = [];
   List<Recipe> dinnerMeals = [];
@@ -62,7 +56,6 @@ class _DiaryPageState extends State<DiaryPage> {
     } else if(date.day == currentDate.day - 1) {
       return 'Yesterday';
     } else {
-      // return '${date.day}/${date.month}/${date.year}';
       return DateFormat("yMd").format(date);
     }
   }
@@ -80,7 +73,6 @@ class _DiaryPageState extends State<DiaryPage> {
     _getFirebaseUser();
     _getUser(userId);
     _getDiary(userId, DateFormat("yMd").format(selectedDate));
-    getAllMeals();
   }
 
   void _getFirebaseUser() {
@@ -101,7 +93,7 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
-  Future _getUser(String userId) async {
+  Future<void> _getUser(String userId) async {
     try {
       var _user = await userRepo.getUserById(userId);
       setState(() {
@@ -112,13 +104,18 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
-  Future _getDiary(String userId, String date) async {
+  Future<void> _getDiary(String userId, String date) async {
     try {
       var diary = await diaryRepo.getDiary(userId, date);
       setState(() {
         todayDiary = diary;
-        recommendedCalories = todayDiary?.caloriesGoals ?? 0;
-        consumedCalories = todayDiary?.caloriesConsumed ?? 0;
+        mealItems = todayDiary?.meals ?? [];
+        recommendedCalories = todayDiary?.caloriesGoal ?? 0.0;
+        consumedCalories = todayDiary?.caloriesConsumed ?? 0.0;
+        carbGoal = todayDiary?.carbGoal ?? 0.0;
+        proteinGoal = todayDiary?.proteinGoal ?? 0.0;
+        fatGoal = todayDiary?.fatGoal ?? 0.0;
+        getAllMeals();
       });
     } catch (e) {
       debugPrint(e.toString());
@@ -126,27 +123,52 @@ class _DiaryPageState extends State<DiaryPage> {
   }
 
   Future getAllMeals() async {
-    // for (var index in user_model.User.breakfast) {
-    for (var index in breakfastItems) {
+    for (var index in mealItems) {
       var meal = await recipeRepo.getRecipe(index);
-      setState(() {
-        breakfastMeals.add(meal);
-      });
+      if (meal.mealTime == "Breakfast") {
+        setState(() {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          breakfastMeals.clear();
+          breakfastMeals.add(meal);
+        });
+      } else if (meal.mealTime == "Lunch") {
+        setState(() {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          lunchMeals.clear();
+          lunchMeals.add(meal);
+        });
+      } else {
+        setState(() {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          dinnerMeals.clear();
+          dinnerMeals.add(meal);
+        });
+      }
     }
+  }
 
-    for (var index in lunchItems) {
-      var meal = await recipeRepo.getRecipe(index);
-      setState(() {
-        lunchMeals.add(meal);
-      });
-    }
-
-    for (var index in dinnerItems) {
-      var meal = await recipeRepo.getRecipe(index);
-      setState(() {
-        dinnerMeals.add(meal);
-      });
-    }
+  void _clearData() {
+    todayDiary = null;
+    breakfastMeals.clear();
+    lunchMeals.clear();
+    dinnerMeals.clear();
+    recommendedCalories = 0;
+    consumedCalories = 0;
+    carbGoal = 0;
+    carbConsumed = 0;
+    proteinGoal = 0;
+    proteinConsumed = 0;
+    fatGoal = 0;
+    fatConsumed = 0;
   }
 
   void _navigateToLogbook() {
@@ -155,10 +177,6 @@ class _DiaryPageState extends State<DiaryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final String breakfast = todayDiary?.breakfast ?? "";
-    final String lunch = todayDiary?.lunch ?? "";
-    final String dinner = todayDiary?.dinner ?? "";
-
     double progress = calculateProgress(consumedCalories, recommendedCalories);
     int remainingCalories = (recommendedCalories - consumedCalories).round();
 
@@ -172,14 +190,21 @@ class _DiaryPageState extends State<DiaryPage> {
     double remainingFat = fatGoal - fatConsumed;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: const Text("Diary"),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () => _navigateToLogbook(),
+              icon: Icon(Icons.add_circle, size: 32,)
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: SafeArea(
           child: Container(
-            color: Colors.grey.shade300,
+            // color: Colors.grey.shade300,
             child: Column(
               children: [
                 Column(
@@ -197,9 +222,7 @@ class _DiaryPageState extends State<DiaryPage> {
                             onPressed: () {
                               setState(() {
                                 selectedDate = selectedDate.subtract(const Duration(days: 1));
-                                todayDiary = null;
-                                recommendedCalories = 0;
-                                consumedCalories = 0;
+                                _clearData();
                                 _getDiary(userId, DateFormat("yMd").format(selectedDate));
                               });
                             },
@@ -227,9 +250,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                       DateTime(currentDate.year, currentDate.month, currentDate.day)) {
                                 setState(() {
                                   selectedDate = displayDate;
-                                  todayDiary = null;
-                                  recommendedCalories = 0;
-                                  consumedCalories = 0;
+                                  _clearData();
                                   _getDiary(userId, DateFormat("yMd").format(selectedDate));
                                 });
                               }
@@ -244,7 +265,6 @@ class _DiaryPageState extends State<DiaryPage> {
                 Card(
                   elevation: 5,
                   margin: const EdgeInsets.all(0),
-                  // margin: const EdgeInsets.symmetric(horizontal: 8),
                   child: Container(
                     color: Colors.white,
                     child: Column(
@@ -374,7 +394,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                                "${remainingCarb}g",
+                                                "${carbConsumed}g",
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Colors.brown,
@@ -419,7 +439,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                                "${remainingProtein}g",
+                                                "${proteinConsumed}g",
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Colors.pink,
@@ -462,7 +482,7 @@ class _DiaryPageState extends State<DiaryPage> {
                                           mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                                "${remainingFat}g",
+                                                "${fatConsumed}g",
                                                 textAlign: TextAlign.center,
                                                 style: const TextStyle(
                                                   color: Colors.blue,
@@ -523,11 +543,6 @@ class _DiaryPageState extends State<DiaryPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () => _navigateToLogbook(),
-        child: const Icon(Icons.add, color: Colors.green,),
-      ),
     );
   }
 
@@ -564,6 +579,7 @@ class _DiaryPageState extends State<DiaryPage> {
               itemCount: meals.length,
               itemBuilder: (context, index) {
                 final meal = meals[index];
+                debugPrint("What about here $meal");
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   title: Text(

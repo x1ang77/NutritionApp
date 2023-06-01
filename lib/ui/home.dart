@@ -65,17 +65,23 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade300,
+      extendBody: true,
       body: Center(
           child: _widgetOptions.elementAt(_selectedIndex)
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30)
-          )
+          ),
+          boxShadow: [BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: Offset(0, 3), // Shadow position
+          )]
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
