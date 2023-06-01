@@ -207,7 +207,9 @@ class _MealPageState extends State<MealPage> {
           //   borderRadius: BorderRadius.circular(10.0),
           // ),
           child: Container(
-            color: Colors.lightGreen,
+            decoration: BoxDecoration(
+              color: Colors.lightGreen, // Add your desired color here
+            ),
             child: ListTile(
               title: Text(
                 title,

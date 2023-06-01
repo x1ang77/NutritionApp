@@ -428,7 +428,7 @@ class _RecipePageState extends State<RecipePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ClipRRect(
-                                      child: Image.asset(_dinnerRecipes[i].thumbnail ?? ""),
+                                      child: Image.network(_dinnerRecipes[i].thumbnail ?? ""),
                                       borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                                     ),
                                     SizedBox(height: 15),
@@ -450,6 +450,7 @@ class _RecipePageState extends State<RecipePage> {
                                   ],
                                 ),
                               ),
+                              SizedBox(height: 15),
                               Positioned(
                                 bottom: 30,
                                 right: 12,
