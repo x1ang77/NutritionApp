@@ -68,7 +68,6 @@ class _OnboardingState extends State<Onboarding> {
         // done: const Text("Done"),
 
         onSkip: () {
-
         },
 
         // onDone: () {
