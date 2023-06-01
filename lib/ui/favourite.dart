@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../custom_icons.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
@@ -62,12 +61,12 @@ class _FavouriteState extends State<Favourite> {
   Future getRecipe() async {
     var user = FirebaseAuth.instance.currentUser?.uid;
     var currentUser = await repo.getUserById(user!);
-    var collection = FirebaseFirestore.instance.collection("meals");
+    var collection = FirebaseFirestore.instance.collection("recipes");
     var querySnapshot = await collection.get();
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      debugPrint("${recipe.image?[0]}");
+      // debugPrint("${recipe.image[0]}");
       if (currentUser!.favourite!.contains(recipe.id)) {
         setState(() {
           _allRecipes.add(recipe);
@@ -214,7 +213,7 @@ class _FavouriteState extends State<Favourite> {
           _allRecipes.sort((a, b) => a.name.compareTo(b.name));
           break;
         case SortType.CalorieCount:
-          _allRecipes.sort((a, b) => (a.calories ?? 0).compareTo(b.calories ?? 0));
+          _allRecipes.sort((a, b) => (a.calorie ?? 0).compareTo(b.calorie ?? 0));
           break;
       }
 
@@ -364,7 +363,7 @@ class _FavouriteState extends State<Favourite> {
                         Icon(Icons.local_fire_department,
                             size: 16, color: Colors.grey), // Add an icon to represent kcal
                         SizedBox(width: 4),
-                        Text("${allRecipe.calories} kcal",
+                        Text("${allRecipe.calorie} kcal",
                             style: TextStyle(fontSize: 12)), // Show the calories value
                         SizedBox(width: 8), // Show the grams value
                       ],
