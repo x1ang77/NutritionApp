@@ -647,6 +647,7 @@ class _ProfileState extends State<Profile> {
       backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: const Text('Profile'),
+        centerTitle: true,
       ),
       body: Stack(
         children: [
