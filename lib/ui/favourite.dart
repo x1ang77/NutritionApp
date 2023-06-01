@@ -51,7 +51,7 @@ class _FavouriteState extends State<Favourite> {
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      debugPrint("${recipe.image?[0]}");
+      // debugPrint("${recipe.image?[0]}");
       if (currentUser!.favourite!.contains(recipe.id)) {
         setState(() {
           _allRecipes.add(recipe);
@@ -89,7 +89,10 @@ class _FavouriteState extends State<Favourite> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      appBar: AppBar(title: Text("Bookmarks")),
+      appBar: AppBar(
+        title: const Text("Favorites"),
+        centerTitle: true,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -107,7 +110,7 @@ class _FavouriteState extends State<Favourite> {
                     padding: EdgeInsets.only(left: 20, top: 20, right: 20),
                     child: Row(
                       children: [
-                        Text("My Bookmarks", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                        Text("My Bookmarks", style: TextStyle(fontSize: 24)),
                         Spacer(),
                         Stack(
                           children: [
@@ -161,16 +164,16 @@ class _FavouriteState extends State<Favourite> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
-                    title: Text(allRecipe.name),
+                    title: Text(allRecipe.name ?? ""),
                     subtitle: Row(
                       children: [
-                        Text("${allRecipe.carbs} kcal"),
+                        Text("${allRecipe.carb} kcal"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.grams}g"),
+                        Text("${allRecipe.carb} g"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.carbs} carbs"),
+                        Text("${allRecipe.protein} g"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.protein} pro"),
+                        Text("${allRecipe.fat} g"),
                       ],
                     ),
                     trailing: GestureDetector(

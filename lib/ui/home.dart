@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -36,7 +35,6 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     _getUser();
-    debugPrint("Who this $user");
   }
 
   Future<void> _getUser() async {

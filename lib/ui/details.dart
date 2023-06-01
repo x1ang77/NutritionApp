@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/model/recipe.dart';
+import 'package:nutrition_app/data/repository/recipe/recipe_repository_impl.dart';
 import '../data/model/user.dart' as user_model;
 import '../data/repository/user/user_repository_impl.dart';
 
@@ -15,34 +16,24 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
-  late Recipe _recipeData;
-  var repo = UserRepoImpl();
+  Recipe? _recipeData;
+  var userRepo = UserRepoImpl();
+  var recipeRepo = RecipeRepoImpl();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getRecipeById();
   }
 
   Future getRecipeById() async{
     try {
-      final documentSnapshot =
-      await FirebaseFirestore.instance.collection('meals').doc(widget.id).get();
-
-      if (documentSnapshot.exists) {
-        final data = documentSnapshot.data();
-        final recipe = Recipe.fromMap(data!);
-        // Assuming you have a Recipe model, you can initialize it with the retrieved data
-        setState(() {
-            _recipeData = recipe;
-        });
-        debugPrint("${_recipeData.image}");
-      } else {
-        print('Document does not exist');
-      }
+      var _recipe = await recipeRepo.getRecipe(widget.id);
+      setState(() {
+        _recipeData = _recipe;
+      });
     } catch (error) {
-      print('Error fetching document: $error');
+      debugPrint('Error fetching document: $error');
     }
   }
 
@@ -55,7 +46,7 @@ class _DetailsState extends State<Details> {
 
     DocumentReference documentRef = FirebaseFirestore.instance.collection("users").doc(user);
     // Retrieve the document
-    var documentSnapshot = await repo.getUserById(user!);
+    var documentSnapshot = await userRepo.getUserById(user!);
 
     if (documentSnapshot != null) {
       var array =documentSnapshot.favourite;
@@ -84,7 +75,7 @@ class _DetailsState extends State<Details> {
                       bottomLeft: Radius.circular(30),
                       bottomRight: Radius.circular(30),
                     ),
-                    child: Image.asset(_recipeData.thumbnail),
+                    child: Image.network(_recipeData?.thumbnail ?? ""),
                   ),
                 ],
               ),
@@ -119,7 +110,7 @@ class _DetailsState extends State<Details> {
           const SizedBox(height: 20,),
           Center(
             child: Text(
-              _recipeData.name,
+              _recipeData?.name ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
@@ -130,7 +121,7 @@ class _DetailsState extends State<Details> {
           const SizedBox(height: 20,),
           Center(
             child: Text(
-              _recipeData.desc,
+              _recipeData?.description ?? "",
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 12,
@@ -152,13 +143,13 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text(_recipeData.calories.toString(),
+                            Text("${_recipeData?.calorie}",
                               style: const TextStyle(
                                   color:Colors.red,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            const Text("calories",
+                            const Text("kcal",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -169,12 +160,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("${_recipeData.grams}g",
+                            Text("${_recipeData?.carb}g",
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            const Text("grams",
+                            const Text("Carb g",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -185,12 +176,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                       Column(
                         children: [
-                          Text(_recipeData.carbs.toString(),
+                          Text("${_recipeData?.protein}g",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                           ),
-                          const Text("carbs",
+                          const Text("Protein g",
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -201,12 +192,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("${_recipeData.protein}g",
+                            Text("${_recipeData?.fat}g",
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            const Text("protein",
+                            const Text("Fat g",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -232,78 +223,101 @@ class _DetailsState extends State<Details> {
                 SizedBox(height: 10,),
                 Row(
                   children: [
-                    Expanded(child:
-                    Column(
-                      children: [
-                        SizedBox(height:36, child: ClipOval(
-                          child: Image.asset(
-                            _recipeData.image![0],
-                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
-                          ),
-                        ),
-                        ),
-                        Text(_recipeData.ingredients![0],
-                          style: const TextStyle(
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    ),
-                    ),
-                    Expanded(child:
-                    Column(
-                      children: [
-                        SizedBox(height:36, child: ClipOval(
-                          child: Image.asset(
-                            _recipeData.image![1],
-                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
-                          ),
-                        ),
-                        ),
-                        Text(_recipeData.ingredients![1],
-                          style: const TextStyle(
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    ),
-                    ),
-                    Expanded(child:
-                    Column(
-                      children: [
-                        SizedBox(height:36, child: ClipOval(
-                          child: Image.asset(
-                            _recipeData.image![2],
-                            fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
-                          ),
-                        ),
-                        ),
-                        Text(_recipeData.ingredients![2],
-                          style: const TextStyle(
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    ),
-                    ),
-                    Expanded(child:
-                      Column(
-                        children: [
-                          SizedBox(height:36, child: ClipOval(
-                            child: Image.asset(
-                              _recipeData.image![3],
-                              fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
-                            ),
-                          ),
-                          ),
-                          Text(_recipeData.ingredients![3],
-                            style: const TextStyle(
-                              fontSize: 12,
-                            ),
-                          )
-                        ],
-                      )
-                    ),
+                    // ListView.builder(
+                    //     itemBuilder: (BuildContext context, int index) {
+                    //       return Column(
+                    //         children: [
+                    //           // SizedBox(
+                    //           //   height:36,
+                    //           //   child: ClipOval(
+                    //           //     child: Image.asset(
+                    //           //       _recipeData.image![0],
+                    //           //       fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                    //           //     ),
+                    //           //   ),
+                    //           // ),
+                    //           Text(_recipeData?.ingredients?[index] ?? "",
+                    //             style: const TextStyle(
+                    //               fontSize: 12,
+                    //             ),
+                    //           )
+                    //         ],
+                    //       );
+                    //     }),
+
+                    // Expanded(child:
+                    //   Column(
+                    //     children: [
+                    //       SizedBox(height:36, child: ClipOval(
+                    //         child: Image.asset(
+                    //           _recipeData.image![0],
+                    //           fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                    //         ),
+                    //       ),
+                    //       ),
+                    //       Text(_recipeData.ingredients![0],
+                    //         style: const TextStyle(
+                    //           fontSize: 12,
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    //
+                    // Expanded(child:
+                    // Column(
+                    //   children: [
+                    //     SizedBox(height:36, child: ClipOval(
+                    //       child: Image.asset(
+                    //         _recipeData.image![1],
+                    //         fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                    //       ),
+                    //     ),
+                    //     ),
+                    //     Text(_recipeData.ingredients![1],
+                    //       style: const TextStyle(
+                    //         fontSize: 12,
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // ),
+                    // Expanded(child:
+                    // Column(
+                    //   children: [
+                    //     SizedBox(height:36, child: ClipOval(
+                    //       child: Image.asset(
+                    //         _recipeData.image![2],
+                    //         fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                    //       ),
+                    //     ),
+                    //     ),
+                    //     Text(_recipeData.ingredients![2],
+                    //       style: const TextStyle(
+                    //         fontSize: 12,
+                    //       ),
+                    //     )
+                    //   ],
+                    // ),
+                    // ),
+                    // Expanded(child:
+                    //   Column(
+                    //     children: [
+                    //       SizedBox(height:36, child: ClipOval(
+                    //         child: Image.asset(
+                    //           _recipeData.image![3],
+                    //           fit: BoxFit.cover, // Make the image scale up while maintaining aspect ratio
+                    //         ),
+                    //       ),
+                    //       ),
+                    //       Text(_recipeData.ingredients![3],
+                    //         style: const TextStyle(
+                    //           fontSize: 12,
+                    //         ),
+                    //       )
+                    //     ],
+                    //   )
+                    // ),
                   ],
                 ),
                 SizedBox(height: 10,)
@@ -322,13 +336,13 @@ class _DetailsState extends State<Details> {
                   const SizedBox(height: 7,),
                   const Text("Preparation",style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                   const SizedBox(height: 2,),
-                  Text("Step 1: ${_recipeData.steps![0]}",
+                  Text("Step 1: ${_recipeData?.steps![0]}",
                     style: const TextStyle(
                         fontSize: 16
                     ),
                   ),
                   const SizedBox(height: 2,),
-                  Text("Step 2: ${_recipeData.steps![1]}",
+                  Text("Step 2: ${_recipeData?.steps![1]}",
                     style: const TextStyle(
                         fontSize: 16
                     ),
