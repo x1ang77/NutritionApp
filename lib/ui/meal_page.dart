@@ -85,7 +85,7 @@ class _MealPageState extends State<MealPage> {
     }
   }
 
-  Future _addMealToList(String id, Recipe recipe) async {
+  Future _addMealToDiary(String id) async {
     try {
       var date = DateFormat.yMd().format(DateTime.now());
       setState(() {
@@ -255,7 +255,7 @@ class _MealPageState extends State<MealPage> {
                   ],
                 ),
                 trailing: ElevatedButton.icon(
-                  onPressed: () => _addMealToList(recipe.id, recipe),
+                  onPressed: () => _addMealToDiary(recipe.id),
                   icon: const Icon(Icons.add_rounded, size: 20),
                   label: const Text("Add"),
                   style: ElevatedButton.styleFrom(

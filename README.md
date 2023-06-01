@@ -5,7 +5,7 @@ A new Flutter project.
 ## Overview
 The app lets users quickly pull up nutritional information of food, find workouts, and track calories and macronutrients. Users also can create personalized diet plans, get diet tips and suggestions for healthier foods and recipes.
 
-## Goals
+## Features
 - Allow users to personalize their profile and diet plan.
 - Provide an interface for users to track their calorie count, track macros, and find available recipes.
 - Users can also obtain more detailed information about their weight, body fat, waist size, and BMI.

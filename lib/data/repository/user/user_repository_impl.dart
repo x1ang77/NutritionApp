@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:nutrition_app/data/model/user.dart' as user_model;
 import 'package:nutrition_app/data/repository/user/user_repository.dart';
 
@@ -99,6 +102,20 @@ class UserRepoImpl extends UserRepo {
   }
 
   @override
+  Future<String?> saveImageInStorage(File imageFile) async {
+    try {
+      final fileName = DateFormat("y_M_d_Hms").format(DateTime.now());
+      final Reference storageReference =
+      FirebaseStorage.instance.ref().child('images/$fileName');
+      await storageReference.putFile(imageFile);
+      return fileName;
+    } catch (e) {
+      debugPrint('Failed to upload image: $e');
+      throw Exception("Failed to upload image: $e");
+    }
+  }
+
+  @override
   Future<void> logout() async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -106,29 +123,4 @@ class UserRepoImpl extends UserRepo {
       debugPrint("Error signing out: $e");
     }
   }
-
-  // Future<String?> uploadImageToFirebase(File imageFile) async {
-  //   try {
-  //     // Create a unique filename for the image
-  //     fileName = DateTime.now().toString();
-  //
-  //     // Create a reference to the Firebase Storage location where you want to store the image
-  //     final Reference storageReference =
-  //     FirebaseStorage.instance.ref().child('images/$fileName');
-  //
-  //     // Upload the image file to Firebase Storage
-  //     await storageReference.putFile(imageFile);
-  //
-  //     // Get the download URL of the uploaded image
-  //     downloadUrl = await storageReference.getDownloadURL();
-  //
-  //     // Return the download URL
-  //     debugPrint("Am i getting here?");
-  //     return downloadUrl;
-  //   } catch (e) {
-  //     // Handle any errors that occur during the upload process
-  //     debugPrint('Failed to upload image: $e');
-  //     return '';
-  //   }
-  // }
 }
