@@ -80,6 +80,31 @@ class _ImagePageState extends State<ImagePage> {
                   ),
                 ],
               ),
+
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          // Handle button 1 tap
+                        },
+                        child: Text('Button 1'),
+                      ),
+                      SizedBox(width: 16.0),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Handle button 2 tap
+                        },
+                        child: Text('Button 2'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),

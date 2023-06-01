@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/ui/auth/forgot_password_page.dart';
 import 'package:nutrition_app/ui/auth/image_page.dart';
 import 'package:nutrition_app/ui/details.dart';
 import 'package:nutrition_app/ui/favourite.dart';
@@ -26,6 +27,7 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/recipe", builder: (context, state) => const RecipePage()),
     GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
     GoRoute(path: "/image", builder: (context, state) => const ImagePage()),
+    GoRoute(path: "/forgot", builder: (context, state) => const ForgotPasswordPage()),
     // GoRoute(path: "/onboarding", builder: (context, state) => const Onboarding()),
     // GoRoute(path: "/onboarding", name: "image", builder: (context, state) {
     //   Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
