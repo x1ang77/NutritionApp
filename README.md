@@ -1,6 +1,6 @@
-# nutrition_app
+# Foodsense Nutrition App
 
-A new Flutter project.
+A nutrition app built using Flutter.
 
 ## Overview
 The app lets users quickly pull up nutritional information of food, find workouts, and track calories and macronutrients. Users also can create personalized diet plans, get diet tips and suggestions for healthier foods and recipes.

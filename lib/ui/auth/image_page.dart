@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../component/custom_auth_painter.dart';
 
 class ImagePage extends StatefulWidget {
   const ImagePage({Key? key}) : super(key: key);
@@ -16,7 +15,7 @@ class _ImagePageState extends State<ImagePage> {
   File? imageFile;
 
   void _skipToNextPage() {
-    context.push("/onboarding");
+    context.pushNamed("image", extra: {"imageFile" : null});
   }
   
   void _navigateToNextPage() {
@@ -37,78 +36,80 @@ class _ImagePageState extends State<ImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
+      appBar: AppBar(
+        title: const Text("Profile Image"),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CustomPaint(
-                painter: CurvePainter(),
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
+                alignment: Alignment.center,
+                child: const Text(
+                  "Set your profile image or later",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0),
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      "Pick your profile image",
-                      textAlign: TextAlign.center,
-                      textDirection: TextDirection.ltr,
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28.0),
-                    ),
-                  ),
 
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    alignment: Alignment.center,
-                    child: CircleAvatar(
-                      backgroundColor: Colors.black,
-                      radius: 115,
-                      child: CircleAvatar(
-                          radius: 110,
-                          backgroundImage: image != null ? Image.file(imageFile!).image : Image.asset("assets/images/empty_profile_image.png").image,
-                      ),
-                    ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                alignment: Alignment.center,
+                child: CircleAvatar(
+                  backgroundColor: Colors.black,
+                  radius: 115,
+                  child: CircleAvatar(
+                      radius: 110,
+                      backgroundImage: image != null ? Image.file(imageFile!).image : Image.asset("assets/images/empty_profile_image.png").image,
                   ),
-                  
-                  ElevatedButton(
-                      onPressed: () => _pickImage(),
-                      child: Text("Pick an Image")
-                  ),
-                ],
+                ),
               ),
 
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          _skipToNextPage();
-                        },
-                        child: const Text('Skip'),
-                      ),
-
-                      ElevatedButton(
-                        onPressed: () {
-                          _navigateToNextPage();
-                        },
-                        child: const Text('Next'),
-                      ),
-                    ],
-                  ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                child: ElevatedButton(
+                    onPressed: () => _pickImage(),
+                    child: const Text(
+                      "Pick an Image",
+                      style: TextStyle(fontSize: 20),
+                    )
                 ),
               ),
             ],
           ),
-        ),
+
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {_skipToNextPage();},
+                    child: const Text('Skip', style: TextStyle(fontSize: 20),),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      _navigateToNextPage();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Icon(Icons.navigate_next,),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -199,20 +199,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Onboarding'),
+        title: const Text('Onboarding'),
+        centerTitle: true,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             alignment: Alignment.topLeft,
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     'Hey, ${_user?.firstName}! 👋',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ),
                 // Expanded(
@@ -228,174 +229,177 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ],
             ),
           ),
+
           Expanded(
             child: SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(height: 150),
-                  Text(
-                    "Let's customize your profile:",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _ageController,
-                          decoration: InputDecoration(
-                            labelText: 'Age',
-                            suffixText: 'y/o',
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 12.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: Colors.grey),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const SizedBox(height: 150),
+                    const Text(
+                      "Let's customize your profile:",
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _ageController,
+                            decoration: InputDecoration(
+                              labelText: 'Age',
+                              suffixText: 'y/o',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 12.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: const BorderSide(color: Colors.grey),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 16.0),
-                      Expanded(
-                        child: TextFormField(
-                          controller: _heightController,
-                          decoration: InputDecoration(
-                            labelText: 'Height',
-                            suffixText: 'm',
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 20.0, vertical: 12.0),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                              borderSide: BorderSide(color: Colors.grey),
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: TextFormField(
+                            controller: _heightController,
+                            decoration: InputDecoration(
+                              labelText: 'Height',
+                              suffixText: 'm',
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 12.0),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: const BorderSide(color: Colors.grey),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.0),
-                  TextFormField(
-                    controller: _weightController,
-                    decoration: InputDecoration(
-                      labelText: 'Weight',
-                      suffixText: 'kg',
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.grey),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      controller: _weightController,
+                      decoration: InputDecoration(
+                        labelText: 'Weight',
+                        suffixText: 'kg',
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
+                    const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton2(
-                              isExpanded: true,
-                              hint: Text(
-                                '     Gender',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).hintColor,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton2(
+                                isExpanded: true,
+                                hint: Text(
+                                  '     Gender',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
+                                items: _addDividersAfterItems(items),
+                                value: selectedValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedValue = value as String;
+                                  });
+                                },
+                                buttonStyleData:
+                                    const ButtonStyleData(height: 40, width: 200),
+                                dropdownStyleData: const DropdownStyleData(
+                                  maxHeight: 200,
+                                ),
+                                menuItemStyleData: MenuItemStyleData(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8.0),
+                                  customHeights: _getCustomItemsHeights(),
                                 ),
                               ),
-                              items: _addDividersAfterItems(items),
-                              value: selectedValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedValue = value as String;
-                                });
-                              },
-                              buttonStyleData:
-                                  const ButtonStyleData(height: 40, width: 200),
-                              dropdownStyleData: const DropdownStyleData(
-                                maxHeight: 200,
-                              ),
-                              menuItemStyleData: MenuItemStyleData(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                customHeights: _getCustomItemsHeights(),
-                              ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 16.0),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
+                        const SizedBox(width: 16.0),
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.grey,
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(4.0),
                             ),
-                            borderRadius: BorderRadius.circular(4.0),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton2(
-                              isExpanded: true,
-                              hint: Text(
-                                '    Diet',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Theme.of(context).hintColor,
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton2(
+                                isExpanded: true,
+                                hint: Text(
+                                  '    Diet',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Theme.of(context).hintColor,
+                                  ),
+                                ),
+                                items: _addDividersAfterItems(items2),
+                                value: selectedValue2,
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedValue2 = value as String;
+                                  });
+                                },
+                                buttonStyleData:
+                                    const ButtonStyleData(height: 40, width: 140),
+                                dropdownStyleData: const DropdownStyleData(
+                                  maxHeight: 200,
+                                ),
+                                menuItemStyleData: MenuItemStyleData(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8.0),
+                                  customHeights: _getCustomItems2Heights(),
                                 ),
                               ),
-                              items: _addDividersAfterItems(items2),
-                              value: selectedValue2,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedValue2 = value as String;
-                                });
-                              },
-                              buttonStyleData:
-                                  const ButtonStyleData(height: 40, width: 140),
-                              dropdownStyleData: const DropdownStyleData(
-                                maxHeight: 200,
-                              ),
-                              menuItemStyleData: MenuItemStyleData(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                customHeights: _getCustomItems2Heights(),
-                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.0),
-                  // ElevatedButton(
-                  //   onPressed: saveUserInformation,
-                  //   child: Text('Save'),
-                  // ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(40),
+                      ],
                     ),
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    onPressed:
-                      saveUserInformation,
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
           ),
+
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20),
+              child: ElevatedButton(
+                onPressed: () {
+                  saveUserInformation();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                child: const Text("Complete", style: TextStyle(fontSize: 20),),
+              ),
+            ),
           ),
         ],
       ),
