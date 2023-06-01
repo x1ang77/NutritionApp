@@ -160,12 +160,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("${_recipeData?.carb}g",
+                            Text("${_recipeData?.carb}",
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            const Text("Carb g",
+                            const Text("Carb (g)",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -176,12 +176,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                       Column(
                         children: [
-                          Text("${_recipeData?.protein}g",
+                          Text("${_recipeData?.protein}",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                           ),
-                          const Text("Protein g",
+                          const Text("Protein (g)",
                             style: TextStyle(
                               fontSize: 12,
                             ),
@@ -192,12 +192,12 @@ class _DetailsState extends State<Details> {
                       Expanded(child:
                         Column(
                           children: [
-                            Text("${_recipeData?.fat}g",
+                            Text("${_recipeData?.fat}",
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16),
                             ),
-                            const Text("Fat g",
+                            const Text("Fat (g)",
                               style: TextStyle(
                                 fontSize: 12,
                               ),
@@ -223,6 +223,26 @@ class _DetailsState extends State<Details> {
                 SizedBox(height: 10,),
                 Row(
                   children: [
+                    Text(_recipeData!.ingredients[0],
+                              style: const TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                    Text(_recipeData!.ingredients[1],
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(_recipeData!.ingredients[2],
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(_recipeData!.ingredients[3],
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                    ),
                     // ListView.builder(
                     //     itemBuilder: (BuildContext context, int index) {
                     //       return Column(
@@ -336,13 +356,13 @@ class _DetailsState extends State<Details> {
                   const SizedBox(height: 7,),
                   const Text("Preparation",style:TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                   const SizedBox(height: 2,),
-                  Text("Step 1: ${_recipeData?.steps![0]}",
+                  Text("Step 1: ${_recipeData?.steps[0]}",
                     style: const TextStyle(
                         fontSize: 16
                     ),
                   ),
                   const SizedBox(height: 2,),
-                  Text("Step 2: ${_recipeData?.steps![1]}",
+                  Text("Step 2: ${_recipeData?.steps[1]}",
                     style: const TextStyle(
                         fontSize: 16
                     ),
