@@ -12,7 +12,7 @@ class DiaryRepoImpl extends DiaryRepo {
   Future addToDiary(
       String userId, String date, List<String>? meals,
       double caloriesGoal, double carbGoal, double proteinGoal,
-      double fatGoal, String? meal,
+      double fatGoal, String? mealId,
       ) async {
     var querySnapshot = await collection
         .where("user_id", isEqualTo: userId)
@@ -38,7 +38,7 @@ class DiaryRepoImpl extends DiaryRepo {
       await collection.doc(id).set(diary.toMap());
     } else {
       final documentRef = collection.doc(id);
-      await documentRef.update({'meals': FieldValue.arrayUnion([meal])});
+      await documentRef.update({'meals': FieldValue.arrayUnion([mealId])});
     }
   }
 
@@ -53,6 +53,17 @@ class DiaryRepoImpl extends DiaryRepo {
       debugPrint(data.toString());
       var diary = Diary.fromMap(data);
       return diary;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e.toString());
+    }
+  }
+
+  Future removeMealFromDiary(String diaryId, String mealId) async {
+    try {
+      final documentRef = collection.doc(diaryId);
+      debugPrint("what is the id here? $diaryId $documentRef");
+      await documentRef.update({'meals': FieldValue.arrayRemove([mealId])});
     } catch (e) {
       debugPrint(e.toString());
       throw Exception(e.toString());

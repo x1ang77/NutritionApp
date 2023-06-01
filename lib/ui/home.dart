@@ -70,14 +70,14 @@ class _HomeState extends State<Home> {
           child: _widgetOptions.elementAt(_selectedIndex)
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(30),
               topRight: Radius.circular(30)
           ),
           boxShadow: [BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey,
             spreadRadius: 2,
             blurRadius: 10,
             offset: Offset(0, 3), // Shadow position

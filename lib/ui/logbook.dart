@@ -26,7 +26,6 @@ class _LogbookState extends State<Logbook> {
   final List<Recipe> _breakfastRecipes = [];
   final List<Recipe> _lunchRecipes = [];
   List<Recipe> _dinnerRecipes = [];
-  int _arraylength = 0;
   bool _isBreakfastExpanded = false;
   bool _isLunchExpanded = false;
   bool _isDinnerExpanded = false;
@@ -86,7 +85,7 @@ class _LogbookState extends State<Logbook> {
     }
   }
 
-  Future _addMealToList(BuildContext context, String id, Recipe recipe) async {
+  Future _addMealToList(String id, Recipe recipe) async {
     try {
       var date = DateFormat.yMd().format(DateTime.now());
       setState(() {
@@ -98,7 +97,9 @@ class _LogbookState extends State<Logbook> {
           user?.proteinGoal ?? 0.0, user?.fatGoal ?? 0.0,
           id
       );
-      showSnackbar(context, "Added meal to diary", Colors.green);
+      setState(() {
+        showSnackbar(context, "Added meal to diary", Colors.green);
+      });
     } catch (e) {
       debugPrint(e.toString());
       showSnackbar(context, "Failed to add meal to diary", Colors.red);
@@ -141,23 +142,23 @@ class _LogbookState extends State<Logbook> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade300,
-      appBar: AppBar(title: Text("Logbook")),
+      appBar: AppBar(title: const Text("Meals"), centerTitle: true,),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
+            const Padding(
+              padding: EdgeInsets.all(16),
               child: Text(
-                "Welcome to your Logbook!",
+                "Welcome to your meals!",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                "Please log your meals for each time of the day:",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                "There is a variety to choose from:",
+                style: TextStyle(fontSize: 16),
               ),
             ),
             const SizedBox(height: 16),
@@ -191,7 +192,7 @@ class _LogbookState extends State<Logbook> {
                 });
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -203,23 +204,23 @@ class _LogbookState extends State<Logbook> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "1. Tap on each meal time section to expand and view available recipes.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16),
               ),
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "2. Tap on the '+' icon next to a recipe to add it to your diaries.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "*Add only one meal for each time of day.",
-                style: TextStyle(fontSize: 16, color: Colors.red),
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 16),
+            //   child: Text(
+            //     "*Add only one meal for each time of day.",
+            //     style: TextStyle(fontSize: 16, color: Colors.red),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -232,25 +233,30 @@ class _LogbookState extends State<Logbook> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
+          margin: const EdgeInsets.all(0),
           elevation: isExpanded ? 4 : 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: ListTile(
-            title: Text(
-              title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          // shape: RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.circular(10.0),
+          // ),
+          child: Container(
+            color: Colors.lightGreen,
+            child: ListTile(
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(
+                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                size: 30,
+              ),
+              onTap: onTap,
             ),
-            trailing: Icon(
-              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              size: 30,
-            ),
-            onTap: onTap,
           ),
         ),
 
         if (isExpanded)
-          ListView.separated(
+          recipes.isNotEmpty
+          ? ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: recipes.length,
@@ -263,14 +269,14 @@ class _LogbookState extends State<Logbook> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 title: Text(
                   recipe.name ?? "",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(
                   children: [
                     const Icon(Icons.local_fire_department,
                         size: 16, color: Colors.deepOrange),
                     const SizedBox(width: 4),
-                    Container(
+                    SizedBox(
                       width: 250, // Set the desired width
                       child: Text(
                         "${recipe.calorie} kcal | ${recipe.carb} g | ${recipe.protein} g | ${recipe.fat}g",
@@ -282,9 +288,9 @@ class _LogbookState extends State<Logbook> {
                 ),
                 trailing: ElevatedButton.icon(
                   // onPressed: () => _pushToMealsId(recipe.id!),
-                  onPressed: () => _addMealToList(context, recipe.id ?? "", recipe),
-                  icon: Icon(Icons.add_rounded, size: 20),
-                  label: Text("Add"),
+                  onPressed: () => _addMealToList(recipe.id ?? "", recipe),
+                  icon: const Icon(Icons.add_rounded, size: 20),
+                  label: const Text("Add"),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
@@ -293,6 +299,13 @@ class _LogbookState extends State<Logbook> {
                 ),
               );
             },
+          ) : const ListTile(
+            tileColor: Colors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            title: Text(
+              "No meals available",
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
       ],
     );

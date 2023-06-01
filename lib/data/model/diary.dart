@@ -3,8 +3,6 @@ class Diary {
   final String? userId;
   final String? date;
   final List<String>? meals;
-  // final List<String>? lunch;
-  // final List<String>? dinner;
   final double? caloriesGoal;
   final double? caloriesConsumed;
   final double? carbGoal;
@@ -16,7 +14,6 @@ class Diary {
   Diary({
     this.id, this.userId, this.date,
     this.meals, this.caloriesGoal = 0,
-    // this.lunch, this.dinner,
     this.caloriesConsumed = 0,
     this.carbGoal = 0,
     this.proteinGoal = 0,
@@ -29,8 +26,6 @@ class Diary {
       "user_id": userId,
       "date": date,
       "meals": meals,
-      // "lunch": lunch,
-      // "dinner": dinner,
       "calories_goal": caloriesGoal,
       "calories_consumed": caloriesConsumed,
       "carb_goal": carbGoal,
@@ -45,8 +40,6 @@ class Diary {
       userId: map["user_id"],
       date: map["date"],
       meals: (map["meals"] as List<dynamic>?)?.cast<String>(),
-      // lunch: (map["lunch"] as List<dynamic>?)?.cast<String>(),
-      // dinner: (map["dinner"] as List<dynamic>?)?.cast<String>(),
       caloriesGoal: map["calories_goal"] is int ? map["calories_goal"].toDouble() : map["calories_goal"],
       caloriesConsumed: map["calories_consumed"] is int ? map["calories_consumed"].toDouble() : map["calories_consumed"],
       carbGoal: map["carb_goal"] is int ? map["carb_goal"].toDouble() : map["carb_goal"],
