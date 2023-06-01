@@ -109,7 +109,6 @@ class _DiaryPageState extends State<DiaryPage> {
         todayDiary = diary;
         mealItems = todayDiary?.meals ?? [];
         recommendedCalories = todayDiary?.caloriesGoal ?? 0.0;
-        consumedCalories = todayDiary?.caloriesConsumed ?? 0.0;
         carbGoal = todayDiary?.carbGoal ?? 0.0;
         proteinGoal = todayDiary?.proteinGoal ?? 0.0;
         fatGoal = todayDiary?.fatGoal ?? 0.0;
