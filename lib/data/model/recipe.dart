@@ -1,30 +1,30 @@
 class Recipe {
-  final String? id;
-  final String? name;
-  final String? thumbnail;
-  final String? description;
-  final double? calorie;
-  final double? carb;
-  final double? protein;
-  final double? fat;
-  final List<String>? ingredients;
-  final List<String>? steps;
-  final String? mealTime;
+  final String id;
+  final String name;
+  final String thumbnail;
+  final String description;
+  final double calorie;
+  final double carb;
+  final double protein;
+  final double fat;
+  final List<String> ingredients;
+  final List<String> steps;
+  final String mealTime;
 
   static const String tableName = "recipes";
 
   Recipe({
-    this.id,
-    this.name,
-    this.thumbnail,
-    this.description,
-    this.calorie,
-    this.carb,
-    this.protein,
-    this.fat,
-    this.ingredients,
-    this.steps,
-    this.mealTime,
+    required this.id,
+    required this.name,
+    required this.thumbnail,
+    required this.description,
+    required this.calorie,
+    required this.carb,
+    required this.protein,
+    required this.fat,
+    required this.ingredients,
+    required this.steps,
+    required this.mealTime,
   });
 
   Map<String, dynamic> toMap() {
@@ -53,8 +53,8 @@ class Recipe {
       carb: map["carb"],
       protein: map["protein"],
       fat: map["fat"],
-      ingredients: (map["ingredients"] as List<dynamic>?)?.cast<String>(),
-      steps: (map["steps"] as List<dynamic>?)?.cast<String>(),
+      ingredients: (map["ingredients"] as List<dynamic>).cast<String>(),
+      steps: (map["steps"] as List<dynamic>).cast<String>(),
       mealTime: map["meal_time"]
     );
   }

@@ -5,6 +5,7 @@ import 'package:nutrition_app/ui/auth/image_page.dart';
 import 'package:nutrition_app/ui/details.dart';
 import 'package:nutrition_app/ui/favourite.dart';
 
+import '../../data/model/user.dart';
 import '../auth/onboarding.dart';
 import '../diary_page.dart';
 import '../home.dart';
@@ -28,7 +29,7 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
     GoRoute(path: "/image", builder: (context, state) => const ImagePage()),
     GoRoute(path: "/forgot", builder: (context, state) => const ForgotPasswordPage()),
-    // GoRoute(path: "/onboarding", builder: (context, state) => const Onboarding()),
+    GoRoute(path: "/onboarding", builder: (context, state) => OnboardingPage()),
     // GoRoute(path: "/onboarding", name: "image", builder: (context, state) {
     //   Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
     //   return Onboarding(object: extras,);
