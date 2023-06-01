@@ -21,58 +21,58 @@ class _RecipePageState extends State<RecipePage> {
   int _index = 0;
   var repo = UserRepoImpl();
 
-  void initFakeData() async {
-    _allRecipes = [
-      Recipe(
-        id: "6",
-        name: "Fake Recipe 6",
-        thumbnail: "assets/images/nuts.jpg",
-        mealTime: "afternoon",
-        description: 'wadwadaw',
-        calorie: 250,
-        carb: 30,
-        protein: 15,
-        ingredients: [
-          'Ingredient 1',
-          'Ingredient 2',
-          'Ingredient 3',
-          'Ingredient 4'
-        ],
-        steps: [
-          'Step 1: Do this',
-          'Step 2: Do that',
-          'Step 1: Do this',
-          'Step 2: Do that'
-        ],
-        // image: [
-        //   "assets/images/nuts.jpg",
-        //   "assets/images/nuts.jpg",
-        //   "assets/images/nuts.jpg",
-        //   "assets/images/nuts.jpg"
-        // ],
-      ),
-    ];
-
-    try {
-      final collectionRef = FirebaseFirestore.instance.collection('meals');
-
-      for (final recipe in _allRecipes) {
-        final recipeMap = recipe.toMap(); // Convert the Recipe object to a Map
-
-        await collectionRef.doc(recipe.id).set(recipeMap);
-      }
-
-      print('Fake recipes added to Firestore successfully.');
-    } catch (error) {
-      print('Error adding fake recipes to Firestore: $error');
-    }
-  }
+  // void initFakeData() async {
+  //   _allRecipes = [
+  //     Recipe(
+  //       id: "6",
+  //       name: "Fake Recipe 6",
+  //       thumbnail: "assets/images/nuts.jpg",
+  //       mealTime: "afternoon",
+  //       description: 'wadwadaw',
+  //       calorie: 250,
+  //       carb: 30,
+  //       protein: 15,
+  //       ingredients: [
+  //         'Ingredient 1',
+  //         'Ingredient 2',
+  //         'Ingredient 3',
+  //         'Ingredient 4'
+  //       ],
+  //       steps: [
+  //         'Step 1: Do this',
+  //         'Step 2: Do that',
+  //         'Step 1: Do this',
+  //         'Step 2: Do that'
+  //       ],
+  //       // image: [
+  //       //   "assets/images/nuts.jpg",
+  //       //   "assets/images/nuts.jpg",
+  //       //   "assets/images/nuts.jpg",
+  //       //   "assets/images/nuts.jpg"
+  //       // ],
+  //     ),
+  //   ];
+  //
+  //   try {
+  //     final collectionRef = FirebaseFirestore.instance.collection('meals');
+  //
+  //     for (final recipe in _allRecipes) {
+  //       final recipeMap = recipe.toMap(); // Convert the Recipe object to a Map
+  //
+  //       await collectionRef.doc(recipe.id).set(recipeMap);
+  //     }
+  //
+  //     print('Fake recipes added to Firestore successfully.');
+  //   } catch (error) {
+  //     print('Error adding fake recipes to Firestore: $error');
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
     getRecipe();
-    initFakeData();
+    // initFakeData();
   }
 
   _navigateToDetails(String id) {
@@ -80,8 +80,8 @@ class _RecipePageState extends State<RecipePage> {
   }
 
   Future getRecipe() async {
-    // var collection = FirebaseFirestore.instance.collection("meals");
     var collection = FirebaseFirestore.instance.collection("recipes");
+    // var collection = FirebaseFirestore.instance.collection("recipes");
     var querySnapshot = await collection.get();
     for (var item in querySnapshot.docs) {
       var data = item.data();
