@@ -24,7 +24,6 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   var repo = UserRepoImpl();
-
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _newCalorieGoalController = TextEditingController();
@@ -694,8 +693,8 @@ class _ProfileState extends State<Profile> {
                         backgroundImage: image != null
                             ? FileImage(image!)
                             : _user?.image != null
-                                ? Image.network(downloadUrl ?? "").image
-                                : AssetImage("assets/images/empty_profile_image"),
+                            ? Image.network(downloadUrl ?? "").image
+                            : const AssetImage("assets/images/empty_profile_image.png"),
                       ),
                     ),
                   ),
