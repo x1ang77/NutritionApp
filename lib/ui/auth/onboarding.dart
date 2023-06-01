@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/ui/component/snackbar.dart';
 
 import '../../data/model/user.dart' as user_model;
 import '../../data/repository/user/user_repository_impl.dart';
@@ -162,6 +163,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
       });
 
       // Navigate to the home page or any other desired page
+      setState(() {
+        showSnackbar(context, "Onboarding complete", Colors.green);
+      });
       _navigateToHome();
     } catch (error) {
       // Handle any errors that occurred during the saving process

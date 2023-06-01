@@ -801,18 +801,19 @@ class _ProfileState extends State<Profile> {
                             bottom: BorderSide(color: Colors.grey),
                           ),
                         ),
-                        // child: ListTile(
-                        //   onTap: _logout,
-                        //   leading: const Icon(Icons.logout),
-                        //   title: const Text('Logout'),
-                        //   trailing: const Icon(Icons.keyboard_arrow_right),
-                        // ),
-                        child: listTile(
-                            () => _logout(context),
-                          const Icon(Icons.logout),
-                          "Logout",
-                          const Icon(Icons.keyboard_arrow_right)
+                        child: ListTile(
+                          onTap: () => _logout(context),
+                          leading: const Icon(Icons.logout),
+                          minLeadingWidth : 10,
+                          title: const Text('Logout'),
+                          trailing: const Icon(Icons.keyboard_arrow_right),
                         ),
+                        // child: listTile(
+                        //     () => _logout(context),
+                        //   const Icon(Icons.logout),
+                        //   "Logout",
+                        //   const Icon(Icons.keyboard_arrow_right)
+                        // ),
                       ),
                     ],
                   ),
