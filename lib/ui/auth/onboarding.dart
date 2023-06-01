@@ -139,6 +139,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     // Validate the inputs and save the user information
     final String age = _ageController.text.trim();
     final String gender = selectedValue as String;
+    final String diet = selectedValue2 as String;
     final String height = _heightController.text.trim();
     final String weight = _heightController.text.trim();
 
@@ -150,6 +151,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       password: _user!.password,
       image: fileName,
       gender: gender,
+      diet: diet,
       age: int.tryParse(age),
       height: double.tryParse(height),
       weight: double.tryParse(weight),
