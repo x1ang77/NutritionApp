@@ -51,7 +51,7 @@ class _FavouriteState extends State<Favourite> {
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      debugPrint("${recipe.image?[0]}");
+      // debugPrint("${recipe.image?[0]}");
       if (currentUser!.favourite!.contains(recipe.id)) {
         setState(() {
           _allRecipes.add(recipe);
@@ -161,16 +161,16 @@ class _FavouriteState extends State<Favourite> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 16),
-                    title: Text(allRecipe.name),
+                    title: Text(allRecipe.name ?? ""),
                     subtitle: Row(
                       children: [
-                        Text("${allRecipe.carbs} cals"),
+                        Text("${allRecipe.carb} kcal"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.grams}g"),
+                        Text("${allRecipe.carb} g"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.carbs} carbs"),
+                        Text("${allRecipe.protein} g"),
                         SizedBox(width: 8),
-                        Text("${allRecipe.protein} pro"),
+                        Text("${allRecipe.fat} g"),
                       ],
                     ),
                     trailing: GestureDetector(

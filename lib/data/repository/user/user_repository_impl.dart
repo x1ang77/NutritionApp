@@ -80,9 +80,6 @@ class UserRepoImpl extends UserRepo {
           .get();
       var data = querySnapshot.docs.single.data();
       debugPrint(data.toString());
-
-      // var docSnapshot = await collection.doc(userId).get();
-      // var data = docSnapshot.data();
       var user = user_model.User.fromMap(data);
       return user;
     } catch (e) {

@@ -1,8 +1,8 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/core/custom_exception.dart';
+import '../component/custom_auth_painter.dart';
 import '../component/snackbar.dart';
 import '../../data/repository/user/user_repository_impl.dart';
 
@@ -46,15 +46,15 @@ class _RegisterState extends State<Register> {
       String passwordConfirm = _passwordConfirmController.text.trim();
 
       setState(() {
-        if (firstName.length < 8) {
-          _firstNameError = "Username needs to be at least 8 characters long";
+        if (firstName.isEmpty) {
+          _firstNameError = "This field cannot be empty";
           return;
         } else {
           _firstNameError = "";
         }
 
-        if (lastName.length < 8) {
-          _lastNameError = "Username needs to be at least 8 characters long";
+        if (lastName.isEmpty) {
+          _lastNameError = "This field cannot be empty";
           return;
         } else {
           _lastNameError = "";
@@ -90,7 +90,6 @@ class _RegisterState extends State<Register> {
           throw CustomException("An account was already registered to this email");
         }
         await userRepo.register(firstName, lastName, email, password);
-        // showSnackbar(_scaffoldKey, "Register successful", Colors.green);
         showSnackbar(context, "Register successful", Colors.green);
         _navigateToHome();
         isLoading = false;
@@ -99,41 +98,9 @@ class _RegisterState extends State<Register> {
       setState(() {
         isLoading = false;
       });
-      // showSnackbar(_scaffoldKey, e.toString(), Colors.red);
       showSnackbar(context, e.toString(), Colors.red);
     }
   }
-
-  // _validate(String username, String email, String password, String passwordConfirm) {
-  //   if (username.length < 8) {
-  //     _firstNameError = "Username needs to be at least 8 characters long";
-  //     return false;
-  //   } else {
-  //     _firstNameError = "";
-  //   }
-  //
-  //   if (!EmailValidator.validate(email)) {
-  //     _emailError = "Invalid email format";
-  //     return false;
-  //   } else {
-  //     _emailError = "";
-  //   }
-  //
-  //   if (password.length < 8) {
-  //     _passwordError = "Password needs to be at least 8 characters long";
-  //     return false;
-  //   } else {
-  //     _passwordError = "";
-  //   }
-  //
-  //   if (passwordConfirm != password) {
-  //     _passwordConfirmError = "Passwords must match";
-  //     return false;
-  //   } else {
-  //     _passwordConfirmError = "";
-  //   }
-  //   return true;
-  // }
 
   void _showPass(bool visibility){
     setState(() {
@@ -148,7 +115,6 @@ class _RegisterState extends State<Register> {
   }
 
   void _navigateToHome() {
-    // context.go("/home/${UserEvent.register.name}");
     context.go("/home");
   }
 
@@ -156,13 +122,12 @@ class _RegisterState extends State<Register> {
     context.go("/login");
   }
 
-  void _navigateToOnboarding() {
-    var username = _firstNameController.text;
-    var email = _emailController.text;
-    var password = _passwordController.text;
-    context.pushNamed("image", extra: {"username": username, "email": email, "password": password});
-    // context.push("/onboarding");
-  }
+  // void _navigateToOnboarding() {
+  //   var username = _firstNameController.text;
+  //   var email = _emailController.text;
+  //   var password = _passwordController.text;
+  //   context.pushNamed("image", extra: {"username": username, "email": email, "password": password});
+  // }
 
   @override
   void dispose() {
@@ -340,8 +305,7 @@ class _RegisterState extends State<Register> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              // onPressed: () => register(context),
-                              onPressed: () => _navigateToOnboarding(),
+                              onPressed: () => register(context),
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   shape: RoundedRectangleBorder(
@@ -378,86 +342,10 @@ class _RegisterState extends State<Register> {
                     ),
                   ],
                 ),
-                // Positioned(
-                //   bottom: 0,
-                //   left: 0,
-                //   right: 0,
-                //   child: CustomPaint(
-                //     painter: CurvePainter(),
-                //     child: Container(),
-                //   ),
-                // ),
               ],
           ),
         ),
       ),
     );
-  }
-}
-
-class CurvePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint1 = Paint()
-      ..color = const Color(0xFF6AC57E) // Color for the first curve
-      ..style = PaintingStyle.fill;
-
-    final paint2 = Paint()
-      ..color = const Color(0xFF6AC57E) // Color for the first curve
-      ..style = PaintingStyle.fill;
-
-    // First Curve
-    final path1 = Path();
-
-    const startPoint1 = Offset(0, 40);
-    final endPoint1 = Offset(size.width, 30);
-
-    final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
-    final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.25);
-
-    path1.moveTo(startPoint1.dx, startPoint1.dy);
-    path1.cubicTo(
-      controlPoint1_1.dx,
-      controlPoint1_1.dy,
-      controlPoint1_2.dx,
-      controlPoint1_2.dy,
-      endPoint1.dx,
-      endPoint1.dy,
-    );
-    path1.lineTo(size.width, 0);
-    path1.lineTo(0, 0);
-    path1.close();
-
-    canvas.drawPath(path1, paint1);
-
-
-    // Second Curve
-    final path2 = Path();
-
-    final startPoint2 = Offset(0, size.height * 0.85);
-    final endPoint2 = Offset(size.width, size.height - 40);
-
-    final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
-    final controlPoint2_2 = Offset(size.width * 0.45, size.height * 0.95);
-
-    path2.moveTo(startPoint2.dx, startPoint2.dy);
-    path2.cubicTo(
-      controlPoint2_1.dx,
-      controlPoint2_1.dy,
-      controlPoint2_2.dx,
-      controlPoint2_2.dy,
-      endPoint2.dx,
-      endPoint2.dy,
-    );
-    path2.lineTo(size.width, size.height);
-    path2.lineTo(0, size.height);
-    path2.close();
-
-    canvas.drawPath(path2, paint2);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return false;
   }
 }

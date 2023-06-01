@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
-
 import '../component/custom_auth_painter.dart';
 import '../component/snackbar.dart';
 
@@ -67,7 +66,6 @@ class _LoginState extends State<Login> {
 
       if (_emailError.isEmpty && _passwordError.isEmpty) {
         await userRepo.login(email, password);
-        // showSnackbar(_scaffoldKey, 'Login successful', Colors.green);
         showSnackbar(context, 'Login successful', Colors.green);
         _navigateToHome();
         isLoading = false;
@@ -76,7 +74,6 @@ class _LoginState extends State<Login> {
       setState(() {
         isLoading = false;
       });
-      // showSnackbar(_scaffoldKey, 'Failed to login', Colors.red);
       showSnackbar(context, e.toString(), Colors.red);
     }
   }
@@ -88,7 +85,6 @@ class _LoginState extends State<Login> {
   }
 
   void _navigateToHome() {
-    // context.go("/home/${UserEvent.login.name}");
     context.go("/home");
   }
 
@@ -165,9 +161,9 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+
+                        const SizedBox(height: 20,),
+
                         Material(
                           elevation: 10,
                           borderRadius: BorderRadius.circular(10),
@@ -190,9 +186,9 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 20,
-                        ),
+
+                        const SizedBox(height: 20,),
+
                         GestureDetector(
                           onTap: () {},
                           child: const Text(
@@ -249,15 +245,6 @@ class _LoginState extends State<Login> {
                   ),
                 ],
               ),
-              // Positioned(
-              //   top: 0,
-              //   left: 0,
-              //   right: 0,
-              //   child: CustomPaint(
-              //     painter: CurvePainter(),
-              //     child: Container(),
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -265,93 +252,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
-// class EmailField extends StatelessWidget {
-//   const EmailField({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return TextField(
-//       focusNode: _focusNode1,
-//       controller: _emailController,
-//       decoration: InputDecoration(
-//         labelText: "Email",
-//         errorText: _emailError.isEmpty ? null : _emailError,
-//         prefixIcon: const Icon(Icons.email),
-//         suffixIcon: isEmailVerified ? Icon(Icons.verified) : null,
-//         border: OutlineInputBorder(
-//           borderRadius: BorderRadius.circular(10),
-//           borderSide: const BorderSide(width: 5.0),
-//         ),
-//       ),
-//     ),
-//   }
-// }
-
-
-// class CurvePainter extends CustomPainter {
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final paint1 = Paint()
-//       ..color = const Color(0xFF6AC57E) // Color for the first curve
-//       ..style = PaintingStyle.fill;
-//
-//     final paint2 = Paint()
-//       ..color = const Color(0xFF6AC57E) // Color for the first curve
-//       ..style = PaintingStyle.fill;
-//
-//     // First Curve
-//     final path1 = Path();
-//
-//     const startPoint1 = Offset(0, 40);
-//     final endPoint1 = Offset(size.width, 30);
-//
-//     final controlPoint1_1 = Offset(size.width * 0.35, size.height * 0.05);
-//     final controlPoint1_2 = Offset(size.width * 0.55, size.height * 0.25);
-//
-//     path1.moveTo(startPoint1.dx, startPoint1.dy);
-//     path1.cubicTo(
-//       controlPoint1_1.dx,
-//       controlPoint1_1.dy,
-//       controlPoint1_2.dx,
-//       controlPoint1_2.dy,
-//       endPoint1.dx,
-//       endPoint1.dy,
-//     );
-//     path1.lineTo(size.width, 0);
-//     path1.lineTo(0, 0);
-//     path1.close();
-//
-//     canvas.drawPath(path1, paint1);
-//
-//
-//     // Second Curve
-//     final path2 = Path();
-//
-//     final startPoint2 = Offset(0, size.height * 0.85);
-//     final endPoint2 = Offset(size.width, size.height - 40);
-//
-//     final controlPoint2_1 = Offset(size.width * 0.35, size.height * 0.75);
-//     final controlPoint2_2 = Offset(size.width * 0.45, size.height * 0.95);
-//
-//     path2.moveTo(startPoint2.dx, startPoint2.dy);
-//     path2.cubicTo(
-//       controlPoint2_1.dx,
-//       controlPoint2_1.dy,
-//       controlPoint2_2.dx,
-//       controlPoint2_2.dy,
-//       endPoint2.dx,
-//       endPoint2.dy,
-//     );
-//     path2.lineTo(size.width, size.height);
-//     path2.lineTo(0, size.height);
-//     path2.close();
-//
-//     canvas.drawPath(path2, paint2);
-//   }
-//
-//   @override
-//   bool shouldRepaint(CustomPainter oldDelegate) {
-//     return false;
-//   }
-// }

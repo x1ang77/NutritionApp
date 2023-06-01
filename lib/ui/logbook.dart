@@ -38,17 +38,17 @@ class _LogbookState extends State<Logbook> {
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      debugPrint("${recipe.image?[0]}");
+      // debugPrint("${recipe.image?[0]}");
       setState(() {
-        if (recipe.mealTime == "morning") {
-          _breakfastRecipes.add(recipe);
-        }
-        if (recipe.mealTime == "afternoon") {
-          _lunchRecipes.add(recipe);
-        }
-        if (recipe.mealTime == "night") {
-          _dinnerRecipes.add(recipe);
-        }
+        // if (recipe.mealTime == "morning") {
+        //   _breakfastRecipes.add(recipe);
+        // }
+        // if (recipe.mealTime == "afternoon") {
+        //   _lunchRecipes.add(recipe);
+        // }
+        // if (recipe.mealTime == "night") {
+        //   _dinnerRecipes.add(recipe);
+        // }
         _allRecipes.add(recipe);
       });
     }
@@ -231,7 +231,7 @@ class _LogbookState extends State<Logbook> {
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 title: Text(
-                  recipe.name,
+                  recipe.name ?? "",
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(
@@ -242,7 +242,7 @@ class _LogbookState extends State<Logbook> {
                     Container(
                       width: 250, // Set the desired width
                       child: Text(
-                        "${recipe.calories} kcal | ${recipe.grams}g | ${recipe.carbs} carbs | ${recipe.protein} pro",
+                        "${recipe.calorie} kcal | ${recipe.carb} g | ${recipe.protein} g | ${recipe.fat}g",
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
                       ),
