@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +10,7 @@ import 'package:nutrition_app/data/repository/user/user_repository_impl.dart';
 
 import '../core/custom_exception.dart';
 import '../data/model/recipe.dart';
+import 'component/snackbar.dart';
 
 class DiaryPage extends StatefulWidget {
   const DiaryPage({Key? key}) : super(key: key);
@@ -29,13 +29,7 @@ class _DiaryPageState extends State<DiaryPage> {
 
   user_model.User? user;
   var userId = "";
-  // final List<String> breakfastMeals = ['Eggs', 'Toast', 'Cereal'];
-  // final List<String> lunchMeals = ['Salad', 'Sandwich', 'Soup', "tSFqEBsKuQLymnerRHP6"];
-  // final List<String> dinnerMeals = ['Steak', 'Pasta', 'Chicken'];
-  List<String> breakfastItems = [];
-  List<String> lunchItems = ["tSFqEBsKuQLymnerRHP6", "tSFqEBsKuQLymnerRHP6"];
-  List<String> dinnerItems = ["tSFqEBsKuQLymnerRHP6"];
-
+  List<String> mealItems = [];
   List<Recipe> breakfastMeals = [];
   List<Recipe> lunchMeals = [];
   List<Recipe> dinnerMeals = [];
@@ -62,7 +56,6 @@ class _DiaryPageState extends State<DiaryPage> {
     } else if(date.day == currentDate.day - 1) {
       return 'Yesterday';
     } else {
-      // return '${date.day}/${date.month}/${date.year}';
       return DateFormat("yMd").format(date);
     }
   }
@@ -80,7 +73,6 @@ class _DiaryPageState extends State<DiaryPage> {
     _getFirebaseUser();
     _getUser(userId);
     _getDiary(userId, DateFormat("yMd").format(selectedDate));
-    getAllMeals();
   }
 
   void _getFirebaseUser() {
@@ -90,9 +82,6 @@ class _DiaryPageState extends State<DiaryPage> {
         setState(() {
           userId = firebaseUser.uid;
         });
-        // var formattedDate = DateFormat("yMd").format(selectedDate);
-        // _getDiary(userId, formattedDate);
-
       } else {
         throw CustomException("Can't fetch Firebase user data");
       }
@@ -101,7 +90,7 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
-  Future _getUser(String userId) async {
+  Future<void> _getUser(String userId) async {
     try {
       var _user = await userRepo.getUserById(userId);
       setState(() {
@@ -112,421 +101,467 @@ class _DiaryPageState extends State<DiaryPage> {
     }
   }
 
-  Future _getDiary(String userId, String date) async {
+  Future<void> _getDiary(String userId, String date) async {
     try {
       var diary = await diaryRepo.getDiary(userId, date);
       setState(() {
         todayDiary = diary;
-        recommendedCalories = todayDiary?.caloriesGoals ?? 0;
-        consumedCalories = todayDiary?.caloriesConsumed ?? 0;
+        mealItems = todayDiary?.meals ?? [];
+        recommendedCalories = todayDiary?.caloriesGoal ?? 0.0;
+        consumedCalories = todayDiary?.caloriesConsumed ?? 0.0;
+        carbGoal = todayDiary?.carbGoal ?? 0.0;
+        proteinGoal = todayDiary?.proteinGoal ?? 0.0;
+        fatGoal = todayDiary?.fatGoal ?? 0.0;
+        _getAllMeals();
       });
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  Future getAllMeals() async {
-    // for (var index in user_model.User.breakfast) {
-    for (var index in breakfastItems) {
+  Future<void> _getAllMeals() async {
+    for (var index in mealItems) {
+      debugPrint("Inside meals $mealItems");
       var meal = await recipeRepo.getRecipe(index);
       setState(() {
-        breakfastMeals.add(meal);
-      });
-    }
-
-    for (var index in lunchItems) {
-      var meal = await recipeRepo.getRecipe(index);
-      setState(() {
-        lunchMeals.add(meal);
-      });
-    }
-
-    for (var index in dinnerItems) {
-      var meal = await recipeRepo.getRecipe(index);
-      setState(() {
-        dinnerMeals.add(meal);
+        if (meal.mealTime == "Breakfast") {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          breakfastMeals.clear();
+          breakfastMeals.add(meal);
+        } else if (meal.mealTime == "Lunch") {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          lunchMeals.clear();
+          lunchMeals.add(meal);
+        } else {
+          consumedCalories += meal.calorie ?? 0.0;
+          carbConsumed += meal.carb ?? 0.0;
+          proteinConsumed += meal.protein ?? 0.0;
+          fatConsumed += meal.fat ?? 0.0;
+          dinnerMeals.clear();
+          dinnerMeals.add(meal);
+        }
       });
     }
   }
 
-  void _navigateToLogbook() {
-    context.push("/logbook");
+  Future<void> _removeMeal(String diaryId, String mealId) async {
+    try {
+      var meal = await recipeRepo.getRecipe(mealId);
+      await diaryRepo.removeMealFromDiary(diaryId, mealId);
+      setState(() {
+        breakfastMeals.removeWhere((meal) => meal.id == mealId);
+        lunchMeals.removeWhere((meal) => meal.id == mealId);
+        dinnerMeals.removeWhere((meal) => meal.id == mealId);
+        consumedCalories -= meal.calorie ?? 0.0;
+        carbConsumed -= meal.carb ?? 0.0;
+        proteinConsumed -= meal.protein ?? 0.0;
+        fatConsumed -= meal.fat ?? 0.0;
+        showSnackbar(context, "Removed meal from diary", Colors.green);
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+      showSnackbar(context, "Failed to remove meal", Colors.red);
+    }
+  }
+
+  void _clearData() {
+    todayDiary = null;
+    breakfastMeals.clear();
+    lunchMeals.clear();
+    dinnerMeals.clear();
+    recommendedCalories = 0;
+    consumedCalories = 0;
+    carbGoal = 0;
+    carbConsumed = 0;
+    proteinGoal = 0;
+    proteinConsumed = 0;
+    fatGoal = 0;
+    fatConsumed = 0;
+  }
+
+  Future<void> _navigateToLogbook() async {
+    final result = await context.push<bool>("/logbook");
+    if (result != null && result) {
+      _getUser(userId);
+      _getDiary(userId, DateFormat("yMd").format(selectedDate));
+    }
+    // context.push("/logbook");
   }
 
   @override
   Widget build(BuildContext context) {
-    final String breakfast = todayDiary?.breakfast ?? "";
-    final String lunch = todayDiary?.lunch ?? "";
-    final String dinner = todayDiary?.dinner ?? "";
-
     double progress = calculateProgress(consumedCalories, recommendedCalories);
     int remainingCalories = (recommendedCalories - consumedCalories).round();
+    String formattedCalorie = remainingCalories.toStringAsFixed(1);
 
     double carbProgress = calculateProgress(carbConsumed, carbGoal);
     double remainingCarb = carbGoal - carbConsumed;
+    String formattedCarb = remainingCarb.toStringAsFixed(1);
 
     double proteinProgress = calculateProgress(proteinConsumed, proteinGoal);
     double remainingProtein = proteinGoal - proteinConsumed;
+    String formattedProtein = remainingProtein.toStringAsFixed(1);
 
     double fatProgress = calculateProgress(fatConsumed, fatGoal);
     double remainingFat = fatGoal - fatConsumed;
+    String formattedFat = remainingFat.toStringAsFixed(1);
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: const Text("Diary"),
         centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () => _navigateToLogbook(),
+              icon: const Icon(Icons.add_circle, size: 32,)
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: SafeArea(
-          child: Container(
-            color: Colors.grey.shade300,
-            child: Column(
-              children: [
-                Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              size: 32,
-                              Icons.chevron_left,
-                            ),
-                            onPressed: () {
+          child: Column(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            size: 32,
+                            Icons.chevron_left,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              selectedDate = selectedDate.subtract(const Duration(days: 1));
+                              _clearData();
+                              _getDiary(userId, DateFormat("yMd").format(selectedDate));
+                            });
+                          },
+                        ),
+
+                        Text(
+                          _formatDate(selectedDate),
+                          style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        IconButton(
+                          icon: const Icon(
+                            size: 32,
+                            Icons.chevron_right
+                          ),
+                          onPressed: () {
+                            DateTime displayDate = selectedDate.add(const Duration(days: 1));
+                            DateTime currentDate = DateTime.now();
+
+                            if (displayDate.isBefore(currentDate) ||
+                                DateTime(displayDate.year, displayDate.month, displayDate.day) ==
+                                    DateTime(currentDate.year, currentDate.month, currentDate.day)) {
                               setState(() {
-                                selectedDate = selectedDate.subtract(const Duration(days: 1));
-                                todayDiary = null;
-                                recommendedCalories = 0;
-                                consumedCalories = 0;
+                                selectedDate = displayDate;
+                                _clearData();
                                 _getDiary(userId, DateFormat("yMd").format(selectedDate));
                               });
-                            },
-                          ),
-
-                          Text(
-                            _formatDate(selectedDate),
-                            style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                          IconButton(
-                            icon: const Icon(
-                              size: 32,
-                              Icons.chevron_right
-                            ),
-                            onPressed: () {
-                              DateTime displayDate = selectedDate.add(const Duration(days: 1));
-                              DateTime currentDate = DateTime.now();
-
-                              if (displayDate.isBefore(currentDate) ||
-                                  DateTime(displayDate.year, displayDate.month, displayDate.day) ==
-                                      DateTime(currentDate.year, currentDate.month, currentDate.day)) {
-                                setState(() {
-                                  selectedDate = displayDate;
-                                  todayDiary = null;
-                                  recommendedCalories = 0;
-                                  consumedCalories = 0;
-                                  _getDiary(userId, DateFormat("yMd").format(selectedDate));
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                Card(
-                  elevation: 5,
-                  margin: const EdgeInsets.all(0),
-                  // margin: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(vertical: 16),
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Stack(
-                                  alignment: AlignmentDirectional.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 150,
-                                      height: 150,
-                                      child: CircularProgressIndicator(
-                                        value: progress,
-                                        strokeWidth: 10,
-                                        backgroundColor: Colors.green[100],
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-                                      ),
-                                    ),
-                                    Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                              "$remainingCalories",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                color: Colors.green,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
-                                              )
-                                          ),
-                                          Text(
-                                              'Remaining',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.green[400]
-                                              )
-                                          )
-                                        ]
-                                    ),
-                                  ]
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      "$consumedCalories",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.orange[700],
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      )
-                                  ),
-                                  Text(
-                                      'Consumed',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.orange[500]
-                                      )
-                                  )
-                                ]
-                            ),
-
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      "$burnedCalories",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.purple[800],
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold
-                                      )
-                                  ),
-                                  Text(
-                                      'Burned',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.purple[300]
-                                      )
-                                  )
-                                ]
-                            ),
-                          ],
-                        ),
-
-                        Container(
-                          margin: const EdgeInsets.only(top: 32),
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 50,
-                                      height: 50,
-                                      child: CircularProgressIndicator(
-                                        value: carbProgress,
-                                        strokeWidth: 10,
-                                        backgroundColor: Colors.brown[100],
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.brown),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 8),
-                                      child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                                "${remainingCarb}g",
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.brown,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                )
-                                            ),
-                                            Text(
-                                                'Carbohydrate',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.brown[400]
-                                                )
-                                            )
-                                          ]
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      width: 50,
-                                      height: 50,
-                                      child: CircularProgressIndicator(
-                                        value: proteinProgress,
-                                        strokeWidth: 10,
-                                        backgroundColor: Colors.pink[100],
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.pink),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 8),
-                                      child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                                "${remainingProtein}g",
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.pink,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                )
-                                            ),
-                                            Text(
-                                                'Protein',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.pink[400]
-                                                )
-                                            )
-                                          ]
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Expanded(
-                                flex: 1,
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: 50,
-                                      height: 50,
-                                      child: CircularProgressIndicator(
-                                        value: fatProgress,
-                                        strokeWidth: 10,
-                                        backgroundColor: Colors.blue[100],
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 8),
-                                      child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                                "${remainingFat}g",
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.blue,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                )
-                                            ),
-                                            Text(
-                                                'Fat',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: Colors.blue[400]
-                                                )
-                                            )
-                                          ]
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            }
+                          },
                         ),
                       ],
                     ),
                   ),
+                ],
+              ),
+
+              Card(
+                elevation: 5,
+                margin: const EdgeInsets.all(0),
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Stack(
+                                alignment: AlignmentDirectional.center,
+                                children: [
+                                  SizedBox(
+                                    width: 150,
+                                    height: 150,
+                                    child: CircularProgressIndicator(
+                                      value: progress,
+                                      strokeWidth: 10,
+                                      backgroundColor: Colors.green[100],
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                                    ),
+                                  ),
+                                  Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                            formattedCalorie,
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            )
+                                        ),
+                                        Text(
+                                            'Remaining',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.green[400]
+                                            )
+                                        )
+                                      ]
+                                  ),
+                                ]
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    "$consumedCalories",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.orange[700],
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                                Text(
+                                    'Consumed',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.orange[500]
+                                    )
+                                )
+                              ]
+                          ),
+
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                    "$burnedCalories",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.purple[800],
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold
+                                    )
+                                ),
+                                Text(
+                                    'Burned',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.purple[300]
+                                    )
+                                )
+                              ]
+                          ),
+                        ],
+                      ),
+
+                      Container(
+                        margin: const EdgeInsets.only(top: 32),
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(
+                                      value: carbProgress,
+                                      strokeWidth: 10,
+                                      backgroundColor: Colors.brown[100],
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.brown),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 8),
+                                    child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              "${formattedCarb}g",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.brown,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                          ),
+                                          Text(
+                                              'Carbohydrate',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.brown[400]
+                                              )
+                                          )
+                                        ]
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(
+                                      value: proteinProgress,
+                                      strokeWidth: 10,
+                                      backgroundColor: Colors.pink[100],
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.pink),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 8),
+                                    child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              "${formattedProtein}g",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.pink,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                          ),
+                                          Text(
+                                              'Protein',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.pink[400]
+                                              )
+                                          )
+                                        ]
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CircularProgressIndicator(
+                                      value: fatProgress,
+                                      strokeWidth: 10,
+                                      backgroundColor: Colors.blue[100],
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 8),
+                                    child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                              "${formattedFat}g",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                color: Colors.blue,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              )
+                                          ),
+                                          Text(
+                                              'Fat',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.blue[400]
+                                              )
+                                          )
+                                        ]
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ),
 
-                Column(
-                  children: [
-                    const SizedBox(height: 20,),
+              Column(
+                children: [
+                  const SizedBox(height: 20,),
 
-                    _buildMealSection(
-                        "Breakfast",
-                        breakfastMeals
-                    ),
+                  _buildMealSection(
+                      "Breakfast",
+                      breakfastMeals
+                  ),
 
-                    const SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
 
-                    _buildMealSection(
-                        "Lunch",
-                        lunchMeals
-                    ),
+                  _buildMealSection(
+                      "Lunch",
+                      lunchMeals
+                  ),
 
-                    const SizedBox(height: 20,),
+                  const SizedBox(height: 20,),
 
-                    _buildMealSection(
-                      "Dinner",
-                      dinnerMeals,
-                    ),
+                  _buildMealSection(
+                    "Dinner",
+                    dinnerMeals,
+                  ),
 
-                    const SizedBox(height: 20,),
-                  ],
-                )
-              ],
-            ),
+                  const SizedBox(height: 20,),
+                ],
+              )
+            ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () => _navigateToLogbook(),
-        child: const Icon(Icons.add, color: Colors.green,),
       ),
     );
   }
@@ -564,22 +599,27 @@ class _DiaryPageState extends State<DiaryPage> {
               itemCount: meals.length,
               itemBuilder: (context, index) {
                 final meal = meals[index];
+                debugPrint("What about here $meal");
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   title: Text(
                     meal.name ?? "",
                   ),
+                  subtitle: Text(
+                    "${meal.calorie}kcal",
+                    style: const TextStyle(
+                      color: Colors.lightGreen
+                    ),
+                  ),
                   trailing: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      _removeMeal(todayDiary?.id ?? "", meal.id ?? "");
+                    },
                     icon: Icon(
                       Icons.remove_circle,
                       color: Colors.grey.shade400,
                     ),
                   ),
-                  // trailing: ElevatedButton(
-                  //   onPressed: () {},
-                  //   child: const Icon(Icons.remove, size: 20),
-                  // ),
                 );
               },
               physics: const NeverScrollableScrollPhysics(),
