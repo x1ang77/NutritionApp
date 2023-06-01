@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nutrition_app/data/model/user.dart' as user_model;
-import '../data/model/diary.dart';
+import 'package:nutrition_app/data/repository/diary/diary_repository_impl.dart';
+import 'package:nutrition_app/ui/component/snackbar.dart';
+import '../core/custom_exception.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
@@ -15,21 +16,52 @@ class Logbook extends StatefulWidget {
 }
 
 class _LogbookState extends State<Logbook> {
-  List<Recipe> _allRecipes = [];
-  List<Recipe> _breakfastRecipes = [];
-  List<Recipe> _lunchRecipes = [];
+  final userRepo = UserRepoImpl();
+  final diaryRepo = DiaryRepoImpl();
+
+  var userId = "";
+  user_model.User? user;
+  List<String> meals = [];
+  final List<Recipe> _allRecipes = [];
+  final List<Recipe> _breakfastRecipes = [];
+  final List<Recipe> _lunchRecipes = [];
   List<Recipe> _dinnerRecipes = [];
-  List<String> _mealsId = [];
-  int _arraylength = 0;
   bool _isBreakfastExpanded = false;
   bool _isLunchExpanded = false;
   bool _isDinnerExpanded = false;
-  var repo = UserRepoImpl();
 
   @override
   void initState() {
     super.initState();
+    _getFirebaseUser();
+    _getUser(userId);
     getRecipe();
+  }
+
+  void _getFirebaseUser() {
+    try {
+      var firebaseUser = userRepo.getCurrentUser();
+      if (firebaseUser != null) {
+        setState(() {
+          userId = firebaseUser.uid;
+        });
+      } else {
+        throw CustomException("Can't fetch Firebase user data");
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future _getUser(String userId) async {
+    try {
+      var _user = await userRepo.getUserById(userId);
+      setState(() {
+        user = _user;
+      });
+    } catch (e) {
+      throw CustomException("Can't fetch user data");
+    }
   }
 
   Future getRecipe() async {
@@ -38,7 +70,6 @@ class _LogbookState extends State<Logbook> {
     for (var item in querySnapshot.docs) {
       var data = item.data();
       var recipe = Recipe.fromMap(data);
-      // debugPrint("${recipe.image?[0]}");
       setState(() {
         if (recipe.mealTime == "Breakfast") {
           _breakfastRecipes.add(recipe);
@@ -54,68 +85,83 @@ class _LogbookState extends State<Logbook> {
     }
   }
 
-  _pushToMealsId(String id) {
-    _mealsId.add(id);
-    setState(() {
-      _arraylength = _mealsId.length;
-    });
-  }
-
-  _addToDiaries() async {
-    var firebaseUser = await FirebaseAuth.instance.currentUser;
-    var currentUser = await repo.getUserById(firebaseUser!.uid);
-    var timeStamp = DateTime.now();
-    var date = DateFormat.yMd().format(timeStamp);
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-    CollectionReference diaries = firestore.collection("diaries");
-
-    // Check if a diary with the same timestamp and userId already exists
-    var querySnapshot = await diaries
-        .where('date', isEqualTo: date)
-        .where('user_id', isEqualTo: currentUser?.id)
-        .limit(1)
-        .get();
-    debugPrint("${querySnapshot.docs}");
-    if (querySnapshot.docs.isEmpty) {
-      var id = diaries.doc().id;
-
-      var diaryData = Diary(
-        date: date,
-        id: id,
-        userId: currentUser?.id,
-        breakfast: _mealsId[0],
-        lunch: _mealsId[1],
-        dinner: _mealsId[2],
-        caloriesGoals: currentUser?.calorieGoal,
-      ).toMap(); // Convert Diary object to Map
-
-      diaries.doc(id).set(diaryData);
+  Future _addMealToList(String id, Recipe recipe) async {
+    try {
+      var date = DateFormat.yMd().format(DateTime.now());
+      setState(() {
+        meals.add(id);
+      });
+      await diaryRepo.addToDiary(
+          userId, date, meals,
+          user?.calorieGoal ?? 0.0, user?.carbGoal ?? 0.0,
+          user?.proteinGoal ?? 0.0, user?.fatGoal ?? 0.0,
+          id
+      );
+      setState(() {
+        showSnackbar(context, "Added meal to diary", Colors.green);
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+      showSnackbar(context, "Failed to add meal to diary", Colors.red);
     }
   }
+
+  // _addToDiaries() async {
+  //   var firebaseUser = await FirebaseAuth.instance.currentUser;
+  //   var currentUser = await userRepo.getUserById(firebaseUser!.uid);
+  //   var timeStamp = DateTime.now();
+  //   var date = DateFormat.yMd().format(timeStamp);
+  //   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //   CollectionReference diaries = firestore.collection("diaries");
+  //
+  //   // Check if a diary with the same timestamp and userId already exists
+  //   var querySnapshot = await diaries
+  //       .where('date', isEqualTo: date)
+  //       .where('user_id', isEqualTo: currentUser?.id)
+  //       .limit(1)
+  //       .get();
+  //   debugPrint("${querySnapshot.docs}");
+  //   if (querySnapshot.docs.isEmpty) {
+  //     var id = diaries.doc().id;
+  //
+  //     var diaryData = Diary(
+  //       date: date,
+  //       id: id,
+  //       userId: currentUser?.id,
+  //       // breakfast: _mealsId[0],
+  //       // lunch: _mealsId[1],
+  //       // dinner: _mealsId[2],
+  //       caloriesGoal: currentUser?.calorieGoal,
+  //     ).toMap(); // Convert Diary object to Map
+  //
+  //     diaries.doc(id).set(diaryData);
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Logbook")),
+      backgroundColor: Colors.grey.shade300,
+      appBar: AppBar(title: const Text("Meals"), centerTitle: true,),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
+            const Padding(
+              padding: EdgeInsets.all(16),
               child: Text(
-                "Welcome to your Logbook!",
+                "Welcome to your meals!",
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                "Please log your meals for each time of the day:",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                "There is a variety to choose from:",
+                style: TextStyle(fontSize: 16),
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildMealTimeSection(
               "Breakfast",
               _breakfastRecipes,
@@ -146,21 +192,7 @@ class _LogbookState extends State<Logbook> {
                 });
               },
             ),
-            SizedBox(height: 16),
-            Center(
-              child: _arraylength > 2
-                  ? ElevatedButton(
-                      onPressed: () => _addToDiaries(),
-                      child: Text("Add to Diaries"),
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    )
-                  : Container(),
-            ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -172,23 +204,23 @@ class _LogbookState extends State<Logbook> {
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "1. Tap on each meal time section to expand and view available recipes.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16),
               ),
             ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 "2. Tap on the '+' icon next to a recipe to add it to your diaries.",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "*Add only one meal for each time of day.",
-                style: TextStyle(fontSize: 16, color: Colors.red),
-              ),
-            ),
+            // const Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 16),
+            //   child: Text(
+            //     "*Add only one meal for each time of day.",
+            //     style: TextStyle(fontSize: 16, color: Colors.red),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -201,25 +233,30 @@ class _LogbookState extends State<Logbook> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
+          margin: const EdgeInsets.all(0),
           elevation: isExpanded ? 4 : 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          child: ListTile(
-            title: Text(
-              title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          // shape: RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.circular(10.0),
+          // ),
+          child: Container(
+            color: Colors.lightGreen,
+            child: ListTile(
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              trailing: Icon(
+                isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                size: 30,
+              ),
+              onTap: onTap,
             ),
-            trailing: Icon(
-              isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              size: 30,
-            ),
-            onTap: onTap,
           ),
         ),
 
         if (isExpanded)
-          ListView.separated(
+          recipes.isNotEmpty
+          ? ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: recipes.length,
@@ -232,14 +269,14 @@ class _LogbookState extends State<Logbook> {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 title: Text(
                   recipe.name ?? "",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(
                   children: [
                     const Icon(Icons.local_fire_department,
                         size: 16, color: Colors.deepOrange),
                     const SizedBox(width: 4),
-                    Container(
+                    SizedBox(
                       width: 250, // Set the desired width
                       child: Text(
                         "${recipe.calorie} kcal | ${recipe.carb} g | ${recipe.protein} g | ${recipe.fat}g",
@@ -250,9 +287,10 @@ class _LogbookState extends State<Logbook> {
                   ],
                 ),
                 trailing: ElevatedButton.icon(
-                  onPressed: () => _pushToMealsId(recipe.id!),
-                  icon: Icon(Icons.add_rounded, size: 20),
-                  label: Text("Add"),
+                  // onPressed: () => _pushToMealsId(recipe.id!),
+                  onPressed: () => _addMealToList(recipe.id ?? "", recipe),
+                  icon: const Icon(Icons.add_rounded, size: 20),
+                  label: const Text("Add"),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0)),
@@ -261,6 +299,13 @@ class _LogbookState extends State<Logbook> {
                 ),
               );
             },
+          ) : const ListTile(
+            tileColor: Colors.white,
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            title: Text(
+              "No meals available",
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
       ],
     );
