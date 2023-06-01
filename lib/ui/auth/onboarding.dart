@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +19,11 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-  var repo = UserRepoImpl();
+  var userRepo = UserRepoImpl();
   user_model.User? _user;
+  File? imageFile;
+  String? fileName;
+
   final _ageController = TextEditingController();
   final _genderController = TextEditingController();
   final _heightController = TextEditingController();
@@ -99,7 +104,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
   @override
   void initState() {
     super.initState();
-    debugPrint("did I get the image ${widget.object["imageFile"]}");
+    _getFileName();
     getUser();
   }
 
@@ -114,13 +119,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   Future<void> getUser() async {
     User? user = FirebaseAuth.instance.currentUser;
-    var currentUser = await repo.getUserById(user!.uid);
+    var currentUser = await userRepo.getUserById(user!.uid);
     setState(() {
       _user = currentUser;
     });
   }
 
-  _navigateToHome() {
+  void _navigateToHome() {
     context.go("/home");
   }
 
@@ -144,7 +149,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       lastName: _user!.lastName,
       email: _user!.email,
       password: _user!.password,
-      image: _user!.image,
+      image: fileName,
       gender: gender,
       diet: diet,
       age: int.tryParse(age),
@@ -154,6 +159,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
 
     try {
+      debugPrint("url $fileName");
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user?.uid)
@@ -163,6 +169,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
         'diet': updatedUser.diet,
         'height': updatedUser.height,
         'weight': updatedUser.weight,
+        'image': updatedUser.image,
         'completed_onboarding': updatedUser.completedOnboarding,
       });
 
@@ -174,6 +181,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
     } catch (error) {
       // Handle any errors that occurred during the saving process
       debugPrint('Error saving user information: $error');
+    }
+  }
+
+  Future<void> _getFileName() async {
+    try {
+      var imageFile = widget.object["imageFile"];
+      var image = File(imageFile.path);
+      var _fileName = await userRepo.saveImageInStorage(image);
+      setState(() {
+        fileName = _fileName;
+      });
+    } catch (error) {
+      debugPrint("Error getting the download URL from storage: $error");
     }
   }
 

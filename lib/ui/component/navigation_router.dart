@@ -28,7 +28,6 @@ class NavRouter extends StatelessWidget {
     GoRoute(path: "/favorite", builder: (context, state) => const Favourite()),
     GoRoute(path: "/forgot", builder: (context, state) => const ForgotPasswordPage()),
     GoRoute(path: "/image", builder: (context, state) => const ImagePage()),
-    // GoRoute(path: "/onboarding", builder: (context, state) => const OnboardingPage()),
     GoRoute(path: "/onboarding", name: "image", builder: (context, state) {
       Map<String, dynamic> extras = state.extra as Map<String, dynamic>;
       return OnboardingPage(object: extras,);

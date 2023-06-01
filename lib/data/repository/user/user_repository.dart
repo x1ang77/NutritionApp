@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:nutrition_app/data/model/user.dart' as user_model;
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -8,5 +10,6 @@ abstract class UserRepo {
   User? getCurrentUser();
   Future<user_model.User?> getUserById(String userId);
   Future<void> updateUserProfile(String userId, String image);
+  Future<String?> saveImageInStorage(File imageFile);
   Future<void> logout();
 }
