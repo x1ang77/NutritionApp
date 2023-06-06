@@ -125,26 +125,27 @@ class _DiaryPageState extends State<DiaryPage> {
       var meal = await recipeRepo.getRecipe(index);
       setState(() {
         if (meal.mealTime == "Breakfast") {
-          consumedCalories += meal.calorie;
-          carbConsumed += meal.carb;
-          proteinConsumed += meal.protein;
-          fatConsumed += meal.fat;
-          breakfastMeals.clear();
+          // breakfastMeals.clear();
           breakfastMeals.add(meal);
+          debugPrint("how many ${breakfastMeals.length} and inside ${meal.name}");
+          consumedCalories += meal.calorie;
+          carbConsumed += meal.carb;
+          proteinConsumed += meal.protein;
+          fatConsumed += meal.fat;
         } else if (meal.mealTime == "Lunch") {
-          consumedCalories += meal.calorie;
-          carbConsumed += meal.carb;
-          proteinConsumed += meal.protein;
-          fatConsumed += meal.fat;
-          lunchMeals.clear();
+          // lunchMeals.clear();
           lunchMeals.add(meal);
-        } else {
           consumedCalories += meal.calorie;
           carbConsumed += meal.carb;
           proteinConsumed += meal.protein;
           fatConsumed += meal.fat;
-          dinnerMeals.clear();
+        } else {
+          // dinnerMeals.clear();
           dinnerMeals.add(meal);
+          consumedCalories += meal.calorie;
+          carbConsumed += meal.carb;
+          proteinConsumed += meal.protein;
+          fatConsumed += meal.fat;
         }
       });
     }
@@ -162,7 +163,7 @@ class _DiaryPageState extends State<DiaryPage> {
         carbConsumed -= meal.carb;
         proteinConsumed -= meal.protein;
         fatConsumed -= meal.fat;
-        showSnackbar(context, "Removed meal from diary", Colors.grey);
+        showSnackbar(context, "Removed ${meal.name} from diary", Colors.grey);
       });
     } catch (e) {
       debugPrint(e.toString());

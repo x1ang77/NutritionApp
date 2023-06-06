@@ -27,11 +27,11 @@ class _RecipePageState extends State<RecipePage> {
     getRecipe();
   }
 
-  _navigateToDetails(String id) {
+  void _navigateToDetails(String id) {
     context.pushNamed("id", pathParameters: {"id": id});
   }
 
-  Future getRecipe() async {
+  Future<void> getRecipe() async {
     var collection = FirebaseFirestore.instance.collection("recipes");
     var querySnapshot = await collection.get();
     for (var item in querySnapshot.docs) {
@@ -51,7 +51,7 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
-  _addToFavourite(String id) async {
+  Future<void> _addToFavourite(String id) async {
     var userId = FirebaseAuth.instance.currentUser?.uid;
 
     if (userId != null) {
