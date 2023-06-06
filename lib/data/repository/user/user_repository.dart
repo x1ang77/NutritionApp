@@ -11,5 +11,6 @@ abstract class UserRepo {
   Future<user_model.User?> getUserById(String userId);
   Future<void> updateUserProfile(String userId, String image);
   Future<String?> saveImageInStorage(File imageFile);
+  Future<bool> checkFavorite(String userId, String mealId);
   Future<void> logout();
 }

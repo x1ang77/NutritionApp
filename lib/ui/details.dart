@@ -28,7 +28,7 @@ class _DetailsState extends State<Details> {
   List<String> meals = [];
   bool isLoading = false;
 
-  Future getUser() async {
+  Future<void> getUser() async {
     isLoading = true;
     User? user = FirebaseAuth.instance.currentUser;
     var currentUser = await userRepo.getUserById(user?.uid ?? "");
@@ -45,7 +45,7 @@ class _DetailsState extends State<Details> {
     getUser();
   }
 
-  Future getRecipeById() async {
+  Future<void> getRecipeById() async {
     try {
       var _recipe = await recipeRepo.getRecipe(widget.id);
       setState(() {
@@ -56,11 +56,11 @@ class _DetailsState extends State<Details> {
     }
   }
 
-  _navigateToRecipe() {
+  void _navigateToRecipe() {
     context.pop();
   }
 
-  Future _addMealToDiary(String id) async {
+  Future<void> _addMealToDiary(String id) async {
     try {
       var date = DateFormat.yMd().format(DateTime.now());
       setState(() {
@@ -149,24 +149,45 @@ class _DetailsState extends State<Details> {
     );
   }
 
-  _addToFavourite(String id) async {
-    var user = FirebaseAuth.instance.currentUser?.uid;
+  Future<void> _addToFavourite(String id) async {
+    var userId = FirebaseAuth.instance.currentUser?.uid;
 
-    if (user != null) {
+    if (userId != null) {
       DocumentReference documentRef =
-      FirebaseFirestore.instance.collection("users").doc(user);
-      // Retrieve the document
-      var documentSnapshot = await userRepo.getUserById(user);
-      if (documentSnapshot != null) {
-        var array = documentSnapshot.favourite;
-        if (array != null) {
-          if (!array.contains(id)) {
-            documentRef.update({
-              'favourite': FieldValue.arrayUnion([id])
-            });
-          }
-        }
+      FirebaseFirestore.instance.collection("users").doc(userId);
+
+      final mealExists = await userRepo.checkFavorite(userId, id);
+      if (mealExists) {
+        setState(() {
+          showSnackbar(context, "Recipe already in favorites", Colors.yellow.shade700);
+        });
+      } else {
+        documentRef.update({
+          'favourite': FieldValue.arrayUnion([id])
+        });
+        setState(() {
+          showSnackbar(context, "Recipe added to favorites", Colors.green);
+        });
       }
+
+      // var documentSnapshot = await userRepo.getUserById(userId);
+      // if (documentSnapshot != null) {
+      //   var array = documentSnapshot.favourite;
+      //   if (array != null) {
+      //     if (!array.contains(id)) {
+      //       documentRef.update({
+      //         'favourite': FieldValue.arrayUnion([id])
+      //       });
+      //       setState(() {
+      //         showSnackbar(context, "Recipe added to favorites", Colors.green);
+      //       });
+      //     } else {
+      //       setState(() {
+      //         showSnackbar(context, "Recipe already in favorites", Colors.yellow.shade700);
+      //       });
+      //     }
+      //   }
+      // }
     }
   }
 

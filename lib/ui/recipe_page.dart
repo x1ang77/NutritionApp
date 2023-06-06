@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:nutrition_app/ui/component/snackbar.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
 
@@ -18,7 +19,7 @@ class _RecipePageState extends State<RecipePage> {
   final List<Recipe> _lunchRecipes = [];
   final List<Recipe> _dinnerRecipes = [];
   int _index = 0;
-  var repo = UserRepoImpl();
+  var userRepo = UserRepoImpl();
 
   @override
   void initState() {
@@ -50,23 +51,25 @@ class _RecipePageState extends State<RecipePage> {
     }
   }
 
-  // Add snackbar if user has already bookmarked
   _addToFavourite(String id) async {
-    var user = FirebaseAuth.instance.currentUser?.uid;
+    var userId = FirebaseAuth.instance.currentUser?.uid;
 
-    DocumentReference documentRef =
-        FirebaseFirestore.instance.collection("users").doc(user);
-    // Retrieve the document
-    var documentSnapshot = await repo.getUserById(user!);
+    if (userId != null) {
+      DocumentReference documentRef =
+      FirebaseFirestore.instance.collection("users").doc(userId);
 
-    if (documentSnapshot != null) {
-      var array = documentSnapshot.favourite;
-      if (array != null) {
-        if (!array.contains(id)) {
-          documentRef.update({
-            'favourite': FieldValue.arrayUnion([id])
-          });
-        }
+      final mealExists = await userRepo.checkFavorite(userId, id);
+      if (mealExists) {
+        setState(() {
+          showSnackbar(context, "Recipe already in favorites", Colors.yellow.shade700);
+        });
+      } else {
+        documentRef.update({
+          'favourite': FieldValue.arrayUnion([id])
+        });
+        setState(() {
+          showSnackbar(context, "Recipe added to favorites", Colors.green);
+        });
       }
     }
   }
