@@ -116,6 +116,21 @@ class UserRepoImpl extends UserRepo {
   }
 
   @override
+  Future<bool> checkFavorite(String userId, String mealId) async {
+    try {
+      var querySnapshot = await collection
+          .where("id", isEqualTo: userId)
+          .where("favourite", arrayContains: mealId)
+          .get();
+      debugPrint("result $querySnapshot");
+      return querySnapshot.docs.isNotEmpty;
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
   Future<void> logout() async {
     try {
       await FirebaseAuth.instance.signOut();

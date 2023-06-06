@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:nutrition_app/data/model/diary.dart';
 import 'package:nutrition_app/data/repository/diary/diary_repository.dart';
 
+import '../../../core/custom_exception.dart';
+
 class DiaryRepoImpl extends DiaryRepo {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final collection = FirebaseFirestore.instance.collection("diaries");
@@ -64,6 +66,22 @@ class DiaryRepoImpl extends DiaryRepo {
     try {
       final documentRef = collection.doc(diaryId);
       await documentRef.update({'meals': FieldValue.arrayRemove([mealId])});
+    } catch (e) {
+      debugPrint(e.toString());
+      throw Exception(e.toString());
+    }
+  }
+
+  @override
+  Future<bool> checkMealInDiary(String userId, String date, String mealId) async {
+    try {
+      var querySnapshot = await collection
+          .where("user_id", isEqualTo: userId)
+          .where("date", isEqualTo: date)
+          .where("meals", arrayContains: mealId)
+          .get();
+      debugPrint("result $querySnapshot");
+      return querySnapshot.docs.isNotEmpty;
     } catch (e) {
       debugPrint(e.toString());
       throw Exception(e.toString());

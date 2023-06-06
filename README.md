@@ -1,9 +1,12 @@
+# Project by Chong Mun Chen, Phua Yan Han, and Chuay Xiang Ze
+
 # Foodsense Nutrition App
 
 A nutrition app built using Flutter.
 
 ## Overview
-The app lets users quickly pull up nutritional information of food, find workouts, and track calories and macronutrients. Users also can create personalized diet plans, get diet tips and suggestions for healthier foods and recipes.
+The app lets users quickly pull up nutritional information of food, find workouts, and track calories and macronutrients. 
+Users also can create personalized diet plans, get diet tips and suggestions for healthier foods and recipes.
 
 ## Features
 - Allow users to personalize their profile and diet plan.

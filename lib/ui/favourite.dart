@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:nutrition_app/ui/component/snackbar.dart';
 import '../custom_icons.dart';
 import '../data/model/recipe.dart';
 import '../data/repository/user/user_repository_impl.dart';
@@ -34,28 +36,31 @@ class _FavouriteState extends State<Favourite> {
     getRecipe();
   }
 
-  // Show snackbar when bookmark has been deleted
-  _deleteFavourite(String id) async {
-    var user = FirebaseAuth.instance.currentUser?.uid;
+  void _navigateToDetails(String id) {
+    context.pushNamed("id", pathParameters: {"id": id});
+  }
 
-    DocumentReference documentRef =
-        FirebaseFirestore.instance.collection("users").doc(user);
-    // Retrieve the document
-    var documentSnapshot = await repo.getUserById(user!);
+  Future<void> _deleteFavourite(String id) async {
+    var userId = FirebaseAuth.instance.currentUser?.uid;
 
-    if (documentSnapshot != null) {
-      documentRef.update({
-        'favourite': FieldValue.arrayRemove([id])
-      }).then((_) {
+    if (userId != null) {
+      DocumentReference documentRef =
+      FirebaseFirestore.instance.collection("users").doc(userId);
+      var documentSnapshot = await repo.getUserById(userId);
+      if (documentSnapshot != null) {
+        documentRef.update({
+          'favourite': FieldValue.arrayRemove([id])
+        });
         setState(() {
           _allRecipes.removeWhere((recipe) => recipe.id == id);
           _filteredRecipes.removeWhere((recipe) => recipe.id == id);
+          showSnackbar(context, "Recipe removed from favorites", Colors.grey);
         });
-      });
+      }
     }
   }
 
-  Future getRecipe() async {
+  Future<void> getRecipe() async {
     var user = FirebaseAuth.instance.currentUser?.uid;
     var currentUser = await repo.getUserById(user!);
     var collection = FirebaseFirestore.instance.collection("recipes");
@@ -83,14 +88,14 @@ class _FavouriteState extends State<Favourite> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.grey),),
             ),
             TextButton(
               onPressed: () {
-                _deleteFavourite(recipe.id!);
+                _deleteFavourite(recipe.id);
                 Navigator.pop(context);
               },
-              child: Text('Delete'),
+              child: Text('Delete', style: TextStyle(color: Colors.red),),
             ),
           ],
         );
@@ -217,7 +222,7 @@ class _FavouriteState extends State<Favourite> {
           break;
         case SortType.CalorieCount:
           _allRecipes
-              .sort((a, b) => (a.calorie ?? 0).compareTo(b.calorie ?? 0));
+              .sort((a, b) => (a.calorie).compareTo(b.calorie));
           break;
       }
 
@@ -350,46 +355,50 @@ class _FavouriteState extends State<Favourite> {
               itemCount: _filteredRecipes.length,
               itemBuilder: (context, index) {
                 final allRecipe = _filteredRecipes[index];
-                return Card(
-                  color: Color(0xFFFBFBF8),
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  // Adjust margin as needed
-                  elevation: 4,
-                  // Add elevation for a raised appearance
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(10), // Add rounded corners
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
-                    title: Text(allRecipe.name),
-                    subtitle: Row(
-                      children: [
-                        Icon(Icons.local_fire_department,
-                            size: 16, color: Colors.grey),
-                        // Add an icon to represent kcal
-                        SizedBox(width: 4),
-                        Text("${allRecipe.calorie} kcal",
-                            style: TextStyle(fontSize: 12)),
-                        // Show the calories value
-                        SizedBox(width: 8),
-                        // Show the grams value
-                      ],
+                return GestureDetector(
+                  onTap: () { _navigateToDetails(allRecipe.id); },
+                  child: Card(
+                    color: Color(0xFFFBFBF8),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    // Adjust margin as needed
+                    elevation: 4,
+                    // Add elevation for a raised appearance
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(10), // Add rounded corners
                     ),
-                    trailing: GestureDetector(
-                      onTap: () => _showDeleteConfirmationDialog(allRecipe),
-                      child: const Icon(
-                        CustomIcons.trash,
-                        color: Colors.grey,
-                        size: 20,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 16),
+                      title: Text(allRecipe.name),
+                      subtitle: Row(
+                        children: [
+                          Icon(Icons.local_fire_department,
+                              size: 16, color: Colors.grey),
+                          // Add an icon to represent kcal
+                          SizedBox(width: 4),
+                          Text("${allRecipe.calorie} kcal",
+                              style: TextStyle(fontSize: 12)),
+                          // Show the calories value
+                          SizedBox(width: 8),
+                          // Show the grams value
+                        ],
+                      ),
+                      trailing: GestureDetector(
+                        onTap: () => _showDeleteConfirmationDialog(allRecipe),
+                        child: const Icon(
+                          CustomIcons.trash,
+                          color: Colors.grey,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
                 );
               },
-            )
+            ),
+            SizedBox(height: 20),
           ],
         ),
       ),
