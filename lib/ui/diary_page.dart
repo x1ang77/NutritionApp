@@ -162,7 +162,7 @@ class _DiaryPageState extends State<DiaryPage> {
         carbConsumed -= meal.carb;
         proteinConsumed -= meal.protein;
         fatConsumed -= meal.fat;
-        showSnackbar(context, "Removed meal from diary", Colors.green);
+        showSnackbar(context, "Removed meal from diary", Colors.grey);
       });
     } catch (e) {
       debugPrint(e.toString());

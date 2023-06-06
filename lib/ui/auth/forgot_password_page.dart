@@ -26,12 +26,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
       setState(() {
         // showDialog(context: context, barrierDismissible: false, builder: (context) => const Center(child: CircularProgressIndicator()));
-        showSnackbar(context, "Password reset email sent.", Colors.yellow);
+        showSnackbar(context, "Password reset email sent.", Colors.yellow.shade700);
         context.pop();
       });
     } on FirebaseAuthException catch (e) {
       debugPrint(e.toString());
-      showSnackbar(context, e.message.toString(), Colors.yellow);
+      showSnackbar(context, e.message.toString(), Colors.red);
       Navigator.of(context).pop();
     }
   }

@@ -66,18 +66,25 @@ class _DetailsState extends State<Details> {
       setState(() {
         meals.add(id);
       });
-      await diaryRepo.addToDiary(
-          _user?.id ?? "",
-          date,
-          meals,
-          _user?.calorieGoal ?? 0.0,
-          _user?.carbGoal ?? 0.0,
-          _user?.proteinGoal ?? 0.0,
-          _user?.fatGoal ?? 0.0,
-          id);
-      setState(() {
-        showSnackbar(context, "Added meal to diary", Colors.green);
-      });
+      final mealExists = await diaryRepo.checkMealInDiary(_user?.id ?? "", date, id);
+      if (mealExists) {
+        setState(() {
+          showSnackbar(context, "Meal already exists in diary", Colors.yellow.shade700);
+        });
+      } else {
+        await diaryRepo.addToDiary(
+            _user?.id ?? "",
+            date,
+            meals,
+            _user?.calorieGoal ?? 0.0,
+            _user?.carbGoal ?? 0.0,
+            _user?.proteinGoal ?? 0.0,
+            _user?.fatGoal ?? 0.0,
+            id);
+        setState(() {
+          showSnackbar(context, "Added meal to diary", Colors.green);
+        });
+      }
     } catch (e) {
       debugPrint(e.toString());
       showSnackbar(context, "Failed to add meal to diary", Colors.red);

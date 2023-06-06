@@ -22,7 +22,6 @@ class _MealPageState extends State<MealPage> {
   var userId = "";
   user_model.User? user;
   List<String> meals = [];
-  // final List<Recipe> _allRecipes = [];
   final List<Recipe> _breakfastRecipes = [];
   final List<Recipe> _lunchRecipes = [];
   final List<Recipe> _dinnerRecipes = [];
@@ -80,7 +79,6 @@ class _MealPageState extends State<MealPage> {
         if (recipe.mealTime == "Dinner") {
           _dinnerRecipes.add(recipe);
         }
-        // _allRecipes.add(recipe);
       });
     }
   }
@@ -91,15 +89,22 @@ class _MealPageState extends State<MealPage> {
       setState(() {
         meals.add(id);
       });
-      await diaryRepo.addToDiary(
-          userId, date, meals,
-          user?.calorieGoal ?? 0.0, user?.carbGoal ?? 0.0,
-          user?.proteinGoal ?? 0.0, user?.fatGoal ?? 0.0,
-          id
-      );
-      setState(() {
-        showSnackbar(context, "Added meal to diary", Colors.green);
-      });
+      final mealExists = await diaryRepo.checkMealInDiary(userId, date, id);
+      if (mealExists) {
+        setState(() {
+          showSnackbar(context, "Meal already exists in diary", Colors.yellow.shade700);
+        });
+      } else {
+        await diaryRepo.addToDiary(
+            userId, date, meals,
+            user?.calorieGoal ?? 0.0, user?.carbGoal ?? 0.0,
+            user?.proteinGoal ?? 0.0, user?.fatGoal ?? 0.0,
+            id
+        );
+        setState(() {
+          showSnackbar(context, "Added meal to diary", Colors.green);
+        });
+      }
     } catch (e) {
       debugPrint(e.toString());
       showSnackbar(context, "Failed to add meal to diary", Colors.red);
@@ -182,6 +187,7 @@ class _MealPageState extends State<MealPage> {
                 style: TextStyle(fontSize: 16),
               ),
             ),
+            const SizedBox(height: 16),
             // const Padding(
             //   padding: EdgeInsets.symmetric(horizontal: 16),
             //   child: Text(
@@ -207,7 +213,7 @@ class _MealPageState extends State<MealPage> {
           //   borderRadius: BorderRadius.circular(10.0),
           // ),
           child: Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.lightGreen, // Add your desired color here
             ),
             child: ListTile(
